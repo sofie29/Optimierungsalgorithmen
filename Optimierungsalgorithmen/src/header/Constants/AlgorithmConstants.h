@@ -9,4 +9,6 @@ namespace AlgorithmConstants {
 	static const int initialEdgeSize_ = 50;
 
 	static const int maxBoxEdgeSize_ = 2 * maxRectangleEdgeSize_;
+
+	static const int  maxIterations = 1000000;
 }
