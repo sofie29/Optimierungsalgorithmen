@@ -4,6 +4,7 @@
 #include "MainScene.h"
 #include "RectangleDrawer.h"
 #include "stdafx.h"
+#include "BoundingBox.h"
 
 
 Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
@@ -32,8 +33,11 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     leftDock_->setFixedSize(UIConstants::leftDockWidth_, UIConstants::leftDockHeight_);
     leftDock_->setWidget(algoSelectionUI_);
     this->addDockWidget(Qt::LeftDockWidgetArea, leftDock_);
-    
-    
+
+    /* testing tryFit */
+    BoundingBox::add(10, 10);
+    BoundingBox::add(9, 11);
+    BoundingBox::add(11, 9);
 }
 
 Optimierungsalgorithmen::~Optimierungsalgorithmen()
