@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_Optimierungsalgorithmen.h"
-
+#include "RuleBasedNeighbour.h"
 class Optimierungsalgorithmen : public QMainWindow
 {
     Q_OBJECT
@@ -18,5 +18,9 @@ private:
     class MainScene* mainScene_;
     class MainWindow* mainWindow_;
     class AlgorithmSelectionUI* algoSelectionUI_;
-    
+
+    std::shared_ptr<class DataHolder> dataHolder_;
+    RuleBasedNeighbour<class DataHolder*>* ruleBasedNeighbour_;
+    //std::shared_ptr<class QNeighbourWrapper*> neighbourWrapper_;
+    class QNeighbourWrapper* neighbourWrapper_;
 };

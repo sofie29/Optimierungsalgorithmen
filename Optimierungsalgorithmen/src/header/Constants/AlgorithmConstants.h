@@ -5,10 +5,11 @@ namespace AlgorithmConstants {
 	static const int maxRectangleEdgeSize_ = 50;
 	static const int minRectangleEdgeSize_ = 10;
 
-	static const int initialAmount_ = 1;
+	static const int initialAmount_ = 10;
 	static const int initialEdgeSize_ = 50;
 
 	static const int maxBoxEdgeSize_ = 2 * maxRectangleEdgeSize_;
+	static const int initialBoxEdgeSize_ = initialEdgeSize_;
 
 	static const int  maxIterations = 1000000;
 }

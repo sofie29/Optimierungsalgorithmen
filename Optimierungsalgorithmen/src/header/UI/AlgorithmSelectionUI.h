@@ -10,6 +10,14 @@ public:
 	QSlider* getRecMaxSizeSlider() const;
 	QLineEdit* getRecAmountLineEdit() const;
 	QLineEdit* getRecMaxSizeLineEdit() const;
+
+	QSlider* getBoxEdgeSlider() const;
+	QLineEdit* getBoxEdgeLineEdit() const;
+signals:
+	void OnValueChanged();
+public slots:
+	void ValueChangedI(int dummy);
+	void ValueChangedS(QString dummy);
 private:
 	QBoxLayout* layout_;
 	QGridLayout* gridLayout_;

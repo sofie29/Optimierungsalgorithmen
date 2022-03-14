@@ -7,6 +7,8 @@ public:
 	MainScene(QMainWindow* win);
 	~MainScene();
 	class RectangleDrawer* getRecDrawer() const;
+	class BoundingBoxDrawer* getBoxDrawer() const;
+	class Drawer* getDrawer() const;
 protected:
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* mouseEvent) override;
@@ -15,5 +17,5 @@ signals:
 public slots:
 	void DrawRect(QPointF p);
 private:
-	class RectangleDrawer* recDrawer_;
+	class Drawer* drawer_;
 };

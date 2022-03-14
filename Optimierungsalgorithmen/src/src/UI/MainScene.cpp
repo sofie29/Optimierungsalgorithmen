@@ -1,21 +1,34 @@
 #include "MainScene.h"
 #include "RectangleDrawer.h"
+#include "BoundingBoxDrawer.h"
+#include "Drawer.h"
 MainScene::MainScene(QMainWindow* win) : QGraphicsScene(win) {
 	
 	//connect(this, &MainScene::Clicked, this, &MainScene::DrawRect);
 	
-	recDrawer_ = new RectangleDrawer(this);
 
+	drawer_ = new Drawer(this);
 }
 MainScene::~MainScene()
 {
-	delete recDrawer_;
-	recDrawer_ = nullptr;
+
+	delete drawer_;
+	drawer_ = nullptr;
 }
 
 RectangleDrawer* MainScene::getRecDrawer() const
 {
-	return recDrawer_;
+	return drawer_->getRectDrawer();
+}
+
+BoundingBoxDrawer* MainScene::getBoxDrawer() const
+{
+	return drawer_->getBBoxDrawer();
+}
+
+Drawer* MainScene::getDrawer() const
+{
+	return drawer_;
 }
 
 void MainScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) 

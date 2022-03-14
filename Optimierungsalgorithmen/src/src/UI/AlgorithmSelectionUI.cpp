@@ -74,6 +74,16 @@ AlgorithmSelectionUI::AlgorithmSelectionUI()
 	connect(boxSizeSlider_, &QSlider::valueChanged, boxSizeLineEdit_, [=]() {boxSizeLineEdit_->setText(QString::number(boxSizeSlider_->value())); });
 	connect(boxSizeLineEdit_, &QLineEdit::textChanged, boxSizeSlider_, [=]() {boxSizeSlider_->setValue(boxSizeLineEdit_->text().toInt()); });
 
+	
+	connect(this->getRecAmountSlider(), &QSlider::valueChanged, this, &AlgorithmSelectionUI::ValueChangedI);
+	connect(this->getRecAmountLineEdit(), &QLineEdit::textChanged, this, &AlgorithmSelectionUI::ValueChangedS);
+
+	connect(this->getRecMaxSizeSlider(), &QSlider::valueChanged, this, &AlgorithmSelectionUI::ValueChangedI);
+	connect(this->getRecMaxSizeLineEdit(), &QLineEdit::textChanged, this, &AlgorithmSelectionUI::ValueChangedS);
+
+	connect(this->getBoxEdgeSlider(), &QSlider::valueChanged, this, &AlgorithmSelectionUI::ValueChangedI);
+	connect(this->getBoxEdgeLineEdit(), &QLineEdit::textChanged, this, &AlgorithmSelectionUI::ValueChangedS);
+	
 }
 
 AlgorithmSelectionUI::~AlgorithmSelectionUI()
@@ -130,4 +140,23 @@ QLineEdit* AlgorithmSelectionUI::getRecAmountLineEdit() const
 QLineEdit* AlgorithmSelectionUI::getRecMaxSizeLineEdit() const
 {
 	return recMaxSizeAltInput_;
+}
+
+QSlider* AlgorithmSelectionUI::getBoxEdgeSlider() const
+{
+	return boxSizeSlider_;
+}
+
+QLineEdit* AlgorithmSelectionUI::getBoxEdgeLineEdit() const
+{
+	return boxSizeLineEdit_;
+}
+
+void AlgorithmSelectionUI::ValueChangedS(QString dummy)
+{
+	emit OnValueChanged();
+}
+
+void AlgorithmSelectionUI::ValueChangedI(int dummy) {
+	emit OnValueChanged();
 }

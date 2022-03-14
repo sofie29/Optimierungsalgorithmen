@@ -3,17 +3,22 @@
 class RectangleDrawer : public QWidget {
 	Q_OBJECT
 public:
-	RectangleDrawer(QGraphicsScene* scene);
+	RectangleDrawer();
 	~RectangleDrawer();
+	void DrawOnScreen(QGraphicsScene* scene);
+signals:
+	void EmitRectInformation(const int amount, const int edgeLength);
+	void EmitListChanged();
 public slots:
 	void DrawRectAmountChangedI(const int amount);
 	void DrawRectAmountChangedS(const QString& amount);
 	void DrawRectSizeChangedI(const int maxEdgeLength);
 	void DrawRectSizeChangedS(const QString& maxEdgeLength);
+	void SetRects(const std::vector<QRectF>& list);
+	void OnBoundingBoxSizeChanged(int x);
 private:
-	QGraphicsScene* scene_;
 	int currentAmount_;
 	int currentMaxEdgeLength_;
-
-	void DrawRects();
+	std::vector<QRectF> rectList_;
+	
 };

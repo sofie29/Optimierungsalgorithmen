@@ -1,18 +1,34 @@
 #pragma once
 #include "NeighbourI.h"
-template<class Solution>
-class RuleBasedNeighbour : public NeighbourI<Solution> {
+#include "DataHolder.h"
+#include "BoundingBoxCreator.h"
+#include "RectangleCreator.h"
+#include "InitialSolutionI.h"
+template<class Data>
+class RuleBasedNeighbour : public NeighbourI<Data> {
 public:
-	RuleBasedNeighbour();
+	RuleBasedNeighbour(Data data, InitialSolutionI<Data>* initSol);
+	
 	virtual void optimize();
 };
 
-template<class Solution>
-inline RuleBasedNeighbour<Solution>::RuleBasedNeighbour()
+
+template<class Data>
+inline RuleBasedNeighbour<Data>::RuleBasedNeighbour(Data data, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, initSol)
+{
+	//NeighbourI<Data>::data_ = data;
+}
+
+
+template<class Data>
+inline void RuleBasedNeighbour<Data>::optimize()
 {
 }
 
-template<class Solution>
-inline void RuleBasedNeighbour<Solution>::optimize()
-{
+template<>
+inline void RuleBasedNeighbour<DataHolder*>::optimize() {
+	
+	initSol_->CreateInitialSolution(data_);
+	emit OptimDone();
+
 }

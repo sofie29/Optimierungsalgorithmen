@@ -10,5 +10,5 @@ namespace UIConstants {
 	static const int leftDockWidth_ = 500;
 	static const int leftDockHeight_ = 900;
 
-	static const int rectangleSpace_ = 2;
+	static const int rectangleSpace_ = 5;
 }

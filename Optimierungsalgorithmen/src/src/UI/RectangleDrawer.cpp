@@ -1,22 +1,31 @@
 #include "RectangleDrawer.h"
 
-RectangleDrawer::RectangleDrawer(QGraphicsScene* scene) : scene_(scene)
+RectangleDrawer::RectangleDrawer() 
 {
 	currentAmount_ = AlgorithmConstants::initialAmount_;
 	currentMaxEdgeLength_ = AlgorithmConstants::initialEdgeSize_;
+
+	
 }
 
 
 RectangleDrawer::~RectangleDrawer()
 {
-	scene_ = nullptr;
+	
+}
+
+void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
+{
+	for (QRectF rect : rectList_) {
+		scene->addRect(rect);
+	}
 }
 
 void RectangleDrawer::DrawRectAmountChangedI(const int amount)
 {
 	if (amount <= AlgorithmConstants::maxRectangleAmount_) {
 		currentAmount_ = amount;
-		DrawRects();
+		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
 	}
 }
 
@@ -25,7 +34,7 @@ void RectangleDrawer::DrawRectAmountChangedS(const QString& amount)
 {
 	if (amount.toInt() <= AlgorithmConstants::maxRectangleAmount_) {
 		currentAmount_ = amount.toInt();
-		DrawRects();
+		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
 	}
 }
 
@@ -33,7 +42,7 @@ void RectangleDrawer::DrawRectSizeChangedI(const int maxEdgeLength)
 {
 	if (maxEdgeLength <= AlgorithmConstants::maxRectangleEdgeSize_ && maxEdgeLength >= AlgorithmConstants::minRectangleEdgeSize_) {
 		currentMaxEdgeLength_ = maxEdgeLength;
-		DrawRects();
+		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
 	}
 }
 
@@ -41,27 +50,27 @@ void RectangleDrawer::DrawRectSizeChangedS(const QString& maxEdgeLength)
 {
 	if (maxEdgeLength.toInt() <= AlgorithmConstants::maxRectangleEdgeSize_ && maxEdgeLength.toInt() >= AlgorithmConstants::minRectangleEdgeSize_){
 		currentMaxEdgeLength_ = maxEdgeLength.toInt();
-		DrawRects();
+		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
 	}
 }
 
-void RectangleDrawer::DrawRects() {
-	scene_->clear();
-	std::random_device rd;
-	std::mt19937 engine(rd());
-	std::uniform_int_distribution<> dist(AlgorithmConstants::minRectangleEdgeSize_, currentMaxEdgeLength_);
+void RectangleDrawer::SetRects(const std::vector<QRectF>& list) {
+	
+	rectList_ = list;
+	emit EmitListChanged();
 
-	//int maxLines = (int)(UIConstants::mainSceneHeight_ / (float)(maxEdgeLength + UIConstants::rectangleSpace_));
-	//int pixelForNewLine = UIConstants::mainWSceneWidth_ /
-	int recsPerLine =  std::ceil(std::sqrt(currentAmount_));
-	for (int i = 0; i < currentAmount_; i++) {
+	/*
+	scene_->clear();
+	
+	for (const QRectF& rect : list) {
 		
-		int height =  dist(engine);
-		int width = dist(engine);
-		int x_pos = (i % recsPerLine) * (currentMaxEdgeLength_ + UIConstants::rectangleSpace_);
-		int y_pos = (int)(i / (float)recsPerLine) * (currentMaxEdgeLength_ + UIConstants::rectangleSpace_);
-		QRectF rect(x_pos, y_pos, width, height);
+		
 		scene_->addRect(rect);
 	}
 	scene_->update();
+	*/
+}
+
+void RectangleDrawer::OnBoundingBoxSizeChanged(int x) {
+	emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
 }
