@@ -21,6 +21,7 @@ private:
 
     std::shared_ptr<class DataHolder> dataHolder_;
     RuleBasedNeighbour<class DataHolder*>* ruleBasedNeighbour_;
-    //std::shared_ptr<class QNeighbourWrapper*> neighbourWrapper_;
+    InitialSolutionI<DataHolder*>* initSol_;
     class QNeighbourWrapper* neighbourWrapper_;
+
 };

@@ -27,8 +27,8 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     dataHolder_ = std::make_shared<DataHolder>();
 
     
-    InitialSolutionI<DataHolder*>* initSol = new SimpleInitialSolution<DataHolder*>();
-    ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolder_.get(), initSol);
+    initSol_ = new SimpleInitialSolution<DataHolder*>();
+    ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolder_.get(), initSol_);
     //neighbourWrapper_ = std::make_shared<QNeighbourWrapper>(ruleBasedNeighbour_);
     neighbourWrapper_ = new QNeighbourWrapper(ruleBasedNeighbour_);
 
@@ -59,8 +59,7 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     leftDock_->setWidget(algoSelectionUI_);
     this->addDockWidget(Qt::LeftDockWidgetArea, leftDock_);
     
-    //dataHolder_->getRectCreator().get()->CreateRects(AlgorithmConstants::initialAmount_, AlgorithmConstants::initialEdgeSize_);
-    //ruleBasedNeighbour_->optimize();
+   
 
 
 }
@@ -85,6 +84,9 @@ Optimierungsalgorithmen::~Optimierungsalgorithmen()
 
     delete neighbourWrapper_;
     neighbourWrapper_ = nullptr;
+
+    delete initSol_;
+    initSol_ = nullptr;
 
 
 }
