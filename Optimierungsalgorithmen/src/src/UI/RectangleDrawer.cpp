@@ -22,7 +22,7 @@ void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
 	QPen pen;
 	pen.setColor(Qt::black);
 	pen.setWidth(1);
-	for (QRectF rect : rectList_) {
+	for (const QRectF& rect : rectList_) {
 		scene->addRect(rect, pen, brush);
 	}
 }
