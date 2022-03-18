@@ -16,8 +16,14 @@ RectangleDrawer::~RectangleDrawer()
 
 void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
 {
+	QBrush brush;
+	brush.setStyle(Qt::BrushStyle::SolidPattern);
+	brush.setColor(Qt::darkCyan);
+	QPen pen;
+	pen.setColor(Qt::black);
+	pen.setWidth(1);
 	for (QRectF rect : rectList_) {
-		scene->addRect(rect);
+		scene->addRect(rect, pen, brush);
 	}
 }
 
