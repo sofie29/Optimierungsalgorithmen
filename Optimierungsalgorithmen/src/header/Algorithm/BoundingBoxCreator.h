@@ -7,7 +7,7 @@ public:
 	BoundingBoxCreator();
 	void getRectList(std::vector<QRectF>& list);
 	void getBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list);
-	void addBoundingBox(int x_pos, int y_pos, QRectF& rect);
+	void addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex);
 signals:
 	void EmitRectList(std::vector<QRectF>& list);
 public slots:

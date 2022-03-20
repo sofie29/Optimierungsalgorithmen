@@ -14,13 +14,12 @@ void BoundingBoxCreator::getBoundingBoxList(std::vector<std::shared_ptr<class Bo
 	list = boundingBoxList_;
 }
 
-void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect)
+void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex)
 {
 
-	boundingBoxList_.emplace_back(std::make_unique<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rect));
+	boundingBoxList_.emplace_back(std::make_unique<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rect, rectIndex));
 	rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), edgeLength_, edgeLength_));
 
-	
 }
 
 void BoundingBoxCreator::OnOptimDone()
