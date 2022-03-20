@@ -2,9 +2,9 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_Optimierungsalgorithmen.h"
-#include "RuleBasedNeighbour.h"
 #include "LocalSearch.h"
-
+#include "RuleBasedNeighbour.h"
+#include "GeometryBasedNeighbour.h"
 
 class Optimierungsalgorithmen : public QMainWindow
 {

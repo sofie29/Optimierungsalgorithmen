@@ -22,7 +22,8 @@ protected:
 template<class Data>
 inline NeighbourI<Data>::NeighbourI(Data d, Data currentBest, InitialSolutionI<Data>* initSol) : data_(d), bestData_(currentBest), initSol_(initSol)
 {
-	
+	// TODO: reset when changing parameters (e.g. number of rectangles)
+	// currentBest_ = 999000; // worst score in GeometryBasedNeighbourhood with 1000 rectangles
 	initSol_->CreateInitialSolution(d);
 }
 

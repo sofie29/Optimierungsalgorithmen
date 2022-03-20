@@ -1,16 +1,18 @@
 #include "BoundingBox.h"
 
 
-BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, QRectF& rect) :
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, QRectF& rect, int rectIndex) :
 	rect_height(rect_height),
 	rect_width(rect_width),
 	x(x_pos),
 	y(y_pos),
 	first(nullptr),
-	second(nullptr)
+	second(nullptr),
+	numberOfRectangles(0)
 {
 	int x, y;
 	this->tryFit(rect.width(), rect.height(), x, y);
+	this->addRectangleIndex(rectIndex);
 	rect.moveTopLeft(QPointF(x, y));
 	
 }
@@ -20,7 +22,8 @@ rect_width(rect_width),
 x(x),
 y(y),
 first(nullptr),
-second(nullptr)
+second(nullptr),
+numberOfRectangles(0)
 {
 }
 /*
@@ -47,6 +50,12 @@ void BoundingBox::add(int rect_width, int rect_height)
 
 }
 */
+
+void BoundingBox::removeLowerLevelBoundingBoxes() {
+	first.reset();
+	second.reset();
+	// number of rectangles = 0 ?
+}
 
 bool BoundingBox::tryFit(int rect_width, int rect_height, int& x_out, int& y_out)
 {
@@ -79,22 +88,16 @@ bool BoundingBox::tryFit(int rect_width, int rect_height, int& x_out, int& y_out
 				// split space along x axis
 				this->first = std::shared_ptr<BoundingBox>(new BoundingBox(emptySpaceX, rect_height, this->x + rect_width, this->y));
 				this->second = std::shared_ptr<BoundingBox>(new BoundingBox(this->rect_width, emptySpaceY, this->x, this->y + rect_height));
-				x_out = this->x ;
-				y_out = this->y;
-
 			}
 			else {
 				// split space along y axis
 				this->first = std::shared_ptr<BoundingBox>(new BoundingBox(rect_width, emptySpaceY, this->x, this->y + rect_height));
 				this->second = std::shared_ptr<BoundingBox>(new BoundingBox(emptySpaceX, this->rect_height, this->x + rect_width, this->y));
-				x_out = this->x;
-				y_out = this->y;
 			}
 
-			// TODO:
 			// set rectangle position
-			// rectangle->x_pos = this->x;
-			// rectangle->y_pos = this->y;
+			x_out = this->x;
+			y_out = this->y;
 
 			return true;
 		}
@@ -111,4 +114,23 @@ int BoundingBox::getXPos() const
 int BoundingBox::getYPos() const
 {
 	return y;
+}
+
+std::vector<int> BoundingBox::getRectangleIndices() {
+	return rectangleIndices;
+}
+
+void BoundingBox::addRectangleIndex(int index) {
+	rectangleIndices.push_back(index);
+	++numberOfRectangles;
+	return;
+}
+
+
+void BoundingBox::removeRectangleIndex(int index) {
+	rectangleIndices.erase(std::remove(rectangleIndices.begin(), rectangleIndices.end(), index), rectangleIndices.end());
+	--numberOfRectangles;
+	return;
+
+	// TODO: if (--numberOfRectangles == 0) delete this bounding box
 }

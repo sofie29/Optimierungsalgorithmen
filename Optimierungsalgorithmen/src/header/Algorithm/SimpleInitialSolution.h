@@ -40,11 +40,13 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 
 	int amount = rectList.size();
 	int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
-	for (QRectF& rect : rectList) {
+	for (int i = 0; i < rectList.size(); ++i) {
+		QRectF& rect = rectList[i];
 		bool added = false;
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
 			int x, y;
 			if (box->tryFit(rect.width(), rect.height(), x, y)) {
+				box->addRectangleIndex(i);
 				added = true;
 				rect.moveTopLeft(QPointF(x, y));
 				break;
@@ -56,7 +58,7 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 			
 			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
-			boxCreator->addBoundingBox(x_pos, y_pos, rect);
+			boxCreator->addBoundingBox(x_pos, y_pos, rect, i);
 			boxCreator->getBoundingBoxList(bBoxList);
 		}
 		//boxCreator->addBoundingBox(rect.x(), rect.y());
