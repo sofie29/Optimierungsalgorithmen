@@ -5,18 +5,29 @@ RectangleCreator::RectangleCreator()
 }
 void RectangleCreator::getRectList(std::vector<QRectF>& list)
 {
-	list = rectangleList;
+	list = rectangleList_;
 }
 
-void RectangleCreator::OnRectPositionsUpdated(const std::vector<QRectF>& list)
+void RectangleCreator::setNewRectList(std::vector<QRectF>& list)
 {
-	rectangleList = list;
-	emit RectListUpdated(rectangleList);
+	rectangleList_.clear();
+	for (const auto& rect : list) {
+		rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), rect.width(), rect.height()));
+	}
 }
+
+void RectangleCreator::setRectList(std::vector<QRectF>& list)
+{
+	rectangleList_ = list;
+}
+
+
 
 void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 
-	rectangleList.clear();
+	rectangleList_.clear();
+
+	float squareSize = 0.0f;
 
 	std::random_device rd;
 	std::mt19937 engine(rd());
@@ -31,7 +42,12 @@ void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 		int x_pos = 0;
 		int y_pos = 0;
 		QRectF rect(x_pos, y_pos, width, height);
-		rectangleList.emplace_back(rect);
+		rectangleList_.emplace_back(rect);
+		squareSize += height * width;
 	}
-	emit RectListCreated();
+	emit RectListUpdated(rectangleList_);
+	emit EmitSquareSize(squareSize);
+}
+void RectangleCreator::OnOptimDone() {
+	emit EmitRectList(rectangleList_);
 }

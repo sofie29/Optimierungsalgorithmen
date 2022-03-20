@@ -1,33 +1,28 @@
 #pragma once
 #include "stdafx.h"
 #include "InitialSolutionI.h"
-class SignalHelper : public QWidget {
-	Q_OBJECT
-signals:
-	void OptimDone();
 
-};
 
 template<class Data>
-class NeighbourI : public SignalHelper  {
+class NeighbourI {
 
 public:
-	NeighbourI(Data d, InitialSolutionI<Data>* initSol);
+	NeighbourI(Data d, Data currentBest,  InitialSolutionI<Data>* initSol);
 	
 	~NeighbourI();
-	virtual void optimize() = 0;
-	inline int getBestScore() { return currentBest_; }
+	virtual int optimize() = 0;
+	
 protected:
-	int currentBest_;
 	Data data_;
+	Data bestData_;
 	InitialSolutionI<Data>* initSol_;
 	
 };
 
 template<class Data>
-inline NeighbourI<Data>::NeighbourI(Data d, InitialSolutionI<Data>* initSol) : data_(d), initSol_(initSol)
+inline NeighbourI<Data>::NeighbourI(Data d, Data currentBest, InitialSolutionI<Data>* initSol) : data_(d), bestData_(currentBest), initSol_(initSol)
 {
-	currentBest_ = 0;
+	
 	initSol_->CreateInitialSolution(d);
 }
 

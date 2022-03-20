@@ -74,11 +74,55 @@ AlgorithmSelectionUI::AlgorithmSelectionUI()
 	connect(boxSizeSlider_, &QSlider::valueChanged, boxSizeLineEdit_, [=]() {boxSizeLineEdit_->setText(QString::number(boxSizeSlider_->value())); });
 	connect(boxSizeLineEdit_, &QLineEdit::textChanged, boxSizeSlider_, [=]() {boxSizeSlider_->setValue(boxSizeLineEdit_->text().toInt()); });
 
+	startButton_ = new QPushButton("Start");
+	gridLayout_->addWidget(startButton_, 3, 1, Qt::AlignLeft);
 
+	algoSelectionBox_ = new QComboBox();
+	algoSelectionBox_->addItem("RuleBasedNeighbour");
+	algoSelectionBox_->addItem("GeometryBasedNeighbour");
+	algoSelectionBox_->addItem("ThirdNeighbourTooLazyToLookUp");
+	algoSelectionBox_->addItem("Greedy");
+	gridLayout_->addWidget(algoSelectionBox_, 3, 0, Qt::AlignLeft);
+
+	optimLabel_ = new QLabel("Minimum number of bounding boxes required: ");
+	gridLayout_->addWidget(optimLabel_, 4, 0, Qt::AlignLeft);
+
+	currentLabel_ = new QLabel("Current number of bounding boxes: ");
+	gridLayout_->addWidget(currentLabel_, 5, 0, Qt::AlignLeft);
+
+	optimNumberLabel_ = new QLabel("0.00");
+	gridLayout_->addWidget(optimNumberLabel_, 4, 1, Qt::AlignLeft);
+
+	currentNumberLabel_ = new QLabel("0");
+	gridLayout_->addWidget(currentNumberLabel_, 5, 1, Qt::AlignLeft);
+
+	currentOptimPctLabel_ = new QLabel("0.00");
+	gridLayout_->addWidget(currentOptimPctLabel_, 5, 2, Qt::AlignLeft);
 }
 
 AlgorithmSelectionUI::~AlgorithmSelectionUI()
 {
+	delete currentOptimPctLabel_;
+	currentOptimPctLabel_ = nullptr;
+
+	delete currentNumberLabel_;
+	currentNumberLabel_ = nullptr;
+
+	delete optimNumberLabel_;
+	optimNumberLabel_ = nullptr;
+
+	delete optimLabel_;
+	optimLabel_ = nullptr;
+
+	delete currentLabel_;
+	currentLabel_ = nullptr;
+
+	delete algoSelectionBox_;
+	algoSelectionBox_ = nullptr;
+
+	delete startButton_;
+	startButton_ = nullptr;
+
 	delete boxSizeText_;
 	boxSizeText_ = nullptr;
 
@@ -141,5 +185,48 @@ QSlider* AlgorithmSelectionUI::getBoxEdgeSlider() const
 QLineEdit* AlgorithmSelectionUI::getBoxEdgeLineEdit() const
 {
 	return boxSizeLineEdit_;
+}
+
+QPushButton* AlgorithmSelectionUI::getStartButton() const
+{
+	return startButton_;
+}
+
+QComboBox* AlgorithmSelectionUI::getAlgoSelectionBox() const
+{
+	return algoSelectionBox_;
+}
+
+QLabel* AlgorithmSelectionUI::getOptimNumberLabel() const
+{
+	return optimNumberLabel_;
+}
+
+QLabel* AlgorithmSelectionUI::getCurrentNumberLabel() const
+{
+	return currentNumberLabel_;
+}
+QLabel* AlgorithmSelectionUI::getCurrentOptimPctLabel() const
+{
+	return currentOptimPctLabel_;
+}
+
+void AlgorithmSelectionUI::setCurrentNumberLabel(int number)
+{
+	QString s = QString::number(number);
+	currentNumberLabel_->setText(s);
+}
+
+void AlgorithmSelectionUI::setOptimNumberLabel(float number)
+{
+	QString s = QString::number(number, 'f', 2);
+	optimNumberLabel_->setText(s);
+}
+
+void AlgorithmSelectionUI::setCurrentOptimPctLabel(float number)
+{
+	float num = number * 100;
+	QString s = QString::number(num, 'f', 2) + QString("% optimal");
+	currentOptimPctLabel_->setText(s);
 }
 

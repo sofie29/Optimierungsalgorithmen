@@ -32,12 +32,5 @@ void BoundingBoxDrawer::BoundingBoxSizeChangedI(const int maxEdgeLength)
 void BoundingBoxDrawer::SetBoundingBoxes(const std::vector<QRectF>& list)
 {
 	boundingBoxList_ = list;
-	emit EmitListChanged();
-	/*
-	scene_->clear();
-	for (QRectF rect : list) {
-		scene_->addRect(rect);
-	}
-	scene_->update();
-	*/
+	
 }

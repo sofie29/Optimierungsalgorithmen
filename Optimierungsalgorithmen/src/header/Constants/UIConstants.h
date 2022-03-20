@@ -11,4 +11,5 @@ namespace UIConstants {
 	static const int leftDockHeight_ = 900;
 
 	static const int rectangleSpace_ = 5;
+	static const int maxBoxesPerLine = 20;
 }

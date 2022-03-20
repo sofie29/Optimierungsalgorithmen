@@ -5,8 +5,8 @@ Drawer::Drawer(QGraphicsScene* scene) : scene_(scene) {
 	boundingBoxDrawer_ = new BoundingBoxDrawer();
 	rectDrawer_ = new RectangleDrawer();
 
-	connect(boundingBoxDrawer_, &BoundingBoxDrawer::EmitListChanged, this, &Drawer::DrawScene);
-	connect(rectDrawer_, &RectangleDrawer::EmitListChanged, this, &Drawer::DrawScene);
+	//connect(boundingBoxDrawer_, &BoundingBoxDrawer::EmitListChanged, this, &Drawer::DrawScene);
+	//connect(rectDrawer_, &RectangleDrawer::EmitListChanged, this, &Drawer::DrawScene);
 }
 
 Drawer::~Drawer()

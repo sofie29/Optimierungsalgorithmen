@@ -1,31 +1,35 @@
 #pragma once
+#include "OptimAlgoI.h"
 #include "NeighbourI.h"
 #include "stdafx.h"
 template<class Solution>
-class LocalSearch{
+class LocalSearch : public OptimAlgoI{
 
 public:
-	LocalSearch(NeighbourI<Solution>* n, Solution* sol);
+	LocalSearch(NeighbourI<Solution>* n, Solution sol);
 	~LocalSearch();
 	//returns optimal box amount
-	int execute();
+	virtual int execute() override;
+	void setNeighbourDefinition(NeighbourI<Solution>* n);
 private:
-	NeighbourI<Solution>* neighbourDefinition;
-	Solution* solution;
+	NeighbourI<Solution>* neighbourDefinition_;
+	Solution solution;
+	int currentBestScore_;
 	
 };
 
 template<class Solution>
-LocalSearch<Solution>::LocalSearch(NeighbourI<Solution>* n, Solution* sol)
+LocalSearch<Solution>::LocalSearch(NeighbourI<Solution>* n, Solution sol) : OptimAlgoI()
 {
-	neighbourDefinition = n;
+	neighbourDefinition_ = n;
 	solution = sol;
+	currentBestScore_ = 0;
 }
 
 template<class Solution>
 LocalSearch<Solution>::~LocalSearch()
 {
-	neighbourDefinition = nullptr;
+	neighbourDefinition_ = nullptr;
 	solution = nullptr;
 }
 
@@ -35,10 +39,24 @@ int LocalSearch<Solution>::execute()
 {
 
 	for(int i = 0; i < AlgorithmConstants::maxIterations; i++){
-		neighbourDefinition->optimize();
+		std::cout << i << std::endl;
+		int tmp = neighbourDefinition_->optimize();
+		if (tmp > currentBestScore_) {
+			currentBestScore_ = tmp;
+
+		}
+		std::cout << "" << std::endl;
 		
 	}
-	return neighbourDefinition->getBestScore();
+	emit OptimDone();
+	emit DrawSolution();
+	return currentBestScore_;
+}
+
+template<class Solution>
+inline void LocalSearch<Solution>::setNeighbourDefinition(NeighbourI<Solution>* n)
+{
+	neighbourDefinition_ = n;
 }
 
 

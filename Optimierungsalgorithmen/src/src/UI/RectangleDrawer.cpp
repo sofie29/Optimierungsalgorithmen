@@ -63,7 +63,7 @@ void RectangleDrawer::DrawRectSizeChangedS(const QString& maxEdgeLength)
 void RectangleDrawer::SetRects(const std::vector<QRectF>& list) {
 	
 	rectList_ = list;
-	emit EmitListChanged();
+	//emit EmitListChanged();
 
 	/*
 	scene_->clear();
