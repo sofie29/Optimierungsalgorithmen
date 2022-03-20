@@ -82,6 +82,9 @@
     <ClCompile Include="src\src\UI\Drawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\src\Algorithm\OptimAlgoI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\header\Optimierungsalgorithmen.h">
@@ -108,13 +111,13 @@
     <QtMoc Include="src\header\Algorithm\BoundingBoxCreator.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\header\Algorithm\NeighbourI.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="src\header\Algorithm\QNeighbourWrapper.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="src\header\UI\Drawer.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="src\header\Algorithm\OptimAlgoI.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -141,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\Algorithm\InitialSolutionI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\NeighbourI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

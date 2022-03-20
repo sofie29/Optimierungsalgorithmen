@@ -114,6 +114,7 @@
     <ClCompile Include="src\src\Algorithm\BoundingBoxCreator.cpp" />
     <ClCompile Include="src\src\Algorithm\DataHolder.cpp" />
     <ClCompile Include="src\src\Algorithm\NeighbourI.cpp" />
+    <ClCompile Include="src\src\Algorithm\OptimAlgoI.cpp" />
     <ClCompile Include="src\src\Algorithm\QNeighbourWrapper.cpp" />
     <ClCompile Include="src\src\Algorithm\RectangleCreator.cpp" />
     <ClCompile Include="src\src\Algorithm\RuleBasedNeighbour.cpp" />
@@ -125,9 +126,10 @@
     <ClInclude Include="src\header\Algorithm\DataHolder.h" />
     <ClInclude Include="src\header\Algorithm\InitialSolutionI.h" />
     <ClInclude Include="src\header\Algorithm\LocalSearch.h" />
-    <QtMoc Include="src\header\Algorithm\NeighbourI.h" />
+    <ClInclude Include="src\header\Algorithm\NeighbourI.h" />
     <QtMoc Include="src\header\Algorithm\RectangleCreator.h" />
     <QtMoc Include="src\header\Algorithm\QNeighbourWrapper.h" />
+    <QtMoc Include="src\header\Algorithm\OptimAlgoI.h" />
     <ClInclude Include="src\header\Algorithm\RuleBasedNeighbour.h" />
     <ClInclude Include="src\header\Algorithm\SimpleInitialSolution.h" />
     <ClInclude Include="src\header\Constants\AlgorithmConstants.h" />
