@@ -61,9 +61,6 @@
     <ClCompile Include="src\src\Algorithm\BoundingBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\src\Algorithm\RectangleCreator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\src\UI\BoundingBoxDrawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -83,6 +80,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\src\Algorithm\OptimAlgoI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\src\Algorithm\RectangleCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\src\Algorithm\RectangleHolder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\Algorithm\NeighbourI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\RectangleHolder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

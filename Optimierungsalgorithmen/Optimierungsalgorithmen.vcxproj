@@ -116,6 +116,7 @@
     <ClCompile Include="src\src\Algorithm\NeighbourI.cpp" />
     <ClCompile Include="src\src\Algorithm\OptimAlgoI.cpp" />
     <ClCompile Include="src\src\Algorithm\QNeighbourWrapper.cpp" />
+    <ClCompile Include="src\src\Algorithm\RectangleHolder.cpp" />
     <ClCompile Include="src\src\Algorithm\RectangleCreator.cpp" />
     <ClCompile Include="src\src\Algorithm\RuleBasedNeighbour.cpp" />
     <ClCompile Include="src\src\Optimierungsalgorithmen.cpp" />
@@ -130,6 +131,7 @@
     <QtMoc Include="src\header\Algorithm\RectangleCreator.h" />
     <QtMoc Include="src\header\Algorithm\QNeighbourWrapper.h" />
     <QtMoc Include="src\header\Algorithm\OptimAlgoI.h" />
+    <ClInclude Include="src\header\Algorithm\RectangleHolder.h" />
     <ClInclude Include="src\header\Algorithm\RuleBasedNeighbour.h" />
     <ClInclude Include="src\header\Algorithm\SimpleInitialSolution.h" />
     <ClInclude Include="src\header\Constants\AlgorithmConstants.h" />
