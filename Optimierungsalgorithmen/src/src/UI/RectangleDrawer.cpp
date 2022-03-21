@@ -1,5 +1,5 @@
 #include "RectangleDrawer.h"
-
+#include "RectangleHolder.h"
 RectangleDrawer::RectangleDrawer() 
 {
 	currentAmount_ = AlgorithmConstants::initialAmount_;
@@ -60,9 +60,11 @@ void RectangleDrawer::DrawRectSizeChangedS(const QString& maxEdgeLength)
 	}
 }
 
-void RectangleDrawer::SetRects(const std::vector<QRectF>& list) {
+void RectangleDrawer::SetRects(const std::vector<class RectangleHolder*>* list) {
 	
-	rectList_ = list;
+	rectList_.clear();
+	for(class RectangleHolder* r : *list)
+		rectList_.emplace_back(r->getRect());
 	//emit EmitListChanged();
 
 	/*

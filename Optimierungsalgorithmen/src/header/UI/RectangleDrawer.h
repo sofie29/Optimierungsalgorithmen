@@ -14,7 +14,7 @@ public slots:
 	void DrawRectAmountChangedS(const QString& amount);
 	void DrawRectSizeChangedI(const int maxEdgeLength);
 	void DrawRectSizeChangedS(const QString& maxEdgeLength);
-	void SetRects(const std::vector<QRectF>& list);
+	void SetRects(const std::vector<class RectangleHolder*>* list);
 	void OnBoundingBoxSizeChanged(int x);
 private:
 	int currentAmount_;

@@ -10,7 +10,7 @@ public:
 	NeighbourI(Data d, Data currentBest,  InitialSolutionI<Data>* initSol);
 	
 	~NeighbourI();
-	virtual int optimize() = 0;
+	virtual float optimize() = 0;
 	
 protected:
 	Data data_;
@@ -24,7 +24,7 @@ inline NeighbourI<Data>::NeighbourI(Data d, Data currentBest, InitialSolutionI<D
 {
 	// TODO: reset when changing parameters (e.g. number of rectangles)
 	// currentBest_ = 999000; // worst score in GeometryBasedNeighbourhood with 1000 rectangles
-	initSol_->CreateInitialSolution(d);
+	//initSol_->CreateInitialSolution(d);
 }
 
 

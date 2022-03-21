@@ -14,3 +14,8 @@ NeighbourI<class DataHolder*>* QNeighbourWrapper::getNeighbourI()
 {
 	return neighbour_;
 }
+
+void QNeighbourWrapper::setNeighbour(NeighbourI<class DataHolder*>* n)
+{
+	neighbour_ = n;
+}

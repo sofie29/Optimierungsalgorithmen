@@ -2,6 +2,7 @@
 #include "RectangleCreator.h"
 #include "BoundingBoxCreator.h"
 #include "BoundingBox.h"
+#include "RectangleHolder.h"
 DataHolder::DataHolder() 
 {
 	boxCreator_ = std::make_shared<BoundingBoxCreator>();
@@ -38,8 +39,7 @@ void DataHolder::OverwriteData(DataHolder* other)
 	boxCreator_->setCurrentFitScore(other->getBoxCreator()->getCurrentFitScore());
 
 
-	std::vector<QRectF> rectList;
-	other->getRectCreator()->getRectList(rectList);
+	std::vector<RectangleHolder*>* rectList = other->getRectCreator()->getRectList();
 	rectCreator_->setNewRectList(rectList);
 
 	

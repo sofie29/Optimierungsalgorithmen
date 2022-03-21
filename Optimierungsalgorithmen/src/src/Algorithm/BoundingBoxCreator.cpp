@@ -39,7 +39,7 @@ void BoundingBoxCreator::setBoundingBoxList(std::vector<std::shared_ptr<class Bo
 void BoundingBoxCreator::ResetBoundingBoxList()
 {
 	
-	currentFitScore_ = 0.0f;
+	
 	boundingBoxList_.clear();
 	rectangleList_.clear();
 }

@@ -27,31 +27,32 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 	std::shared_ptr<BoundingBoxCreator> boxCreator = d->getBoxCreator();
 	std::shared_ptr<RectangleCreator> rectCreator = d->getRectCreator();
 
-	std::vector<QRectF> rectList;
-	rectCreator->getRectList(rectList);
+	std::vector<class RectangleHolder*>* rectList = rectCreator->getRectList();
+	
 
-	auto cmp = [](QRectF& first, QRectF& second) {return first.width() * first.height() > second.width() * second.height(); };
-	std::sort(rectList.begin(), rectList.end(), cmp);
+	//auto cmp = [](std:: &first, QRectF& second) {return first.width() * first.height() > second.width() * second.height(); };
+	//std::sort(rectList.begin(), rectList.end(), cmp);
 
 	
 
 	std::vector<std::shared_ptr<BoundingBox>> bBoxList;
 	boxCreator->getBoundingBoxList(bBoxList);
 
-	int amount = rectList.size();
+	int amount = rectList->size();
 	int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
-	for (int i = 0; i < rectList.size(); ++i) {
-		QRectF& rect = rectList[i];
+	for (int i = 0; i < rectList->size(); ++i) {
+		QRectF& rect = (*rectList)[i]->getRectRef();
 		bool added = false;
+		int idx = 0;
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
-			int x, y;
-			if (box->tryFit(rect.width(), rect.height(), x, y)) {
+			//int x, y;
+			if (box->tryFit((*rectList)[i], idx)) {
 				box->addRectangleIndex(i);
 				added = true;
-				rect.moveTopLeft(QPointF(x, y));
+				//rect.moveTopLeft(QPointF(x, y));
 				break;
 			}
-
+			idx++;
 		}
 		if (!added) {
 			//BoundingBox* box = new BoundingBox();

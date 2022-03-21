@@ -1,14 +1,15 @@
-#pragma once
+ï»¿#pragma once
 #include "stdafx.h"
 
 class BoundingBox {
 public:
 	BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, QRectF& rect, int rectIndex); //rect_h/w bounding box, QRectF interior rect
 	BoundingBox(int rect_width, int rect_height, int x, int y);
-	//static void add(int rect_width, int rect_height);§
+	//static void add(int rect_width, int rect_height)
 	int getXPos() const;
 	int getYPos() const;
-	bool tryFit(int rect_width, int rect_height, int& x_out, int& y_out); // don't forget to call addRectangleIndex / removeRectangleIndex after calling tryFit
+	bool tryFit(int rect_width, int rect_height, int& x_out, int& y_out); // dont forget to call addRectangleIndex / removeRectangleIndex after calling tryFit
+	bool tryFit(class RectangleHolder* rectHolder, int boundingBoxIndex);
 	void removeLowerLevelBoundingBoxes();
 	std::vector<int> getRectangleIndices();
 	void addRectangleIndex(int index);

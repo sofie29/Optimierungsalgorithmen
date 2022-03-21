@@ -28,11 +28,13 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     algoSelectionUI_ = new AlgorithmSelectionUI();
     dataHolder_ = std::make_shared<DataHolder>();
     bestDataHolder_ = std::make_shared<DataHolder>();
+   
 
     initSol_ = new SimpleInitialSolution<DataHolder*>();
     ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolder_.get(), bestDataHolder_.get(), initSol_);
-    ruleBasedWrapped_ = new QNeighbourWrapper(ruleBasedNeighbour_);
-    localSearch_ = new LocalSearch<DataHolder*>(ruleBasedWrapped_->getNeighbourI(), bestDataHolder_.get());
+    geometryBasedNeighbour_ = new GeometryBasedNeighbour(dataHolder_.get(), bestDataHolder_.get(), initSol_);
+    neighbourWrapper_ = new QNeighbourWrapper(ruleBasedNeighbour_);
+    localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), bestDataHolder_.get());
     selectedAlgorithm_ = localSearch_;
 
     connect(algoSelectionUI_->getRecAmountSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectAmountChangedI);
@@ -96,11 +98,14 @@ Optimierungsalgorithmen::~Optimierungsalgorithmen()
     delete mainScene_;
     mainScene_ = nullptr;
 
+    delete geometryBasedNeighbour_;
+    geometryBasedNeighbour_ = nullptr;
+
     delete ruleBasedNeighbour_;
     ruleBasedNeighbour_ = nullptr;
 
-    delete ruleBasedWrapped_;
-    ruleBasedWrapped_ = nullptr;
+    delete neighbourWrapper_;
+    neighbourWrapper_ = nullptr;
 
     delete initSol_;
     initSol_ = nullptr;
@@ -114,11 +119,14 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
 {
     switch (idx) {
     case 0:
+        neighbourWrapper_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setNeighbourDefinition(ruleBasedNeighbour_);
         selectedAlgorithm_ = localSearch_;
         break;
     case 1:
-        selectedAlgorithm_ = nullptr;
+        neighbourWrapper_->setNeighbour(geometryBasedNeighbour_);
+        localSearch_->setNeighbourDefinition(geometryBasedNeighbour_);
+        selectedAlgorithm_ = localSearch_;
         break;
     case 2:
         selectedAlgorithm_ = nullptr;

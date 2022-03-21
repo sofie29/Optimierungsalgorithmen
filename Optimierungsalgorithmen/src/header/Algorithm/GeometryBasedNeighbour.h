@@ -5,31 +5,31 @@
 #include "RectangleCreator.h"
 #include "InitialSolutionI.h"
 #include "BoundingBox.h"
-
+#include "RectangleHolder.h"
 template<class Data>
 class GeometryBasedNeighbour : public NeighbourI<Data>
 {
 public:
-	GeometryBasedNeighbour(Data data, InitialSolutionI<Data>* initSol);
+	GeometryBasedNeighbour(Data data, Data currentBest, InitialSolutionI<Data>* initSol);
 
-	virtual int optimize();
+	virtual float optimize();
 
 private:
 	size_t rectPos = 0;
 	size_t rotationIteration = 0;
 	// void setSolution(std::vector<QRectF>& rectList); // temporary (should be in NeighbourI?)
 	float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
-	bool fitBoundingBox(std::vector<int> indices, std::vector<QRectF>& rectangles, std::shared_ptr<BoundingBox>& box);
+	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::shared_ptr<BoundingBox>& box, int boundingBoxIndex);
 };
 
 template<class Data>
-inline GeometryBasedNeighbour<Data>::GeometryBasedNeighbour(Data data, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, initSol) {
+inline GeometryBasedNeighbour<Data>::GeometryBasedNeighbour(Data data, Data currentBest, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, currentBest,  initSol) {
 	//NeighbourI<Data>::data_ = data;
 	rectPos = 0;
 }
 
 template<class Data>
-inline int GeometryBasedNeighbour<Data>::optimize()
+inline float GeometryBasedNeighbour<Data>::optimize()
 {
 }
 
@@ -69,14 +69,14 @@ inline void GeometryBasedNeighbour<DataHolder*>::setSolution(std::vector<QRectF>
 */
 
 template<>
-inline bool GeometryBasedNeighbour<DataHolder*>::fitBoundingBox(std::vector<int> indices, std::vector<QRectF>& rectangles, std::shared_ptr<BoundingBox>& box) {
+inline bool GeometryBasedNeighbour<DataHolder*>::fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::shared_ptr<BoundingBox>& box, int boundingBoxIndex) {
 	box->removeLowerLevelBoundingBoxes();
 
 	// place all rectangles specified in indices at the given bounding box
 	for (int i : indices) {
-		QRectF& rect = rectangles[i];
+		QRectF& rect = (*rectangles)[i]->getRectRef();
 		int xr, yr;
-		if (!box->tryFit(rect.width(), rect.height(), xr, yr)) {
+		if (!box->tryFit((*rectangles)[i], boundingBoxIndex)) {
 			return false;
 		}
 		// TODO: what if changes must be reverted
@@ -88,8 +88,9 @@ inline bool GeometryBasedNeighbour<DataHolder*>::fitBoundingBox(std::vector<int>
 
 
 template<>
-inline int GeometryBasedNeighbour<DataHolder*>::optimize() {	
+inline float GeometryBasedNeighbour<DataHolder*>::optimize() {	
 
+	//dataH->OverwriteData(dataHolder_.get());
 	initSol_->CreateInitialSolution(data_);
 
 	// get bounding box list
@@ -99,9 +100,9 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 
 	// get rectangle list
 	std::shared_ptr<RectangleCreator> rectCreator = data_->getRectCreator();
-	std::vector<QRectF> rectList;
-	rectCreator->getRectList(rectList);
-	size_t rectListSize = rectList.size();
+	std::vector<class RectangleHolder*>* rectList = rectCreator->getRectList();
+	
+	size_t rectListSize = rectList->size();
 
 	bool foundNeighbour = false;
 
@@ -117,7 +118,7 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 
 		// 1) select a rectangle
 		rectPos = (rectPos >= rectListSize) ? 1 : rectPos + 1;
-		QRectF& rect = rectList[rectListSize - rectPos]; // get a rectangle from list, start with the last one
+		QRectF& rect = (*rectList)[rectListSize - rectPos]->getRectRef(); // get a rectangle from list, start with the last one
 		bBoxFromRect = 0; // TODO (= rect.boundingBox)
 
 		// 2) rotate the selected rectangle
@@ -128,8 +129,9 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 
 		// 3) try to move to another bounding box
 		int x, y;
+		int idx = 0;
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
-			if (box->tryFit(rect.width(), rect.height(), x, y)) {
+			if (box->tryFit((*rectList)[rectListSize - rectPos], idx)) {
 
 				std::cout << "rects before swap: " << std::endl;
 				for (int i : bBoxList[bBoxFromRect]->getRectangleIndices()) {
@@ -141,7 +143,7 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 				rect.moveTopLeft(QPointF(x, y));
 
 				// 4) replace all rectangles previous bounding box
-				if (this->fitBoundingBox(bBoxList[bBoxFromRect]->getRectangleIndices(), rectList, bBoxList[bBoxFromRect])) {
+				if (this->fitBoundingBox(bBoxList[bBoxFromRect]->getRectangleIndices(), rectList, bBoxList[bBoxFromRect], idx)) {
 					box->addRectangleIndex(rectListSize - rectPos);
 					foundNeighbour = true;
 				}
@@ -153,11 +155,12 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 				}
 
 			}
+			idx++;
 		}
 	}
 
 
-	if (!foundNeighbour) { // search for another neighbour
+	if (!foundNeighbour && rectListSize > 1) { // search for another neighbour
 
 		/******* METHOD B : Swap two rectangles *******/
 
@@ -167,18 +170,18 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 		bool isPlaced2 = false;
 		size_t iter = 0;
 
-		while ((!foundNeighbour || !foundNeighbour) && (++iter < 2)) {
+		while ((!isPlaced1 || !isPlaced2) && (++iter < 2)) {
 			std::cout << "while" << iter << std::endl;
 
 
 			// 1) get two rectangles
 			int rectIndex1 = 0; // TODO: random
 			int rectIndex2 = 1;
-			QRectF& rect1 = rectList[rectIndex1];
-			QRectF& rect2 = rectList[rectIndex2];
+			QRectF& rect1 = (*rectList)[rectIndex1]->getRectRef();
+			QRectF& rect2 = (*rectList)[rectIndex2]->getRectRef();
 
-			int boxFromRect1 = 0; // TODO: rect.boundingBox
-			int boxFromRect2 = 1;
+			int boxFromRect1 = (*rectList)[rectIndex1]->getBoundingBoxIndex(); 
+			int boxFromRect2 = (*rectList)[rectIndex2]->getBoundingBoxIndex();
 
 
 			// 2) get lists of rectangles of their bounding boxes
@@ -186,12 +189,12 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 			// tryFit with rectangles of boxFromRect1 without rect 1 and with rect2
 			bBoxList[boxFromRect1]->removeRectangleIndex(rectIndex1);
 			bBoxList[boxFromRect1]->addRectangleIndex(rectIndex2);
-			isPlaced1 = this->fitBoundingBox(bBoxList[boxFromRect1]->getRectangleIndices(), rectList, bBoxList[boxFromRect1]);
+			isPlaced1 = this->fitBoundingBox(bBoxList[boxFromRect1]->getRectangleIndices(), rectList, bBoxList[boxFromRect1], boxFromRect1);
 
 			// tryFit with rectangles of boxFromRect2 without rect 2 and with rect1
 			bBoxList[boxFromRect2]->removeRectangleIndex(rectIndex2);
 			bBoxList[boxFromRect2]->addRectangleIndex(rectIndex1);
-			isPlaced2 = this->fitBoundingBox(bBoxList[boxFromRect2]->getRectangleIndices(), rectList, bBoxList[boxFromRect2]);
+			isPlaced2 = this->fitBoundingBox(bBoxList[boxFromRect2]->getRectangleIndices(), rectList, bBoxList[boxFromRect2], boxFromRect2);
 
 			if (!isPlaced1 || !isPlaced2) { // revert changes
 				bBoxList[boxFromRect1]->removeRectangleIndex(rectIndex2);
@@ -211,9 +214,9 @@ inline int GeometryBasedNeighbour<DataHolder*>::optimize() {
 		// return max value;
 	}
 
-	float score = this->calculateScore(rectListSize, bBoxList);
 
-	return 0; // TODO: score FLOAT
+
+	return this->calculateScore(rectListSize, bBoxList);;
 	
 
 	// temporary: should be called by LocalSearch class

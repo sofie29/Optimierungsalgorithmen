@@ -1,22 +1,30 @@
 #include "RectangleCreator.h"
-
+#include "RectangleHolder.h"
 RectangleCreator::RectangleCreator()
 {
+	rectangleList_ = new std::vector<class RectangleHolder*>();
 }
-void RectangleCreator::getRectList(std::vector<QRectF>& list)
+RectangleCreator::~RectangleCreator()
 {
-	list = rectangleList_;
+	rectangleList_->clear();
+	rectangleList_->shrink_to_fit();
+}
+std::vector<class RectangleHolder*>* RectangleCreator::getRectList()
+{
+	return rectangleList_;
 }
 
-void RectangleCreator::setNewRectList(std::vector<QRectF>& list)
+void RectangleCreator::setNewRectList(std::vector<class RectangleHolder*>* list)
 {
-	rectangleList_.clear();
-	for (const auto& rect : list) {
-		rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), rect.width(), rect.height()));
+	rectangleList_->clear();
+	rectangleList_->shrink_to_fit();
+	for (class RectangleHolder* r : *list) {
+		QRectF rect = r->getRect();
+		rectangleList_->emplace_back(new class RectangleHolder(rect));
 	}
 }
 
-void RectangleCreator::setRectList(std::vector<QRectF>& list)
+void RectangleCreator::setRectList(std::vector<class RectangleHolder*>* list)
 {
 	rectangleList_ = list;
 }
@@ -25,7 +33,8 @@ void RectangleCreator::setRectList(std::vector<QRectF>& list)
 
 void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 
-	rectangleList_.clear();
+	rectangleList_->clear();
+	rectangleList_->shrink_to_fit();
 
 	float squareSize = 0.0f;
 
@@ -42,7 +51,7 @@ void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 		int x_pos = 0;
 		int y_pos = 0;
 		QRectF rect(x_pos, y_pos, width, height);
-		rectangleList_.emplace_back(rect);
+		rectangleList_->emplace_back(new class RectangleHolder(rect));
 		squareSize += height * width;
 	}
 	emit RectListUpdated(rectangleList_);

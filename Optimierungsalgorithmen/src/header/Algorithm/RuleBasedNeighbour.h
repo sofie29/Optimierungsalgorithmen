@@ -5,7 +5,7 @@
 #include "RectangleCreator.h"
 #include "InitialSolutionI.h"
 #include "BoundingBox.h"
-
+#include "RectangleHolder.h"
 
 
 
@@ -15,7 +15,7 @@ class RuleBasedNeighbour : public NeighbourI<Data> {
 public:
 	RuleBasedNeighbour(Data data, Data currentBest,  InitialSolutionI<Data>* initSol);
 	
-	virtual int optimize() override;
+	virtual float optimize() override;
 	
 };
 
@@ -28,12 +28,12 @@ inline RuleBasedNeighbour<Data>::RuleBasedNeighbour(Data data, Data currentBest,
 
 
 template<class Data>
-inline int RuleBasedNeighbour<Data>::optimize()
+inline float RuleBasedNeighbour<Data>::optimize()
 {
 }
 
 template<>
-inline int RuleBasedNeighbour<DataHolder*>::optimize() {
+inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 	
 	
 
@@ -51,35 +51,37 @@ inline int RuleBasedNeighbour<DataHolder*>::optimize() {
 	std::shared_ptr<RectangleCreator> rectCreator = data_->getRectCreator();
 
 
-	std::vector<QRectF> rectList;
-	rectCreator->getRectList(rectList);
+	std::vector<class RectangleHolder*>* rectList =  rectCreator->getRectList();
+	
 	auto rd = std::random_device{};
 	auto rng = std::default_random_engine{ rd() };
-	std::shuffle(std::begin(rectList), std::end(rectList), rng);
+	std::shuffle(std::begin(*rectList), std::end(*rectList), rng);
 
 	boxCreator->ResetBoundingBoxList();
 	std::vector<std::shared_ptr<BoundingBox>> bBoxList;
 	boxCreator->getBoundingBoxList(bBoxList);
 
-	int amount = rectList.size();
+	int amount = rectList->size();
 	int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int) std::ceil(std::sqrt(amount)));
-	for (QRectF& rect : rectList) {
+	for (class RectangleHolder* rect : *rectList) {
+		
 		bool added = false;
+		int idx = 0;
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
-			int x, y;
-			if (box->tryFit(rect.width(), rect.height(), x, y)) {
+			//int x, y;
+			if (box->tryFit(rect, idx)) {
 				added = true;
-				rect.moveTopLeft(QPointF(x, y));
+				//rect->getRectRef().moveTopLeft(QPointF(x, y));
 				break;
 			}
-
+			idx++;
 		}
 	
 		
 		if (!added) {
 			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
-			boxCreator->addBoundingBox(x_pos, y_pos, rect);
+			boxCreator->addBoundingBox(x_pos, y_pos, rect->getRectRef());
 			boxCreator->getBoundingBoxList(bBoxList);
 		}
 		
@@ -92,8 +94,9 @@ inline int RuleBasedNeighbour<DataHolder*>::optimize() {
 	//emit OptimDone();
 
 	
-
+	
 	if (bBoxList.size() < bestBoxList.size()) {
+		
 		bestData_->OverwriteData(data_);
 	}
 

@@ -32,7 +32,8 @@ private:
     LocalSearch<class DataHolder*>* localSearch_;
 
     RuleBasedNeighbour<class DataHolder*>* ruleBasedNeighbour_;
+    GeometryBasedNeighbour<class DataHolder*>* geometryBasedNeighbour_;
     InitialSolutionI<DataHolder*>* initSol_;
-    class QNeighbourWrapper* ruleBasedWrapped_;
+    class QNeighbourWrapper* neighbourWrapper_;
 
 };

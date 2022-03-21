@@ -11,5 +11,5 @@ signals:
 class OptimAlgoI : public SignalHelper{
 public:
 	OptimAlgoI();
-	virtual int execute() = 0;
+	virtual float execute() = 0;
 };

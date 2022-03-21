@@ -9,12 +9,12 @@ public:
 	LocalSearch(NeighbourI<Solution>* n, Solution sol);
 	~LocalSearch();
 	//returns optimal box amount
-	virtual int execute() override;
+	virtual float execute() override;
 	void setNeighbourDefinition(NeighbourI<Solution>* n);
 private:
 	NeighbourI<Solution>* neighbourDefinition_;
 	Solution solution;
-	int currentBestScore_;
+	float currentBestScore_;
 	
 };
 
@@ -35,7 +35,7 @@ LocalSearch<Solution>::~LocalSearch()
 
 
 template<class Solution>
-int LocalSearch<Solution>::execute()
+float LocalSearch<Solution>::execute()
 {
 
 	for(int i = 0; i < AlgorithmConstants::maxIterations; i++){
@@ -43,6 +43,7 @@ int LocalSearch<Solution>::execute()
 		int tmp = neighbourDefinition_->optimize();
 		if (tmp > currentBestScore_) {
 			currentBestScore_ = tmp;
+			
 
 		}
 		std::cout << "" << std::endl;

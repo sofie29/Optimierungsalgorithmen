@@ -6,6 +6,7 @@ class QNeighbourWrapper : public QWidget {
 public:
 	QNeighbourWrapper(class NeighbourI<class DataHolder*>* n);
 	class NeighbourI<class DataHolder*>* getNeighbourI();
+	void setNeighbour(class NeighbourI<class DataHolder*>* n);
 public slots:
 	void Optim();
 private:
