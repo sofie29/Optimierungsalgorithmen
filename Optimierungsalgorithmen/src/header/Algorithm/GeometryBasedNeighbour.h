@@ -176,8 +176,6 @@ inline float GeometryBasedNeighbour<DataHolder*>::optimize() {
 			}
 
 			std::shared_ptr<BoundingBox>& newBox = bBoxList[newBoxIdx];
-			int x_old_rect = rect.x();
-			int y_old_rect = rect.y();
 
 			if (newBox->tryFit((*rectList)[rectIdx], newBoxIdx)) {
 				std::vector<int> newIndices = oldBox->getRectangleIndices();
@@ -188,10 +186,19 @@ inline float GeometryBasedNeighbour<DataHolder*>::optimize() {
 					newBox->addRectangleIndex(rectIdx);
 					oldBox->removeRectangleIndex(rectIdx);
 					foundNeighbour = true;
+
+					// 5) delete bounding box in case it is empty
+					if (oldBox->getRectangleIndices().size() == 0) {
+						std::cout << "erased box" << std::endl;
+						bBoxList[oldBoxIndex].reset(); // TODO: bounding box is not destroyed
+						bBoxList.erase(bBoxList.begin() + oldBoxIndex);
+					}
+
+					break;
 				}
 
 				else { // revert changes
-					std::cout << "************ STOP **********" << std::endl;
+					std::cout << "Could not place elements in old box" << std::endl;
 					data_->OverwriteData(bestData_);
 					return AlgorithmConstants::maxScore;
 				}

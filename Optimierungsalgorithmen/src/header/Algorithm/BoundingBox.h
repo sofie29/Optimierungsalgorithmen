@@ -7,6 +7,7 @@ public:
 	BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, class RectangleHolder* rectHolder, int rectIndex, int boxIndex); //rect_h/w bounding box, QRectF interior rect
 	BoundingBox(int rect_width, int rect_height, int x, int y);
 	BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices);
+	~BoundingBox(); // for debugging
 	int getXPos() const;
 	int getYPos() const;
 	bool tryFit(int rect_width, int rect_height, int& x_out, int& y_out); // dont forget to call addRectangleIndex / removeRectangleIndex after calling tryFit

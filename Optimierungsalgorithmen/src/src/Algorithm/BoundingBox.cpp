@@ -51,6 +51,11 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vec
 {
 }
 
+BoundingBox::~BoundingBox()
+{
+	// std::cout << "destroy box" << std::endl;
+}
+
 
 void BoundingBox::removeLowerLevelBoundingBoxes() {
 	first.reset();
