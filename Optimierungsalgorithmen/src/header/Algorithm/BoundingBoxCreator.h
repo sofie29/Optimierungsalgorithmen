@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "RectangleHolder.h"
 
 class BoundingBoxCreator : public QWidget {
 	Q_OBJECT
@@ -11,6 +12,7 @@ public:
 	void getBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list);
 	void setBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list);
 	void ResetBoundingBoxList();
+	void addBoundingBox(int x_pos, int y_pos, class RectangleHolder* rectHolder, int rectIndex, int boxIndex);
 	void addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex);
 	void addBoundingBox(int x_pos, int y_pos, QRectF& rect);
 	float getCurrentFitScore();

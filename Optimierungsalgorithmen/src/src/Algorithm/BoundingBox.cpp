@@ -14,42 +14,43 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, 
 	this->tryFit(rect.width(), rect.height(), x, y);
 	this->addRectangleIndex(rectIndex);
 	rect.moveTopLeft(QPointF(x, y));
-	
+}
+
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, RectangleHolder* rectHolder, int rectIndex, int boxIndex) :
+	rect_height(rect_height),
+	rect_width(rect_width),
+	x(x_pos),
+	y(y_pos),
+	first(nullptr),
+	second(nullptr),
+	numberOfRectangles(0)
+{
+	this->tryFit(rectHolder, boxIndex);
+	this->addRectangleIndex(rectIndex);
 }
 BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y):
 rect_height(rect_height),
 rect_width(rect_width),
 x(x),
 y(y),
-first(nullptr),
+first(nullptr), // TODO ???
 second(nullptr),
 numberOfRectangles(0)
 {
 }
-/*
-void BoundingBox::add(int rect_width, int rect_height)
+
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices) :
+	rect_height(rect_height),
+	rect_width(rect_width),
+	x(x),
+	y(y),
+	first(nullptr), // TODO ???
+	second(nullptr),
+	rectangleIndices(indices),
+	numberOfRectangles(indices.size())
 {
-	
-	BoundingBox test(10, 10, 0, 0);
-	bool fit = test.tryFit(rect_width, rect_height);
-	std::cout << fit << std::endl;
-	bool added = false;
-
-
-	for (BoundingBox* box : solution) {
-		
-		if (box->tryFit(rect_width, rect_height)) {
-			added = true;
-			break;
-		}
-		
-	}
-	if (!added) {
-		//BoundingBox* box = new BoundingBox();
-	}
-
 }
-*/
+
 
 void BoundingBox::removeLowerLevelBoundingBoxes() {
 	first.reset();

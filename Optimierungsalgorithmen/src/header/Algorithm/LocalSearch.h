@@ -23,7 +23,7 @@ LocalSearch<Solution>::LocalSearch(NeighbourI<Solution>* n, Solution sol) : Opti
 {
 	neighbourDefinition_ = n;
 	solution = sol;
-	currentBestScore_ = 0;
+	currentBestScore_ = AlgorithmConstants::maxScore; 
 }
 
 template<class Solution>
@@ -39,16 +39,16 @@ float LocalSearch<Solution>::execute()
 {
 
 	for(int i = 0; i < AlgorithmConstants::maxIterations; i++){
-		std::cout << i << std::endl;
-		int tmp = neighbourDefinition_->optimize();
-		if (tmp > currentBestScore_) {
+		std::cout << "Iteration: " << i << std::endl;
+		float tmp = neighbourDefinition_->optimize();
+		if (tmp < currentBestScore_) {
 			currentBestScore_ = tmp;
-			
-
 		}
 		std::cout << "" << std::endl;
 		
 	}
+	std::cout << "Score after optimization: " << currentBestScore_ << std::endl;
+
 	emit OptimDone();
 	emit DrawSolution();
 	return currentBestScore_;

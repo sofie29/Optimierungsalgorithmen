@@ -12,4 +12,5 @@ namespace AlgorithmConstants {
 	static const int initialBoxEdgeSize_ = initialEdgeSize_;
 
 	static const int  maxIterations = 100;
+	static const int  maxScore = 999000; // maximal score in geometryBasedNeighbourHood
 }
