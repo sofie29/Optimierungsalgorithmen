@@ -172,7 +172,7 @@ inline float GeometryBasedNeighbour<DataHolder*>::optimize() {
 		for (int newBoxIdx = 0; newBoxIdx < bBoxList.size(); ++newBoxIdx) {
 
 			if (newBoxIdx == oldBoxIndex) {
-				continue; // must be handled separatly
+				continue; // TODO: handle separatly
 			}
 
 			std::shared_ptr<BoundingBox>& newBox = bBoxList[newBoxIdx];

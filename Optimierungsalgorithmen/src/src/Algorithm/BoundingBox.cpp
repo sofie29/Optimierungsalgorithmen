@@ -39,6 +39,7 @@ numberOfRectangles(0)
 {
 }
 
+
 BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices) :
 	rect_height(rect_height),
 	rect_width(rect_width),
@@ -46,6 +47,19 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vec
 	y(y),
 	first(nullptr), // TODO ???
 	second(nullptr),
+	rectangleIndices(indices),
+	numberOfRectangles(indices.size())
+{
+}
+
+// Constructor for OverwriteData method / deep copy
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices, std::shared_ptr<BoundingBox> firstBox, std::shared_ptr<BoundingBox> secondBox) :
+	rect_height(rect_height),
+	rect_width(rect_width),
+	x(x),
+	y(y),
+	first(firstBox),
+	second(secondBox),
 	rectangleIndices(indices),
 	numberOfRectangles(indices.size())
 {
@@ -172,8 +186,28 @@ int BoundingBox::getYPos() const
 	return y;
 }
 
+std::shared_ptr<BoundingBox> BoundingBox::getFirstBox()
+{
+	return first;
+}
+
+std::shared_ptr<BoundingBox> BoundingBox::getSecondBox()
+{
+	return second;
+}
+
 std::vector<int> BoundingBox::getRectangleIndices() {
 	return rectangleIndices;
+}
+
+int BoundingBox::getBoxWidth()
+{
+	return rect_width;
+}
+
+int BoundingBox::getBoxHeight()
+{
+	return rect_height;
 }
 
 void BoundingBox::addRectangleIndex(int index) {

@@ -15,6 +15,7 @@ public:
 	void addBoundingBox(int x_pos, int y_pos, class RectangleHolder* rectHolder, int rectIndex, int boxIndex);
 	void addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex);
 	void addBoundingBox(int x_pos, int y_pos, QRectF& rect);
+	std::shared_ptr<class BoundingBox> createDeepCopy(std::shared_ptr<class BoundingBox> box);
 	float getCurrentFitScore();
 	void setCurrentFitScore(float score);
 	

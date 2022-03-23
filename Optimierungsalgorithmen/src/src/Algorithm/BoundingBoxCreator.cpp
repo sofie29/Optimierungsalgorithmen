@@ -27,15 +27,32 @@ void BoundingBoxCreator::getBoundingBoxList(std::vector<std::shared_ptr<class Bo
 	list = boundingBoxList_;
 }
 
+std::shared_ptr<class BoundingBox> BoundingBoxCreator::createDeepCopy(std::shared_ptr<class BoundingBox> box) {
+	std::shared_ptr<BoundingBox> firstBox = box->getFirstBox();
+	std::shared_ptr<BoundingBox> secondBox = box->getSecondBox();
+
+	if (firstBox != nullptr) {
+		std::shared_ptr<BoundingBox> firstCopy = createDeepCopy(firstBox);
+		std::shared_ptr<BoundingBox> secondCopy = createDeepCopy(secondBox);
+
+		return std::make_shared<BoundingBox>
+			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices(), firstCopy, secondCopy);
+	}
+	else { // firstBox and secondBox are nullptr -> box is a leaf
+		return std::make_shared<BoundingBox>
+			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos()); // no child boxes
+	}
+}
+
 void BoundingBoxCreator::setBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list)
 {
 	boundingBoxList_.clear();
 	for (const auto& bB : list) {
-		boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, bB->getXPos(), bB->getYPos(), bB->getRectangleIndices()));
+		boundingBoxList_.emplace_back(createDeepCopy(bB));
 		// boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, bB->getXPos(), bB->getYPos()));
-	}
-	
+	}	
 }
+
 
 void BoundingBoxCreator::ResetBoundingBoxList()
 {
