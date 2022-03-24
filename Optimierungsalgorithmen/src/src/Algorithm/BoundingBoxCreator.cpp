@@ -38,9 +38,9 @@ std::shared_ptr<class BoundingBox> BoundingBoxCreator::createDeepCopy(std::share
 		return std::make_shared<BoundingBox>
 			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices(), firstCopy, secondCopy);
 	}
-	else { // firstBox and secondBox are nullptr -> box is a leaf
+	else { // firstBox and secondBox are nullptr -> box is a leaf (can also be root node simultaneously)
 		return std::make_shared<BoundingBox>
-			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos()); // no child boxes
+			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices()); // no child boxes
 	}
 }
 

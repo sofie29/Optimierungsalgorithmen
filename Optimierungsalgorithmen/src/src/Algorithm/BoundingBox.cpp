@@ -74,7 +74,6 @@ BoundingBox::~BoundingBox()
 void BoundingBox::removeLowerLevelBoundingBoxes() {
 	first.reset();
 	second.reset();
-	// number of rectangles = 0 ?
 }
 
 bool BoundingBox::tryFit(int rect_width, int rect_height, int& x_out, int& y_out)
