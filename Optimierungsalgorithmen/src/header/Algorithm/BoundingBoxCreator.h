@@ -28,6 +28,7 @@ public slots:
 	void EdgeLengthChanged(const int length);
 	void RecSquareSizeChanged(int rectSquareSize);
 	void OnOptimDone();
+	void OnStepDone();
 	
 private:
 	std::vector<QRectF> rectangleList_; //this is the list for the bounding Box rectangles to draw them easily, NOT the actual rectangles

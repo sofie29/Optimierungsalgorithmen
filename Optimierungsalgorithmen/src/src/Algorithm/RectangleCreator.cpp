@@ -6,6 +6,10 @@ RectangleCreator::RectangleCreator()
 }
 RectangleCreator::~RectangleCreator()
 {
+	for (RectangleHolder* r : *rectangleList_) {
+		delete r;
+		r = nullptr;
+	}
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
 }
@@ -16,6 +20,10 @@ std::vector<class RectangleHolder*>* RectangleCreator::getRectList()
 
 void RectangleCreator::setNewRectList(std::vector<class RectangleHolder*>* list)
 {
+	for (RectangleHolder* r : *rectangleList_) {
+		delete r;
+		r = nullptr;
+	}
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
 	for (class RectangleHolder* r : *list) {
@@ -30,10 +38,24 @@ void RectangleCreator::setRectList(std::vector<class RectangleHolder*>* list)
 	rectangleList_ = list;
 }
 
+void RectangleCreator::ResetData()
+{
+	for (RectangleHolder* r : *rectangleList_) {
+		delete r;
+		r = nullptr;
+	}
+	rectangleList_->clear();
+	rectangleList_->shrink_to_fit();
+}
+
 
 
 void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 
+	for (RectangleHolder* r : *rectangleList_) {
+		delete r;
+		r = nullptr;
+	}
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
 

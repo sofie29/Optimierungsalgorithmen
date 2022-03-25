@@ -9,6 +9,7 @@ public:
 	std::vector<class RectangleHolder*>* getRectList();
 	void setNewRectList(std::vector<class RectangleHolder*>* list);
 	void setRectList(std::vector<class RectangleHolder* >* list);
+	void ResetData();
 signals:
 	void RectListUpdated(const std::vector<class RectangleHolder* >* list);
 	void EmitRectList(const std::vector<class RectangleHolder* >* list);

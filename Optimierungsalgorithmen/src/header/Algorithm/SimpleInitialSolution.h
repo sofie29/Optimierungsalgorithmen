@@ -9,7 +9,7 @@ template<class Data>
 class SimpleInitialSolution : public InitialSolutionI<Data> {
 public:
 	SimpleInitialSolution();
-	void CreateInitialSolution(Data d) override;
+	void CreateInitialSolution(DataHolderT<Data>* d) override;
 };
 
 template<class Data>
@@ -18,14 +18,14 @@ inline SimpleInitialSolution<Data>::SimpleInitialSolution() : InitialSolutionI<D
 }
 
 template<class Data>
-inline void SimpleInitialSolution<Data>::CreateInitialSolution(Data d)
+inline void SimpleInitialSolution<Data>::CreateInitialSolution(DataHolderT<Data>* d)
 {
 }
 
 template<>
-inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder* d) {
-	std::shared_ptr<BoundingBoxCreator> boxCreator = d->getBoxCreator();
-	std::shared_ptr<RectangleCreator> rectCreator = d->getRectCreator();
+inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolderT<DataHolder*>* d) {
+	std::shared_ptr<BoundingBoxCreator> boxCreator = d->getData()->getBoxCreator();
+	std::shared_ptr<RectangleCreator> rectCreator = d->getData()->getRectCreator();
 
 	std::vector<class RectangleHolder*>* rectList = rectCreator->getRectList();
 	
@@ -44,6 +44,7 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 		QRectF& rect = (*rectList)[rectIdx]->getRectRef();
 		bool added = false;
 		int boxIdx = 0;
+		/*
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
 			//int x, y;
 			if (box->tryFit((*rectList)[rectIdx], boxIdx)) {
@@ -53,6 +54,7 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 			}
 			boxIdx++;
 		}
+		*/
 		if (!added) {
 			//BoundingBox* box = new BoundingBox();
 

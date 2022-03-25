@@ -44,3 +44,9 @@ void DataHolder::OverwriteData(DataHolder* other)
 
 	
 }
+
+void DataHolder::ResetData()
+{
+	boxCreator_->ResetBoundingBoxList();
+	
+}

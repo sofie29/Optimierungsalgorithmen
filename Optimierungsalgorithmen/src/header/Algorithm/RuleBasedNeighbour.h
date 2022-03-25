@@ -13,15 +13,16 @@
 template<class Data>
 class RuleBasedNeighbour : public NeighbourI<Data> {
 public:
-	RuleBasedNeighbour(Data data, Data currentBest,  InitialSolutionI<Data>* initSol);
+	RuleBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest,  InitialSolutionI<Data>* initSol);
 	
 	virtual float optimize() override;
+	virtual void resetData() override;
 	
 };
 
 
 template<class Data>
-inline RuleBasedNeighbour<Data>::RuleBasedNeighbour(Data data, Data currentBest, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, currentBest, initSol)
+inline RuleBasedNeighbour<Data>::RuleBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, currentBest, initSol)
 {
 	//NeighbourI<Data>::data_ = data;
 }
@@ -32,6 +33,12 @@ inline float RuleBasedNeighbour<Data>::optimize()
 {
 }
 
+template<class Data>
+inline void RuleBasedNeighbour<Data>::resetData()
+{
+	NeighbourI<Data>::data_->ResetData();
+}
+
 template<>
 inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 	
@@ -40,16 +47,9 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 
 	auto t1 = std::chrono::high_resolution_clock::now();
 
-	std::vector<std::shared_ptr<class BoundingBox>> bestBoxList;
-	bestData_->getBoxCreator()->getBoundingBoxList(bestBoxList);
-	if (bestBoxList.size() == 0) {
-		initSol_->CreateInitialSolution(data_);
-		bestData_->OverwriteData(data_);
-	}
 
-	std::shared_ptr<BoundingBoxCreator> boxCreator = data_->getBoxCreator();
-	std::shared_ptr<RectangleCreator> rectCreator = data_->getRectCreator();
-
+	std::shared_ptr<BoundingBoxCreator> boxCreator = data_->getData()->getBoxCreator();
+	std::shared_ptr<RectangleCreator> rectCreator = data_->getData()->getRectCreator();
 
 	std::vector<class RectangleHolder*>* rectList =  rectCreator->getRectList();
 	
@@ -57,7 +57,7 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 	auto rng = std::default_random_engine{ rd() };
 	std::shuffle(std::begin(*rectList), std::end(*rectList), rng);
 
-	boxCreator->ResetBoundingBoxList();
+
 	std::vector<std::shared_ptr<BoundingBox>> bBoxList;
 	boxCreator->getBoundingBoxList(bBoxList);
 
@@ -71,7 +71,6 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 			//int x, y;
 			if (box->tryFit(rect, idx)) {
 				added = true;
-				//rect->getRectRef().moveTopLeft(QPointF(x, y));
 				break;
 			}
 			idx++;
@@ -90,20 +89,9 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 	
 	
 	rectCreator->setRectList(rectList);
-	//rectCreator->OnRectPositionsUpdated(rectList);
-	//emit OptimDone();
-
-	
-	
-	if (bBoxList.size() < bestBoxList.size()) {
-		
-		bestData_->OverwriteData(data_);
-	}
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms_int1 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	
-	
 	std::cout << ms_int1.count() << std::endl;
 	
 

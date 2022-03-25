@@ -10,5 +10,5 @@ public:
 public slots:
 	void Optim();
 private:
-	NeighbourI<class DataHolder*>* neighbour_;
+	class NeighbourI<class DataHolder*>* neighbour_;
 };

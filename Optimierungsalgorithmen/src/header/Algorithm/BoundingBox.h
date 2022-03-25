@@ -23,7 +23,7 @@ public:
 
 	// box_width, box_x and box_y refer to the top level bounding box, indices must not contain index of the rectangle which is placed, temperature t
 	bool tryFitOverlapping(class RectangleHolder* rectHolder, int boundingBoxIndex, int t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y);
-	
+
 	void removeLowerLevelBoundingBoxes();
 	void addRectangleIndex(int index);
 	void removeRectangleIndex(int index);

@@ -20,10 +20,16 @@ public:
 	QLabel* getOptimNumberLabel() const;
 	QLabel* getCurrentNumberLabel() const;
 	QLabel* getCurrentOptimPctLabel() const;
+
+	QLabel* getCurrentStepLabelNumber() const;
+	QPushButton* getNextStepButton() const;
+
+	QPushButton* getResetButton() const;
 public slots:
 	void setCurrentNumberLabel(int number);
 	void setOptimNumberLabel(float number);
 	void setCurrentOptimPctLabel(float number);
+	void setCurrentStepNumberLabel(int number);
 private:
 	QBoxLayout* layout_;
 	QGridLayout* gridLayout_;
@@ -46,5 +52,12 @@ private:
 	QLabel* optimNumberLabel_;
 	QLabel* currentNumberLabel_;
 	QLabel* currentOptimPctLabel_;
+
+	QPushButton* nextStepButton_;
+	QLabel* currentStepLabel_;
+	QLabel* currentStepLabelNumber_;
+
+	QPushButton* resetButton_;
+
 	
 };

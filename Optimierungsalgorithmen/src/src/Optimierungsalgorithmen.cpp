@@ -10,6 +10,7 @@
 #include "InitialSolutionI.h"
 #include "SimpleInitialSolution.h"
 #include "OptimAlgoI.h"
+#include "QAlgoWrapper.h"
 #include "Drawer.h"
 #include "stdafx.h"
 
@@ -26,16 +27,21 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     this->setCentralWidget(mainWindow_);
 
     algoSelectionUI_ = new AlgorithmSelectionUI();
-    dataHolder_ = std::make_shared<DataHolder>();
-    bestDataHolder_ = std::make_shared<DataHolder>();
+
+    dataHolder_ =  new DataHolder();
+    bestDataHolder_ = new DataHolder();
+    dataHolderT_ = new DataHolderT<DataHolder*>(dataHolder_);
+    bestDataHolderT_ = new DataHolderT<DataHolder*>(bestDataHolder_);
    
 
     initSol_ = new SimpleInitialSolution<DataHolder*>();
-    ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolder_.get(), bestDataHolder_.get(), initSol_);
-    geometryBasedNeighbour_ = new GeometryBasedNeighbour(dataHolder_.get(), bestDataHolder_.get(), initSol_);
+    ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
+    geometryBasedNeighbour_ = new GeometryBasedNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
     neighbourWrapper_ = new QNeighbourWrapper(ruleBasedNeighbour_);
-    localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), bestDataHolder_.get());
+    localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), dataHolderT_, bestDataHolderT_, initSol_);
     selectedAlgorithm_ = localSearch_;
+
+    algoWrapper_ = new QAlgoWrapper(selectedAlgorithm_);
 
     connect(algoSelectionUI_->getRecAmountSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectAmountChangedI);
     connect(algoSelectionUI_->getRecMaxSizeSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectSizeChangedI);
@@ -48,9 +54,11 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     connect(mainScene_->getBoxDrawer(), &BoundingBoxDrawer::BoundingBoxSizeChanged, bestDataHolder_->getBoxCreator().get(), &BoundingBoxCreator::EdgeLengthChanged);
 
     //This sets boundingboxes after optimization is done
-    connect(selectedAlgorithm_, &OptimAlgoI::OptimDone, bestDataHolder_->getBoxCreator().get(), &BoundingBoxCreator::OnOptimDone);
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::OptimDone, bestDataHolder_->getBoxCreator().get(), &BoundingBoxCreator::OnOptimDone);
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::StepDone, bestDataHolder_->getBoxCreator().get(), &BoundingBoxCreator::OnStepDone);
     connect(bestDataHolder_->getBoxCreator().get(), &BoundingBoxCreator::EmitRectList, mainScene_->getBoxDrawer(), &BoundingBoxDrawer::SetBoundingBoxes);
-    connect(selectedAlgorithm_, &OptimAlgoI::OptimDone, bestDataHolder_->getRectCreator().get(), &RectangleCreator::OnOptimDone);
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::OptimDone, bestDataHolder_->getRectCreator().get(), &RectangleCreator::OnOptimDone);
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::StepDone, bestDataHolder_->getRectCreator().get(), &RectangleCreator::OnOptimDone);
     connect(bestDataHolder_->getRectCreator().get(), &RectangleCreator::EmitRectList, mainScene_->getRecDrawer(), &RectangleDrawer::SetRects);
 
     //Set FitScore after optim is done
@@ -66,10 +74,17 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
 
     //AlgorithmChange/Start Logic
     connect(algoSelectionUI_->getAlgoSelectionBox(), &QComboBox::currentIndexChanged, this, &Optimierungsalgorithmen::changeAlgorithm);
-    connect(algoSelectionUI_->getStartButton(), &QPushButton::clicked, this, &Optimierungsalgorithmen::RunOptim);
+    connect(algoSelectionUI_->getStartButton(), &QPushButton::clicked, algoWrapper_, &QAlgoWrapper::RunUntilTermination);
 
     //Draw Solution
-    connect(selectedAlgorithm_, &OptimAlgoI::DrawSolution, mainScene_->getDrawer(), &Drawer::DrawScene);
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::DrawSolution, mainScene_->getDrawer(), &Drawer::DrawScene);
+
+    //Step Logic
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::EmitCurrentStep, algoSelectionUI_, &AlgorithmSelectionUI::setCurrentStepNumberLabel);
+    connect(algoSelectionUI_->getNextStepButton(), &QPushButton::clicked, algoWrapper_, &QAlgoWrapper::RunOneStep);
+    
+    //Reset Button
+    connect(algoSelectionUI_->getResetButton(), &QPushButton::clicked, algoWrapper_, &QAlgoWrapper::Reset);
 
     leftDock_ = new QDockWidget(this);
     leftDock_->setTitleBarWidget(new QWidget());
@@ -78,6 +93,7 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     leftDock_->setWidget(algoSelectionUI_);
     this->addDockWidget(Qt::LeftDockWidgetArea, leftDock_);
     
+    dataHolder_->getRectCreator()->CreateRects(AlgorithmConstants::initialAmount_, AlgorithmConstants::initialEdgeSize_);
    
 
 
@@ -85,7 +101,7 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
 
 Optimierungsalgorithmen::~Optimierungsalgorithmen()
 {
-
+    
     delete algoSelectionUI_;
     algoSelectionUI_ = nullptr;
 
@@ -101,6 +117,9 @@ Optimierungsalgorithmen::~Optimierungsalgorithmen()
     delete geometryBasedNeighbour_;
     geometryBasedNeighbour_ = nullptr;
 
+    delete algoWrapper_;
+    algoWrapper_ = nullptr;
+
     delete ruleBasedNeighbour_;
     ruleBasedNeighbour_ = nullptr;
 
@@ -113,6 +132,18 @@ Optimierungsalgorithmen::~Optimierungsalgorithmen()
     delete localSearch_;
     localSearch_ = nullptr;
 
+    delete dataHolderT_;
+    dataHolderT_ = nullptr;
+
+    delete bestDataHolderT_;
+    bestDataHolderT_ = nullptr;
+
+    delete dataHolder_;
+    dataHolder_ = nullptr;
+
+    delete bestDataHolder_;
+    bestDataHolder_ = nullptr;
+
 }
 
 void Optimierungsalgorithmen::changeAlgorithm(int idx)
@@ -122,11 +153,13 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
         neighbourWrapper_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setNeighbourDefinition(ruleBasedNeighbour_);
         selectedAlgorithm_ = localSearch_;
+        algoWrapper_->setAlgorithm(selectedAlgorithm_);
         break;
     case 1:
         neighbourWrapper_->setNeighbour(geometryBasedNeighbour_);
         localSearch_->setNeighbourDefinition(geometryBasedNeighbour_);
         selectedAlgorithm_ = localSearch_;
+        algoWrapper_->setAlgorithm(selectedAlgorithm_);
         break;
     case 2:
         selectedAlgorithm_ = nullptr;
@@ -137,6 +170,3 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
     }
 }
 
-void Optimierungsalgorithmen::RunOptim() {
-    if(selectedAlgorithm_) selectedAlgorithm_->execute();
-}

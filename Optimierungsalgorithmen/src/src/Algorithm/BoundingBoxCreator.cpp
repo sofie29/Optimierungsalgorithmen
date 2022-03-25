@@ -50,21 +50,21 @@ void BoundingBoxCreator::setBoundingBoxList(std::vector<std::shared_ptr<class Bo
 	for (const auto& bB : list) {
 		boundingBoxList_.emplace_back(createDeepCopy(bB));
 		// boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, bB->getXPos(), bB->getYPos()));
-	}	
+	}
 }
 
 
 void BoundingBoxCreator::ResetBoundingBoxList()
 {
-	
-	
+
+
 	boundingBoxList_.clear();
 	rectangleList_.clear();
 }
 
 void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex)
 {
-	
+
 
 	boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rect, rectIndex));
 	rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), edgeLength_, edgeLength_));
@@ -117,6 +117,13 @@ void BoundingBoxCreator::OnOptimDone()
 	emit EmitCurrentFitScore(currentFitScore_);
 	boundingBoxList_.clear();
 	rectangleList_.clear();
+}
+
+void BoundingBoxCreator::OnStepDone()
+{
+	emit EmitRectList(rectangleList_);
+	emit EmitNumberOfBoundingBoxes(boundingBoxList_.size());
+	emit EmitCurrentFitScore(currentFitScore_);
 }
 
 void BoundingBoxCreator::EdgeLengthChanged(const int length) {

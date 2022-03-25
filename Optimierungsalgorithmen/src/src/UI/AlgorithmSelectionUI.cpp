@@ -74,7 +74,7 @@ AlgorithmSelectionUI::AlgorithmSelectionUI()
 	connect(boxSizeSlider_, &QSlider::valueChanged, boxSizeLineEdit_, [=]() {boxSizeLineEdit_->setText(QString::number(boxSizeSlider_->value())); });
 	connect(boxSizeLineEdit_, &QLineEdit::textChanged, boxSizeSlider_, [=]() {boxSizeSlider_->setValue(boxSizeLineEdit_->text().toInt()); });
 
-	startButton_ = new QPushButton("Start");
+	startButton_ = new QPushButton("All Iterations");
 	gridLayout_->addWidget(startButton_, 3, 1, Qt::AlignLeft);
 
 	algoSelectionBox_ = new QComboBox();
@@ -91,17 +91,41 @@ AlgorithmSelectionUI::AlgorithmSelectionUI()
 	gridLayout_->addWidget(currentLabel_, 5, 0, Qt::AlignLeft);
 
 	optimNumberLabel_ = new QLabel("0.00");
-	gridLayout_->addWidget(optimNumberLabel_, 4, 1, Qt::AlignLeft);
+	gridLayout_->addWidget(optimNumberLabel_, 4, 2, Qt::AlignLeft);
 
 	currentNumberLabel_ = new QLabel("0");
-	gridLayout_->addWidget(currentNumberLabel_, 5, 1, Qt::AlignLeft);
+	gridLayout_->addWidget(currentNumberLabel_, 5, 2, Qt::AlignLeft);
 
 	currentOptimPctLabel_ = new QLabel("0.00");
-	gridLayout_->addWidget(currentOptimPctLabel_, 5, 2, Qt::AlignLeft);
+	gridLayout_->addWidget(currentOptimPctLabel_, 5, 3, Qt::AlignLeft);
+
+	nextStepButton_ = new QPushButton("Next Step");
+	gridLayout_->addWidget(nextStepButton_, 3, 2, Qt::AlignLeft);
+
+	currentStepLabel_ = new QLabel("Current Step: ");
+	gridLayout_->addWidget(currentStepLabel_, 3, 3, Qt::AlignLeft);
+
+	currentStepLabelNumber_ = new QLabel("0");
+	gridLayout_->addWidget(currentStepLabelNumber_, 3, 4, Qt::AlignLeft);
+
+	resetButton_ = new QPushButton("Reset");
+	gridLayout_->addWidget(resetButton_, 3, 6, Qt::AlignLeft);
 }
 
 AlgorithmSelectionUI::~AlgorithmSelectionUI()
 {
+	delete resetButton_;
+	resetButton_ = nullptr;
+
+	delete currentStepLabel_;
+	currentStepLabel_ = nullptr;
+
+	delete currentStepLabelNumber_;
+	currentStepLabelNumber_ = nullptr;
+
+	delete nextStepButton_;
+	nextStepButton_ = nullptr;
+
 	delete currentOptimPctLabel_;
 	currentOptimPctLabel_ = nullptr;
 
@@ -211,6 +235,21 @@ QLabel* AlgorithmSelectionUI::getCurrentOptimPctLabel() const
 	return currentOptimPctLabel_;
 }
 
+QLabel* AlgorithmSelectionUI::getCurrentStepLabelNumber() const
+{
+	return currentStepLabelNumber_;
+}
+
+QPushButton* AlgorithmSelectionUI::getNextStepButton() const
+{
+	return nextStepButton_;
+}
+
+QPushButton* AlgorithmSelectionUI::getResetButton() const
+{
+	return resetButton_;
+}
+
 void AlgorithmSelectionUI::setCurrentNumberLabel(int number)
 {
 	QString s = QString::number(number);
@@ -228,5 +267,12 @@ void AlgorithmSelectionUI::setCurrentOptimPctLabel(float number)
 	float num = number * 100;
 	QString s = QString::number(num, 'f', 2) + QString("% optimal");
 	currentOptimPctLabel_->setText(s);
+}
+
+void AlgorithmSelectionUI::setCurrentStepNumberLabel(int number)
+{
+	QString s = QString::number(number);
+	currentStepLabelNumber_->setText(s);
+	
 }
 

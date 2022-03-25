@@ -1,61 +1,101 @@
 #pragma once
 #include "OptimAlgoI.h"
 #include "NeighbourI.h"
+#include "InitialSolutionI.h"
 #include "stdafx.h"
-template<class Solution>
-class LocalSearch : public OptimAlgoI{
+template<class Data>
+class LocalSearch : public OptimAlgoI<Data>{
 
 public:
-	LocalSearch(NeighbourI<Solution>* n, Solution sol);
+	LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* sol, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* initSol);
 	~LocalSearch();
 	//returns optimal box amount
-	virtual float execute() override;
-	void setNeighbourDefinition(NeighbourI<Solution>* n);
+	virtual float execute(int steps) override;
+	virtual void reset() override;
+	void setNeighbourDefinition(NeighbourI<Data>* n);
 private:
-	NeighbourI<Solution>* neighbourDefinition_;
-	Solution solution;
+	NeighbourI<Data>* neighbourDefinition_;
+	//Data solution;
 	float currentBestScore_;
 	
 };
 
-template<class Solution>
-LocalSearch<Solution>::LocalSearch(NeighbourI<Solution>* n, Solution sol) : OptimAlgoI()
+template<class Data>
+inline LocalSearch<Data>::LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* sol, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* initSol) : OptimAlgoI<Data>(sol, bestSol, initSol)
 {
 	neighbourDefinition_ = n;
-	solution = sol;
-	currentBestScore_ = AlgorithmConstants::maxScore; 
+	currentBestScore_ = AlgorithmConstants::maxScore;
 }
 
-template<class Solution>
-LocalSearch<Solution>::~LocalSearch()
+template<class Data>
+LocalSearch<Data>::~LocalSearch()
 {
 	neighbourDefinition_ = nullptr;
-	solution = nullptr;
+	//solution = nullptr;
 }
 
 
-template<class Solution>
-float LocalSearch<Solution>::execute()
+template<class Data>
+float LocalSearch<Data>::execute(int steps)
 {
+	if (OptimAlgoI<Data>::currentStep_ == -1) {
+		OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_);
+		OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
+		neighbourDefinition_->resetData();
+		OptimAlgoI<Data>::currentStep_++;
+	}
 
-	for(int i = 0; i < AlgorithmConstants::maxIterations; i++){
-		std::cout << "Iteration: " << i << std::endl;
+	int steps_left = 0;
+	while(OptimAlgoI<Data>::currentStep_ < AlgorithmConstants::maxIterations && steps_left < steps){
+		std::cout << "Iteration: " << OptimAlgoI<Data>::currentStep_ << std::endl;
 		float tmp = neighbourDefinition_->optimize();
 		if (tmp < currentBestScore_) {
 			currentBestScore_ = tmp;
+			OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
 		}
+		//OptimAlgoI<Data>::currentSol_->ResetData();
+		neighbourDefinition_->resetData();
+
 		std::cout << "" << std::endl;
+		OptimAlgoI<Data>::currentStep_++;
+		emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);
+		
+		steps_left++;
+
 		
 	}
-	std::cout << "Score after optimization: " << currentBestScore_ << std::endl;
-
-	emit OptimDone();
-	emit DrawSolution();
+	bool done = OptimAlgoI<Data>::currentStep_ >= AlgorithmConstants::maxIterations;
+	if (!done) {
+		std::cout << "Score after step: " << currentBestScore_ << std::endl;
+		emit OptimAlgoI<Data>::StepDone();
+		emit OptimAlgoI<Data>::DrawSolution();
+	}
+	else {
+		std::cout << "Score after optimization: " << currentBestScore_ << std::endl;
+		emit OptimAlgoI<Data>::OptimDone();
+		emit OptimAlgoI<Data>::DrawSolution();
+	}
+	
 	return currentBestScore_;
 }
 
-template<class Solution>
-inline void LocalSearch<Solution>::setNeighbourDefinition(NeighbourI<Solution>* n)
+template<class Data>
+inline void LocalSearch<Data>::reset()
+{
+	OptimAlgoI<Data>::currentSol_->ResetData();
+	OptimAlgoI<Data>::bestSol_->ResetData();
+	currentBestScore_ = AlgorithmConstants::maxScore;;
+	OptimAlgoI<Data>::currentStep_ = 0;
+	OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_);
+	OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
+
+	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_ + 1);
+	emit OptimAlgoI<Data>::StepDone();
+	emit OptimAlgoI<Data>::DrawSolution();
+}
+
+template<class Data>
+inline void LocalSearch<Data>::setNeighbourDefinition(NeighbourI<Data>* n)
 {
 	neighbourDefinition_ = n;
 }

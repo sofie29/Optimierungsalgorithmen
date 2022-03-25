@@ -18,7 +18,7 @@ void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
 {
 	QBrush brush;
 	brush.setStyle(Qt::BrushStyle::SolidPattern);
-	brush.setColor(Qt::darkCyan);
+	brush.setColor(QColor(0, 139, 139, 255));
 	QPen pen;
 	pen.setColor(Qt::black);
 	pen.setWidth(1);

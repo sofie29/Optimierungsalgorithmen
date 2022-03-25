@@ -28,14 +28,14 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, 
 	this->tryFit(rectHolder, boxIndex);
 	this->addRectangleIndex(rectIndex);
 }
-BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y):
-rect_height(rect_height),
-rect_width(rect_width),
-x(x),
-y(y),
-first(nullptr), // TODO ???
-second(nullptr),
-numberOfRectangles(0)
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y) :
+	rect_height(rect_height),
+	rect_width(rect_width),
+	x(x),
+	y(y),
+	first(nullptr), // TODO ???
+	second(nullptr),
+	numberOfRectangles(0)
 {
 }
 
@@ -184,7 +184,7 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int boundingBox
 
 	// try to place rectangle at first BoundingBox
 		if (this->first && this->first->tryFitOverlapping(rectHolder, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y));
-			return true;
+		return true;
 
 		// try to place rectangle at second BoundingBox
 		if (this->second && this->second->tryFitOverlapping(rectHolder, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
@@ -216,7 +216,7 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int boundingBox
 			int x_overlap = std::min(rectPosX + rect_width, (int)(rect2.x() + rect2.width())) - std::max(rectPosX, (int)rect2.x());
 			int y_overlap = std::min(rectPosY + rect_height, (int)(rect2.y() + rect2.height())) - std::max(rectPosY, (int)rect2.y());
 			int area_overlap = (x_overlap > 0 && y_overlap > 0) ? x_overlap * y_overlap : 0;
-			
+
 			int area_1 = rect.width() * rect.height();
 			int area_2 = rect2.width() * rect2.height();
 			int area_max = std::max(area_1, area_2);
@@ -289,6 +289,6 @@ void BoundingBox::addRectangleIndex(int index) {
 void BoundingBox::removeRectangleIndex(int index) {
 	rectangleIndices.erase(std::remove(rectangleIndices.begin(), rectangleIndices.end(), index), rectangleIndices.end());
 	--numberOfRectangles;
-	
+
 	return;
 }
