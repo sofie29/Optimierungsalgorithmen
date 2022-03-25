@@ -20,5 +20,6 @@ private:
 	int currentAmount_;
 	int currentMaxEdgeLength_;
 	std::vector<QRectF> rectList_;
+	std::vector<QColor> rectColors_;
 	
 };

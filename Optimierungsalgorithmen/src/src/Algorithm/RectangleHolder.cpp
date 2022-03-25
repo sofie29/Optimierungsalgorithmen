@@ -2,6 +2,7 @@
 
 RectangleHolder::RectangleHolder(QRectF rect) : rect_(rect)
 {
+	drawColor_ = defaultColor_;
 }
 
 RectangleHolder::RectangleHolder(QRectF rect, int idx) : rect_(rect), boundingBoxIndex_(idx)
@@ -37,3 +38,28 @@ void RectangleHolder::setBoundingBoxIndex(int idx)
 {
 	boundingBoxIndex_ = idx;
 }
+
+QColor RectangleHolder::getColor()
+{
+	return drawColor_;
+}
+
+void RectangleHolder::setColor(QColor c)
+{
+	drawColor_ = c;
+}
+
+void RectangleHolder::setToSwappedColor()
+{
+	drawColor_ = swappedColor_;
+}
+
+void RectangleHolder::setToDefaultColor()
+{
+	drawColor_ = defaultColor_;
+}
+
+
+
+QColor RectangleHolder::defaultColor_ = QColor(Qt::darkCyan);
+QColor RectangleHolder::swappedColor_ = QColor(Qt::red);

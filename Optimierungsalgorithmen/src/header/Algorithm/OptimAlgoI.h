@@ -9,6 +9,8 @@ signals:
 	void StepDone();
 	void DrawSolution();
 	void EmitCurrentStep(int step);
+	void EmitTakenTime(double time);
+	void EmitTakenTimeAvg(double time);
 
 };
 template<class Data>
@@ -22,6 +24,7 @@ protected:
 	DataHolderT<Data>* currentSol_;
 	DataHolderT<Data>* bestSol_;
 	class InitialSolutionI<Data>* initSol_;
+	double currentTimeTaken_;
 };
 
 
@@ -29,6 +32,7 @@ template<class Data>
 inline OptimAlgoI<Data>::OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init)
 {
 	currentStep_ = -1;
+	currentTimeTaken_ = 0.0;
 	currentSol_ = dt;
 	bestSol_ = bestSol;
 	initSol_ = init;

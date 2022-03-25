@@ -26,9 +26,12 @@ void RectangleCreator::setNewRectList(std::vector<class RectangleHolder*>* list)
 	}
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
+	int idx = 0;
 	for (class RectangleHolder* r : *list) {
 		QRectF rect = r->getRect();
 		rectangleList_->emplace_back(new class RectangleHolder(rect, r->getBoundingBoxIndex()));
+		(*rectangleList_)[idx]->setColor(r->getColor());
+		++idx;
 		// rectangleList_->emplace_back(new class RectangleHolder(rect));
 	}
 }

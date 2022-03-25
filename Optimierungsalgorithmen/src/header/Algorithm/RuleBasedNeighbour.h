@@ -42,29 +42,37 @@ inline void RuleBasedNeighbour<Data>::resetData()
 template<>
 inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 	
+
+
 	
-
-
-	auto t1 = std::chrono::high_resolution_clock::now();
 
 
 	std::shared_ptr<BoundingBoxCreator> boxCreator = data_->getData()->getBoxCreator();
 	std::shared_ptr<RectangleCreator> rectCreator = data_->getData()->getRectCreator();
 
 	std::vector<class RectangleHolder*>* rectList =  rectCreator->getRectList();
+	if (rectList->size() == 1) return 1;
 	
-	auto rd = std::random_device{};
-	auto rng = std::default_random_engine{ rd() };
-	std::shuffle(std::begin(*rectList), std::end(*rectList), rng);
-
+	std::random_device dev;
+	std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist(0, rectList->size() - 1); // distribution in range [x, y]
+	int firstIndex = dist(rng);
+	int secondIndex = firstIndex;
+	while (secondIndex == firstIndex) {
+		secondIndex = dist(rng);
+	}
+	RectangleHolder* tmp = (*rectList)[firstIndex];
+	(*rectList)[firstIndex] = (*rectList)[secondIndex];
+	(*rectList)[secondIndex] = tmp;
+	
 
 	std::vector<std::shared_ptr<BoundingBox>> bBoxList;
 	boxCreator->getBoundingBoxList(bBoxList);
 
 	int amount = rectList->size();
 	int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int) std::ceil(std::sqrt(amount)));
+	int idx = 0;
 	for (class RectangleHolder* rect : *rectList) {
-		
 		bool added = false;
 		int idx = 0;
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
@@ -75,8 +83,6 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 			}
 			idx++;
 		}
-	
-		
 		if (!added) {
 			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
@@ -84,15 +90,15 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 			boxCreator->getBoundingBoxList(bBoxList);
 		}
 		
+		rect->setToDefaultColor();
 	}
-	
+	(*rectList)[firstIndex]->setToSwappedColor();
+	(*rectList)[secondIndex]->setToSwappedColor();
 	
 	
 	rectCreator->setRectList(rectList);
 
-	auto t2 = std::chrono::high_resolution_clock::now();
-	auto ms_int1 = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-	std::cout << ms_int1.count() << std::endl;
+	
 	
 
 	

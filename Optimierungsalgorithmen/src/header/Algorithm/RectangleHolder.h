@@ -11,7 +11,15 @@ public:
 	void setRect(QRectF rect);
 	int getBoundingBoxIndex();
 	void setBoundingBoxIndex(int idx);
+	QColor getColor();
+	void setColor(QColor c);
+	void setToSwappedColor();
+	void setToDefaultColor();
 private:
 	QRectF rect_;
 	int boundingBoxIndex_;
+	QColor drawColor_;
+
+	static QColor defaultColor_;
+	static QColor swappedColor_;
 };

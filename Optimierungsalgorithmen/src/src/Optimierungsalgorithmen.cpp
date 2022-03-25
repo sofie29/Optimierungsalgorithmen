@@ -86,6 +86,10 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     //Reset Button
     connect(algoSelectionUI_->getResetButton(), &QPushButton::clicked, algoWrapper_, &QAlgoWrapper::Reset);
 
+    //Timer Logic
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::EmitTakenTime, algoSelectionUI_, &AlgorithmSelectionUI::setTimeDisplayLabel);
+    connect(selectedAlgorithm_, &OptimAlgoI<DataHolder*>::EmitTakenTimeAvg, algoSelectionUI_, &AlgorithmSelectionUI::setAvgTimeDisplayLabel);
+
     leftDock_ = new QDockWidget(this);
     leftDock_->setTitleBarWidget(new QWidget());
     leftDock_->setFeatures(QDockWidget::NoDockWidgetFeatures);
@@ -153,13 +157,11 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
         neighbourWrapper_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setNeighbourDefinition(ruleBasedNeighbour_);
         selectedAlgorithm_ = localSearch_;
-        algoWrapper_->setAlgorithm(selectedAlgorithm_);
         break;
     case 1:
         neighbourWrapper_->setNeighbour(geometryBasedNeighbour_);
         localSearch_->setNeighbourDefinition(geometryBasedNeighbour_);
         selectedAlgorithm_ = localSearch_;
-        algoWrapper_->setAlgorithm(selectedAlgorithm_);
         break;
     case 2:
         selectedAlgorithm_ = nullptr;
@@ -168,5 +170,7 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
         selectedAlgorithm_ = nullptr;
         break;
     }
+    algoWrapper_->setAlgorithm(selectedAlgorithm_);
+    algoWrapper_->Reset();
 }
 

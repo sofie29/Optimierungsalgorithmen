@@ -30,9 +30,12 @@ public slots:
 	void setOptimNumberLabel(float number);
 	void setCurrentOptimPctLabel(float number);
 	void setCurrentStepNumberLabel(int number);
+	void setTimeDisplayLabel(double number);
+	void setAvgTimeDisplayLabel(double number);
 private:
 	QBoxLayout* layout_;
-	QGridLayout* gridLayout_;
+	QGridLayout* topLayout_;
+	QGridLayout* bottomLayout_;
 	QLabel* recAmountText_;
 	QLabel* recMaxSizeText_;
 	QSlider* recAmountInput_;
@@ -58,6 +61,10 @@ private:
 	QLabel* currentStepLabelNumber_;
 
 	QPushButton* resetButton_;
+
+	QLabel* timeTextLabel_;
+	QLabel* timeDisplayLabel_;
+	QLabel* avgTimeDisplayLabel_;
 
 	
 };

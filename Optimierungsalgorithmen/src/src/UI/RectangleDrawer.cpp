@@ -11,7 +11,11 @@ RectangleDrawer::RectangleDrawer()
 
 RectangleDrawer::~RectangleDrawer()
 {
-	
+	rectList_.clear();
+	rectList_.shrink_to_fit();
+
+	rectColors_.clear();
+	rectColors_.shrink_to_fit();
 }
 
 void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
@@ -22,8 +26,11 @@ void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
 	QPen pen;
 	pen.setColor(Qt::black);
 	pen.setWidth(1);
+	int idx = 0;
 	for (const QRectF& rect : rectList_) {
+		brush.setColor(rectColors_[idx]);
 		scene->addRect(rect, pen, brush);
+		++idx;
 	}
 }
 
@@ -63,8 +70,12 @@ void RectangleDrawer::DrawRectSizeChangedS(const QString& maxEdgeLength)
 void RectangleDrawer::SetRects(const std::vector<class RectangleHolder*>* list) {
 	
 	rectList_.clear();
-	for(class RectangleHolder* r : *list)
+	rectColors_.clear();
+	for (class RectangleHolder* r : *list) {
 		rectList_.emplace_back(r->getRect());
+		rectColors_.emplace_back(r->getColor());		
+		
+	}
 	//emit EmitListChanged();
 
 	/*

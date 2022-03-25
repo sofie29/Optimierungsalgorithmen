@@ -12,4 +12,6 @@ namespace UIConstants {
 
 	static const int rectangleSpace_ = 5;
 	static const int maxBoxesPerLine = 20;
+
+
 }

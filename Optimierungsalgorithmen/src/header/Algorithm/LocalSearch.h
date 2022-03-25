@@ -38,6 +38,8 @@ LocalSearch<Data>::~LocalSearch()
 template<class Data>
 float LocalSearch<Data>::execute(int steps)
 {
+	auto t1 = std::chrono::high_resolution_clock::now();
+
 	if (OptimAlgoI<Data>::currentStep_ == -1) {
 		OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_);
 		OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
@@ -46,10 +48,10 @@ float LocalSearch<Data>::execute(int steps)
 	}
 
 	int steps_left = 0;
-	while(OptimAlgoI<Data>::currentStep_ < AlgorithmConstants::maxIterations && steps_left < steps){
+	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		std::cout << "Iteration: " << OptimAlgoI<Data>::currentStep_ << std::endl;
 		float tmp = neighbourDefinition_->optimize();
-		if (tmp < currentBestScore_) {
+		if (tmp <= currentBestScore_) {
 			currentBestScore_ = tmp;
 			OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
 		}
@@ -62,7 +64,10 @@ float LocalSearch<Data>::execute(int steps)
 		
 		steps_left++;
 
-		
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
+		OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
+		t1 = std::chrono::high_resolution_clock::now();
 	}
 	bool done = OptimAlgoI<Data>::currentStep_ >= AlgorithmConstants::maxIterations;
 	if (!done) {
@@ -76,22 +81,38 @@ float LocalSearch<Data>::execute(int steps)
 		emit OptimAlgoI<Data>::DrawSolution();
 	}
 	
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
+	OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
+	emit OptimAlgoI<Data>::EmitTakenTime(OptimAlgoI<Data>::currentTimeTaken_);
+	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ /(double) OptimAlgoI<Data>::currentStep_);
 	return currentBestScore_;
 }
 
 template<class Data>
 inline void LocalSearch<Data>::reset()
 {
+
 	OptimAlgoI<Data>::currentSol_->ResetData();
 	OptimAlgoI<Data>::bestSol_->ResetData();
 	currentBestScore_ = AlgorithmConstants::maxScore;;
 	OptimAlgoI<Data>::currentStep_ = 0;
+	OptimAlgoI<Data>::currentTimeTaken_ = 0.0;
+
+	auto t1 = std::chrono::high_resolution_clock::now();
+
 	OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_);
 	OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
-
-	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_ + 1);
+	neighbourDefinition_->resetData();
+	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);
 	emit OptimAlgoI<Data>::StepDone();
 	emit OptimAlgoI<Data>::DrawSolution();
+
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
+	OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
+	emit OptimAlgoI<Data>::EmitTakenTime(OptimAlgoI<Data>::currentTimeTaken_);
+	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_);
 }
 
 template<class Data>
