@@ -14,3 +14,22 @@ int main(int argc, char *argv[])
     w.show();
     return a.exec();
 }
+
+void* operator new(size_t size) {
+
+
+
+    
+    //std::cout << "alloc " << size << std::endl;
+
+    return malloc(size);
+}
+
+void operator delete(void* memory, size_t size) {
+
+
+  
+   // std::cout << "dealloc " << size << std::endl;
+
+    free(memory);
+}

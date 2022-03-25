@@ -79,13 +79,13 @@
     <ClCompile Include="src\src\UI\Drawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\src\Algorithm\OptimAlgoI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\src\Algorithm\RectangleCreator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\src\Algorithm\RectangleHolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\src\Algorithm\QAlgoWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -123,6 +123,9 @@
     <QtMoc Include="src\header\Algorithm\OptimAlgoI.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="src\header\Algorithm\QAlgoWrapper.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\header\Constants\UIConstants.h">
@@ -153,6 +156,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\Algorithm\RectangleHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\DataHolderT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
