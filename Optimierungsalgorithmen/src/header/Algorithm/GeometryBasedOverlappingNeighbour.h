@@ -14,12 +14,16 @@ public:
 	GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
 	virtual float optimize() override;
 	virtual float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
-	virtual bool tryFitWrapper(std::shared_ptr<BoundingBox>& box, RectangleHolder* rectHolder, int boxIdx) override;
+	virtual bool tryFitWrapper(std::shared_ptr<BoundingBox>& box, int rectIdx, int boxIdx, std::vector<class RectangleHolder*>* rectangles) override;
+private:
+	float t_;
 };
+
 
 
 template<class Data>
 inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : GeometryBasedNeighbourI<Data>(data, currentBest, initSol) {
+	t_ = 1;
 }
 
 template<>
@@ -53,7 +57,13 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(size
 }
 
 template<class Data>
-inline bool GeometryBasedOverlappingNeighbour<Data>::tryFitWrapper(std::shared_ptr<BoundingBox>& box, RectangleHolder* rectHolder, int boxIdx)
+inline bool GeometryBasedOverlappingNeighbour<Data>::tryFitWrapper(std::shared_ptr<BoundingBox>& box, int rectIdx, int boxIdx, std::vector<class RectangleHolder*>* rectangles)
 {
-	return box->tryFit(rectHolder, boxIdx);
+	std::vector<int> indices = box->getRectangleIndices();
+	indices.erase(std::remove(indices.begin(), indices.end(), rectIdx), indices.end());
+	if (t_ >= 0.1) {
+		t_ -= 0.1;
+	}
+
+	return box->tryFitOverlapping((*rectangles)[rectIdx], boxIdx, t_, rectangles, indices, box->getBoxWidth(), box->getXPos(), box->getYPos());
 }

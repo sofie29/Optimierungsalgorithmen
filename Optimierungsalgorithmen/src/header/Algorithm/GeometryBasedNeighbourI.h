@@ -18,7 +18,7 @@ public:
 	virtual void resetData() override;
 
 	virtual float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
-	virtual bool tryFitWrapper(std::shared_ptr<BoundingBox>& box, RectangleHolder* rectHolder, int boxIdx) = 0;
+	virtual bool tryFitWrapper(std::shared_ptr<BoundingBox>& box, int rectIdx, int boxIdx, std::vector<class RectangleHolder*>* rectangles) = 0;
 
 protected:
 	size_t rectPos;
@@ -30,9 +30,6 @@ protected:
 	float findNeighbour(bool methodA, bool methodB);
 	void setAllToDefaultColors(std::vector<class RectangleHolder*>* rectList);
 };
-
-// beide implementieren das optimize()
-// optimize ruft entweder findNeighbour(true, false, data*, bestData_*) auf oder findNeighbour(true, true) auf
 
 
 template<class Data>
@@ -250,13 +247,13 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 			std::shared_ptr<BoundingBox>& newBox = bBoxList[newBoxIdx];
 
-			bool rectFitsInBox = this->tryFitWrapper(newBox, (*rectList)[rectIdx], newBoxIdx);
+			bool rectFitsInBox = this->tryFitWrapper(newBox, rectIdx, newBoxIdx, rectList);
 			if (!rectFitsInBox) {
 				// rotate rectangle and try to place again
 				rect.setWidth(height);
 				rect.setHeight(width);
 				hasRotated = true;
-				rectFitsInBox = this->tryFitWrapper(newBox, (*rectList)[rectIdx], newBoxIdx);
+				rectFitsInBox = this->tryFitWrapper(newBox, rectIdx, newBoxIdx, rectList);
 			}
 
 			if (rectFitsInBox) {
