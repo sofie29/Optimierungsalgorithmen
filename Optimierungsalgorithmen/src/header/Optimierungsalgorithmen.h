@@ -5,6 +5,7 @@
 #include "LocalSearch.h"
 #include "RuleBasedNeighbour.h"
 #include "GeometryBasedNeighbour.h"
+#include "GeometryBasedOverlappingNeighbour.h"
 #include "OptimAlgoI.h"
 #include "DataHolderT.h"
 class Optimierungsalgorithmen : public QMainWindow
@@ -36,6 +37,7 @@ private:
 
     RuleBasedNeighbour<class DataHolder*>* ruleBasedNeighbour_;
     GeometryBasedNeighbour<class DataHolder*>* geometryBasedNeighbour_;
+    GeometryBasedOverlappingNeighbour<class DataHolder*>* geometryBasedOverlappingNeighbour_;
     InitialSolutionI<DataHolder*>* initSol_;
     class QNeighbourWrapper* neighbourWrapper_;
     class QAlgoWrapper* algoWrapper_;

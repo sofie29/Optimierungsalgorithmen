@@ -12,6 +12,7 @@ public:
 	void getBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list);
 	void setBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list);
 	void ResetBoundingBoxList();
+	void resetOneBoundingBox(int index);
 	void addBoundingBox(int x_pos, int y_pos, class RectangleHolder* rectHolder, int rectIndex, int boxIndex);
 	void addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex);
 	void addBoundingBox(int x_pos, int y_pos, QRectF& rect);

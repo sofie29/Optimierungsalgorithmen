@@ -37,6 +37,7 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     initSol_ = new SimpleInitialSolution<DataHolder*>();
     ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
     geometryBasedNeighbour_ = new GeometryBasedNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
+    geometryBasedOverlappingNeighbour_ = new GeometryBasedOverlappingNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
     neighbourWrapper_ = new QNeighbourWrapper(ruleBasedNeighbour_);
     localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), dataHolderT_, bestDataHolderT_, initSol_);
     selectedAlgorithm_ = localSearch_;
@@ -120,6 +121,9 @@ Optimierungsalgorithmen::~Optimierungsalgorithmen()
 
     delete geometryBasedNeighbour_;
     geometryBasedNeighbour_ = nullptr;
+    
+    delete geometryBasedOverlappingNeighbour_;
+    geometryBasedOverlappingNeighbour_ = nullptr;
 
     delete algoWrapper_;
     algoWrapper_ = nullptr;
@@ -164,7 +168,9 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
         selectedAlgorithm_ = localSearch_;
         break;
     case 2:
-        selectedAlgorithm_ = nullptr;
+        neighbourWrapper_->setNeighbour(geometryBasedOverlappingNeighbour_);
+        localSearch_->setNeighbourDefinition(geometryBasedOverlappingNeighbour_);
+        selectedAlgorithm_ = localSearch_;
         break;
     case 3:
         selectedAlgorithm_ = nullptr;

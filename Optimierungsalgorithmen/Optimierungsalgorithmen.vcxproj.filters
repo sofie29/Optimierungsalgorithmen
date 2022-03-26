@@ -88,6 +88,12 @@
     <ClCompile Include="src\src\Algorithm\QAlgoWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\src\Algorithm\GeometryBasedNeighbourI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\src\Algorithm\GeometryBasedOverlappingNeighbour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\header\Optimierungsalgorithmen.h">
@@ -159,6 +165,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\Algorithm\DataHolderT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\GeometryBasedNeighbourI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\GeometryBasedOverlappingNeighbour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

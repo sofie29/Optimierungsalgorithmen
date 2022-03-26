@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -110,6 +110,8 @@
     <QtRcc Include="Optimierungsalgorithmen.qrc" />
     <QtUic Include="Optimierungsalgorithmen.ui" />
     <QtMoc Include="src\header\Optimierungsalgorithmen.h" />
+    <ClCompile Include="src\src\Algorithm\GeometryBasedNeighbourI.cpp" />
+    <ClCompile Include="src\src\Algorithm\GeometryBasedOverlappingNeighbour.cpp" />
     <ClCompile Include="src\src\Algorithm\BoundingBox.cpp" />
     <ClCompile Include="src\src\Algorithm\BoundingBoxCreator.cpp" />
     <ClCompile Include="src\src\Algorithm\DataHolder.cpp" />
@@ -122,6 +124,8 @@
     <ClCompile Include="src\src\Optimierungsalgorithmen.cpp" />
     <ClCompile Include="main.cpp" />
     <QtMoc Include="src\header\UI\MainWindow.h" />
+    <ClInclude Include="src\header\Algorithm\GeometryBasedNeighbourI.h" />
+    <ClInclude Include="src\header\Algorithm\GeometryBasedOverlappingNeighbour.h" />
     <ClInclude Include="src\header\Algorithm\BoundingBox.h" />
     <QtMoc Include="src\header\Algorithm\BoundingBoxCreator.h" />
     <ClInclude Include="src\header\Algorithm\DataHolder.h" />

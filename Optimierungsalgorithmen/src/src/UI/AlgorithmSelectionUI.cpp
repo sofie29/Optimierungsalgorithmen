@@ -84,8 +84,8 @@ AlgorithmSelectionUI::AlgorithmSelectionUI()
 
 	algoSelectionBox_ = new QComboBox();
 	algoSelectionBox_->addItem("RuleBasedNeighbour");
-	algoSelectionBox_->addItem("GeometryBasedNeighbour");
-	algoSelectionBox_->addItem("ThirdNeighbourTooLazyToLookUp");
+	algoSelectionBox_->addItem("Geometry");
+	algoSelectionBox_->addItem("GeometryOverlapping");
 	algoSelectionBox_->addItem("Greedy");
 	topLayout_->addWidget(algoSelectionBox_, 3, 0, Qt::AlignLeft);
 

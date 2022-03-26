@@ -130,3 +130,8 @@ void BoundingBoxCreator::EdgeLengthChanged(const int length) {
 	edgeLength_ = length;
 	RecSquareSizeChanged(rectSquareSize_);
 }
+
+void BoundingBoxCreator::resetOneBoundingBox(int index) {
+	boundingBoxList_[index].reset();
+	boundingBoxList_.erase(boundingBoxList_.begin() + index);
+}
