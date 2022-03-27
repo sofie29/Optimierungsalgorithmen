@@ -17,6 +17,7 @@ public:
 
 	virtual float optimize() = 0;
 	virtual void resetData() override;
+	virtual void initParameters() = 0;
 
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) = 0;
@@ -289,12 +290,10 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	float score = this->calculateScore(rectList, bBoxList);
 
 	if (!foundNeighbour) {
-		std::cout << "No neighbour could be found" << std::endl;
 		score = AlgorithmConstants::maxScore;
 	}
 
 	else {
-		std::cout << "Neighbour found" << std::endl;
 		score = this->calculateScore(rectList, bBoxList);
 	}
 

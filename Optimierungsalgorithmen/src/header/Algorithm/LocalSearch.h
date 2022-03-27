@@ -13,6 +13,7 @@ public:
 	virtual float execute(int steps) override;
 	virtual void reset() override;
 	void setNeighbourDefinition(NeighbourI<Data>* n);
+
 private:
 	NeighbourI<Data>* neighbourDefinition_;
 	//Data solution;
@@ -47,8 +48,8 @@ float LocalSearch<Data>::execute(int steps)
 		OptimAlgoI<Data>::currentStep_++;
 	}
 
-	// TODO: RESET PARAMETER T 
 	int steps_left = 0;
+	neighbourDefinition_->initParameters();
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		std::cout << "Iteration: " << OptimAlgoI<Data>::currentStep_ << std::endl;
 		float tmp = neighbourDefinition_->optimize();

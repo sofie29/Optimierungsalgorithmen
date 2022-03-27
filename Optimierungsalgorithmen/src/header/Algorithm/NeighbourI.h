@@ -12,6 +12,8 @@ public:
 	~NeighbourI();
 	virtual float optimize() = 0;
 	virtual void resetData() = 0;
+	virtual void initParameters() = 0;
+
 	
 protected:
 	DataHolderT<Data>* data_;

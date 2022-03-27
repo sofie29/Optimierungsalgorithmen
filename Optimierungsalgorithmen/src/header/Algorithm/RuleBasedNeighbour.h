@@ -17,6 +17,7 @@ public:
 	
 	virtual float optimize() override;
 	virtual void resetData() override;
+	virtual void initParameters() override;
 	
 };
 
@@ -37,6 +38,11 @@ template<class Data>
 inline void RuleBasedNeighbour<Data>::resetData()
 {
 	NeighbourI<Data>::data_->ResetData();
+}
+
+template<class Data>
+inline void RuleBasedNeighbour<Data>::initParameters()
+{
 }
 
 template<>

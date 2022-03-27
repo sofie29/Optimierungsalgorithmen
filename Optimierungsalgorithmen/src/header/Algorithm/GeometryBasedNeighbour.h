@@ -16,6 +16,7 @@ public:
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) override;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
+	virtual void initParameters() override;
 
 private:
 	virtual float calculateScoreDependingOnRectangles(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
@@ -116,4 +117,9 @@ inline void GeometryBasedNeighbour<Data>::handleEmptyBoundingBox(std::shared_ptr
 {
 	boxCreator->resetOneBoundingBox(boxIndex);
 	boxCreator->getBoundingBoxList(boxList);
+}
+
+template<class Data>
+inline void GeometryBasedNeighbour<Data>::initParameters()
+{
 }
