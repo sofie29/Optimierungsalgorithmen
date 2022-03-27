@@ -52,7 +52,7 @@ float LocalSearch<Data>::execute(int steps)
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		std::cout << "Iteration: " << OptimAlgoI<Data>::currentStep_ << std::endl;
 		float tmp = neighbourDefinition_->optimize();
-		if (tmp <= currentBestScore_) {
+		if (tmp < currentBestScore_) {
 			currentBestScore_ = tmp;
 			OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
 		}

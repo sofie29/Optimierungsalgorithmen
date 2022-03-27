@@ -13,7 +13,7 @@ class GeometryBasedOverlappingNeighbour : public GeometryBasedNeighbourI<Data> {
 public:
 	GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
 	virtual float optimize() override;
-	virtual float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
+	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) override;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
 
@@ -36,8 +36,10 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::optimize() {
 // Calculate score, score should be minimized
 // TODO
 template<>
-inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) {
+inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) {
 	size_t bBoxListSize = bBoxList.size();
+	size_t rectListSize = rectangles->size();
+
 	if (bBoxListSize <= 1) {
 		std::cout << "list size 0" << std::endl;
 		return 0;

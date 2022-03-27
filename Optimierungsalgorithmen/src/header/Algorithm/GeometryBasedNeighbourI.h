@@ -18,7 +18,7 @@ public:
 	virtual float optimize() = 0;
 	virtual void resetData() override;
 
-	virtual float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
+	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) = 0;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) = 0;
 
@@ -130,7 +130,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	}
 
 	if (rectListSize <= 1) {
-		return this->calculateScore(rectListSize, bBoxList);
+		return this->calculateScore(rectList, bBoxList);
 	}
 
 
@@ -286,8 +286,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	}
 
 
-	// TODO: durch Tausch kann Score nicht verbessert werden
-	float score = this->calculateScore(rectListSize, bBoxList);
+	float score = this->calculateScore(rectList, bBoxList);
 
 	if (!foundNeighbour) {
 		std::cout << "No neighbour could be found" << std::endl;
@@ -296,16 +295,13 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 	else {
 		std::cout << "Neighbour found" << std::endl;
-		score = this->calculateScore(rectListSize, bBoxList);
+		score = this->calculateScore(rectList, bBoxList);
 	}
 
-	resetData_ = score > bestScore_; // eigentlich: score >= bestScore
-	bestScore_ = score > bestScore_ ? bestScore_ : score;
+	resetData_ = score >= bestScore_;
+	bestScore_ = score >= bestScore_ ? bestScore_ : score;
 
 	return score;
-
-
-
 }
 
 template<class Data>
