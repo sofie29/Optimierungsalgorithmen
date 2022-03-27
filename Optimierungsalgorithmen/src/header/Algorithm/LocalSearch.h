@@ -47,6 +47,7 @@ float LocalSearch<Data>::execute(int steps)
 		OptimAlgoI<Data>::currentStep_++;
 	}
 
+	// TODO: RESET PARAMETER T 
 	int steps_left = 0;
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		std::cout << "Iteration: " << OptimAlgoI<Data>::currentStep_ << std::endl;

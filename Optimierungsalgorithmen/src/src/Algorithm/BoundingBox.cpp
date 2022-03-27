@@ -175,7 +175,7 @@ bool BoundingBox::tryFit(RectangleHolder* rectHolder, int boundingBoxIndex)
 	return false;
 }
 
-bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int boundingBoxIndex, int t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y)
+bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y)
 {
 	QRectF& rect = rectHolder->getRectRef();
 	int rect_width = rect.width();
@@ -183,11 +183,11 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int boundingBox
 	if (this->first || this->second) { // BoundingBox is not empty
 
 	// try to place rectangle at first BoundingBox
-		if (this->first && this->first->tryFitOverlapping(rectHolder, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
+		if (this->first && this->first->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
 			return true;
 
 		// try to place rectangle at second BoundingBox
-		if (this->second && this->second->tryFitOverlapping(rectHolder, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
+		if (this->second && this->second->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
 			return true;
 
 		return false; // rectangle cannot be placed in neither the first nor the second BoundingBox
@@ -203,9 +203,8 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int boundingBox
 		int rectPosX = overlapTopLevelBoxX > 0 ? this->x - overlapTopLevelBoxX : this->x;
 		int	rectPosY = overlapTopLevelBoxY > 0 ? this->y - overlapTopLevelBoxY : this->y;
 
-		float overlapping_area = this->calculateOverlappings(rectangles, indices, rectPosX, rectPosY, rect_width, rect_height, t);
+		float overlapping_area = this->calculateOverlappings(rectangles, indices, rectIdx, rectPosX, rectPosY, rect_width, rect_height, t);
 		if (overlapping_area == rectangles->size() + 1) {
-			std::cout << "go really out" << std::endl;
 			return false; // overlapping exceeds parameter t
 		}
 		// all overlappings are smaller than parameter t
@@ -230,11 +229,14 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int boundingBox
 	}
 }
 
-// ATTENTION: indices must not contain index of the rectangle which should be placed
-float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangles, std::vector<int> indices, int x, int y, int w, int h, float t)
+float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangles, std::vector<int> indices, int rectIdx, int x, int y, int w, int h, float t)
 {
 	float overlap_total = 0;
 	for (int i : indices) {
+		if (i == rectIdx) {
+			continue;
+		}
+
 		QRectF& other = (*rectangles)[i]->getRectRef();
 
 		int x_overlap = std::min(x + w, (int)(other.x() + other.width())) - std::max(x, (int)other.x());
@@ -248,14 +250,15 @@ float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangl
 
 		float overlap = (float)area_overlap / (float)area_max;
 
+		/*
 		std::cout << "" << std::endl;
 		std::cout << "x1 " << x << ", y1: " << y << ", w1: " << w << ", h1: " << h << std::endl;
 		std::cout << "x2 " << other.x() << ", y2: " << other.y() << ", w2: " << other.width() << ", h2: " << other.height() << std::endl;
 		std::cout << "x_overlap " << x_overlap << ", y_overlap: " << y_overlap << std::endl;
 		std::cout << "overlapping area: " << overlap << ", parameter: " << t << std::endl;
+		*/
 
 		if (overlap > t) {
-			std::cout << "go out" << std::endl;
 			return rectangles->size() + 1; // maximal overlap is 1, maximal overlap sum is 1 * rectangles->size()
 		}
 

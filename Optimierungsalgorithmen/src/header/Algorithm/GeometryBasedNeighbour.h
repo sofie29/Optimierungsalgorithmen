@@ -14,7 +14,9 @@ public:
 	GeometryBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
 	virtual float optimize() override;
 	virtual float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
-	virtual bool tryFitWrapper(std::shared_ptr<BoundingBox>& box, int rectIdx, int boxIdx, std::vector<class RectangleHolder*>* rectangles) override;
+	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) override;
+	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
+
 };
 
 
@@ -53,7 +55,14 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScore(size_t rectList
 }
 
 template<class Data>
-inline bool GeometryBasedNeighbour<Data>::tryFitWrapper(std::shared_ptr<BoundingBox>& box, int rectIdx, int boxIdx, std::vector<class RectangleHolder*>* rectangles)
+inline bool GeometryBasedNeighbour<Data>::tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx)
 {
-	return box->tryFit((*rectangles)[rectIdx], boxIdx);
+	return boxList[boxIdx]->tryFit((*rectangles)[rectIdx], boxIdx);
+}
+
+template<class Data>
+inline void GeometryBasedNeighbour<Data>::handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex)
+{
+	boxCreator->resetOneBoundingBox(boxIndex);
+	boxCreator->getBoundingBoxList(boxList);
 }

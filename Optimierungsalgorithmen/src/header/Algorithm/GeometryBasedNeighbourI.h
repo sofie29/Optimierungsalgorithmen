@@ -8,6 +8,7 @@
 #include "BoundingBox.h"
 #include "RectangleHolder.h"
 
+// IDEE: methode B mit rotation
 template<class Data>
 class GeometryBasedNeighbourI : public NeighbourI<Data>
 {
@@ -18,13 +19,14 @@ public:
 	virtual void resetData() override;
 
 	virtual float calculateScore(size_t rectListSize, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
-	virtual bool tryFitWrapper(std::shared_ptr<BoundingBox>& box, int rectIdx, int boxIdx, std::vector<class RectangleHolder*>* rectangles) = 0;
+	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) = 0;
+	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) = 0;
 
 protected:
 	size_t rectPos;
 	float bestScore_;
 	bool isFirstIteration_;
-	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::shared_ptr<BoundingBox>& box, int boundingBoxIndex);
+	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex);
 	bool removeRectFromBox(std::shared_ptr<BoundingBox>& newBox, std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, int newBoxIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList);
 	bool resetData_;
 	float findNeighbour(bool methodA, bool methodB);
@@ -54,12 +56,13 @@ inline void GeometryBasedNeighbourI<Data>::resetData()
 
 // attention: this method doesn't update index vector of the bounding box
 template<>
-inline bool GeometryBasedNeighbourI<DataHolder*>::fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::shared_ptr<BoundingBox>& box, int boundingBoxIndex) {
-	box->removeLowerLevelBoundingBoxes();
+inline bool GeometryBasedNeighbourI<DataHolder*>::fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) {
+	boxList[boxIndex]->removeLowerLevelBoundingBoxes();
 
 	// place all rectangles specified in indices at the given bounding box
 	for (int i : indices) {
-		if (!box->tryFit((*rectangles)[i], boundingBoxIndex)) {
+		//if (!box->tryFit((*rectangles)[i], boundingBoxIndex)) {
+		if (!this->tryFitWrapper(boxList, boxIndex, rectangles, i)) {
 			return false;
 		}
 	}
@@ -72,14 +75,13 @@ inline bool GeometryBasedNeighbourI<DataHolder*>::removeRectFromBox(std::shared_
 	newIndices.erase(std::remove(newIndices.begin(), newIndices.end(), rectIdx), newIndices.end());
 
 	// replace all rectangles previous bounding box
-	if (this->fitBoundingBox(newIndices, rectList, oldBox, oldBoxIdx)) {
+	if (this->fitBoundingBox(newIndices, rectList, bBoxList, oldBoxIdx)) {
 		newBox->addRectangleIndex(rectIdx);
 		oldBox->removeRectangleIndex(rectIdx);
 
 		// delete bounding box in case it is empty
 		if (oldBox->getRectangleIndices().size() == 0) {
-			data_->getData()->getBoxCreator()->resetOneBoundingBox(oldBoxIdx);
-			data_->getData()->getBoxCreator()->getBoundingBoxList(bBoxList);
+			this->handleEmptyBoundingBox(data_->getData()->getBoxCreator(), bBoxList, oldBoxIdx);
 		}
 
 		return true;
@@ -123,7 +125,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	size_t rectListSize = rectList->size();
 
 	if (isFirstIteration_) {
-		std::cout << "Start score: " << this->calculateScore(rectListSize, bBoxList) << std::endl;
+		// std::cout << "Start score: " << this->calculateScore(rectListSize, bBoxList) << std::endl;
 		isFirstIteration_ = false;
 	}
 
@@ -137,9 +139,10 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	int probabilityB = 30; // use method B, when method value is smaller than MethodB
 
 
-	if (method < probabilityB) {
+	if (methodB && method < probabilityB) {
 
 		/******* METHOD B : Swap two rectangles *******/
+		
 		std::cout << "method B" << std::endl;
 
 
@@ -168,7 +171,10 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 					boxFromRect2 = boxIdx;
 				}
 			}
-			if (boxFromRect1 == boxFromRect2) {
+
+			bool sameBox = boxFromRect1 == boxFromRect2;
+			bool oneElementBox = bBoxList[boxFromRect1]->getRectangleIndices().size() == 1 && bBoxList[boxFromRect2]->getRectangleIndices().size() == 1;
+			if (sameBox || oneElementBox) {
 				continue;
 			}
 
@@ -178,12 +184,12 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 			bBoxList[boxFromRect1]->removeRectangleIndex(rectIndex1);
 			bBoxList[boxFromRect1]->addRectangleIndex(rectIndex2);
 
-			isPlaced1 = this->fitBoundingBox(bBoxList[boxFromRect1]->getRectangleIndices(), rectList, bBoxList[boxFromRect1], boxFromRect1);
+			isPlaced1 = this->fitBoundingBox(bBoxList[boxFromRect1]->getRectangleIndices(), rectList, bBoxList, boxFromRect1);
 
 			// Place rect1 and rectangles of boxFromRect2 without rect2 in bounding box from rect2
 			bBoxList[boxFromRect2]->removeRectangleIndex(rectIndex2);
 			bBoxList[boxFromRect2]->addRectangleIndex(rectIndex1);
-			isPlaced2 = this->fitBoundingBox(bBoxList[boxFromRect2]->getRectangleIndices(), rectList, bBoxList[boxFromRect2], boxFromRect2);
+			isPlaced2 = this->fitBoundingBox(bBoxList[boxFromRect2]->getRectangleIndices(), rectList, bBoxList, boxFromRect2);
 
 			if (!isPlaced1 || !isPlaced2) { // revert changes
 				data_->getData()->OverwriteData(bestData_->getData());
@@ -247,13 +253,13 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 			std::shared_ptr<BoundingBox>& newBox = bBoxList[newBoxIdx];
 
-			bool rectFitsInBox = this->tryFitWrapper(newBox, rectIdx, newBoxIdx, rectList);
+			bool rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx);
 			if (!rectFitsInBox) {
 				// rotate rectangle and try to place again
 				rect.setWidth(height);
 				rect.setHeight(width);
 				hasRotated = true;
-				rectFitsInBox = this->tryFitWrapper(newBox, rectIdx, newBoxIdx, rectList);
+				rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx);
 			}
 
 			if (rectFitsInBox) {
