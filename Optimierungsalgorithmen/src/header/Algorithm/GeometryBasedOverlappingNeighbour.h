@@ -14,24 +14,29 @@ public:
 	GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
 	virtual float optimize() override;
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
-	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) override;
+	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) override;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
 	virtual void initParameters() override;
+	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
 
 private:
 	float t_;
+	const float stepSize_;
+	const float scoreFactor_;
 	float scoreShift_;
-	float scoreFactor_;
-	virtual void calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, int& transgressions, float& sumOfIntersections);
+	float sumOfIntersections_;
+	int transgressions_;
+	virtual void calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
 };
 
 
 
 template<class Data>
-inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : GeometryBasedNeighbourI<Data>(data, currentBest, initSol) {
+inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) :
+	GeometryBasedNeighbourI<Data>(data, currentBest, initSol), stepSize_(0.1), scoreFactor_(1.1)
+{
 	t_ = 1;
 	scoreShift_ = 0;
-	scoreFactor_ = 1.01;
 }
 
 template<>
@@ -40,17 +45,20 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::optimize() {
 }
 
 // Calculate score, score should be minimized
-// TODO
+// TODO: sumOfInteraction
 template<>
 inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) {
-	size_t bBoxListSize = bBoxList.size();
 	size_t rectListSize = rectangles->size();
-
-	if (bBoxListSize <= 1) {
+	size_t bBoxListSize = 0;
+	for (std::shared_ptr<BoundingBox> box : bBoxList) {
+		if (!box->getRectangleIndices().empty()) ++bBoxListSize;
+	}
+	if (bBoxListSize == 0) {
 		std::cout << "list size 0" << std::endl;
 		return 0;
 	}
 
+	/*
 	float average = static_cast<float>(rectListSize) / static_cast<float>(bBoxListSize);
 	float boxScore = 0;
 
@@ -62,36 +70,28 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(std:
 		}
 
 	}
+	*/
 
 
 	float maxOv = rectangles->size() + 1;
-	float sumOfIntersections;
-	int transgressions;
 
-	this->calculateOverlappingWrapper(rectangles, bBoxList, transgressions, sumOfIntersections);
-
-	// TODO: only update when score is better
-	if (transgressions == 0 && t_ >= 0.1) {
-		t_ -= 0.1;
-		std::cout << "REDUCE T_ TO " << t_ << std::endl;
-
-		// number of rectangles is the maximum number of overlappings
-		scoreShift_ += rectangles->size() * scoreFactor_;
-	}
+	this->calculateOverlappingWrapper(rectangles, bBoxList);
 
 	// TODO: has the max score to be updated?
 	// return bBoxListSize * (rectListSize + 1) - boxScore - scoreShift_;
-	return bBoxListSize + transgressions * scoreFactor_ - scoreShift_;
+	// 
+	//std::cout << "boxList: " << bBoxListSize << ", transgressions: " << transgressions_ << ", scoreShift: " << scoreShift_ << std::endl;
+	return bBoxListSize + (float)transgressions_ * scoreFactor_ - scoreShift_;
 }
 
 
 // count number of intersections which exceed t and sum up all intersection areas
 template<class Data>
-inline void GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, int& transgressions, float& sumOfIntersections)
+inline void GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
 {
 	float maxOv = rectangles->size() + 1;
-	sumOfIntersections = 0;
-	transgressions = 0;
+	sumOfIntersections_ = 0;
+	transgressions_ = 0;
 
 	for (std::shared_ptr<BoundingBox> box : bBoxList) {
 		std::vector<int> indices = box->getRectangleIndices();
@@ -119,8 +119,8 @@ inline void GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper
 
 			QRectF& rect = (*rectangles)[i]->getRectRef();
 			float intersection = box->calculateOverlappings(rectangles, indices, i, rect.x(), rect.y(), rect.width(), rect.height(), t_);
-			sumOfIntersections += intersection; // attention: maxOv is added
-			if (intersection == maxOv) ++transgressions;
+			sumOfIntersections_ += intersection; // attention: maxOv is added
+			if (intersection == maxOv) ++transgressions_;
 
 			if (indices.size() == 1) break;
 		}
@@ -129,12 +129,13 @@ inline void GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper
 
 
 template<class Data>
-inline bool GeometryBasedOverlappingNeighbour<Data>::tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx)
+inline bool GeometryBasedOverlappingNeighbour<Data>::tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects)
 {
 	std::shared_ptr<BoundingBox>& box = boxList[boxIdx];
 	std::vector<int> indices = box->getRectangleIndices();
 
-	return box->tryFitOverlapping((*rectangles)[rectIdx], rectIdx, boxIdx, t_, rectangles, indices, box->getBoxWidth(), box->getXPos(), box->getYPos());
+	float t = multipleRects ? t_ + stepSize_ : t_;
+	return box->tryFitOverlapping((*rectangles)[rectIdx], rectIdx, boxIdx, t, rectangles, indices, box->getBoxWidth(), box->getXPos(), box->getYPos());
 }
 
 
@@ -145,9 +146,32 @@ inline void GeometryBasedOverlappingNeighbour<Data>::handleEmptyBoundingBox(std:
 
 }
 
+
+// TODO!!!
 template<class Data>
 inline void GeometryBasedOverlappingNeighbour<Data>::initParameters()
 {
+	std::cout << "init parameters " << std::endl;
+
 	t_ = 1;
 	scoreShift_ = 0;
+	this->resetBestScore();
+}
+
+template<class Data>
+inline void GeometryBasedOverlappingNeighbour<Data>::shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
+{
+	// std::cout << "transgressions before decreasing " << transgressions_ << " t " << t_ << std::endl;
+	if (transgressions_ == 0 && t_ >= stepSize_) {
+		t_ -= stepSize_;
+		std::cout << "REDUCE T_ TO " << t_ << std::endl;
+
+		// calculate number of transgressions after decreasing of t
+		this->calculateOverlappingWrapper(rectangles, bBoxList);
+		// std::cout << "transgressions after decreasing " << transgressions_ << " t " << t_ << std::endl;
+
+		scoreShift_ += transgressions_ * scoreFactor_;
+		// std::cout << "new score shift " << scoreShift_ << std::endl;
+
+	}
 }

@@ -8,7 +8,7 @@
 #include "BoundingBox.h"
 #include "RectangleHolder.h"
 
-// IDEE: methode B mit rotation
+
 template<class Data>
 class GeometryBasedNeighbourI : public NeighbourI<Data>
 {
@@ -17,10 +17,11 @@ public:
 
 	virtual float optimize() = 0;
 	virtual void resetData() override;
-	virtual void initParameters() = 0;
 
+	virtual void initParameters() = 0; // TODO: bestScore_ = AlgorithmConstants::maxScore;
+	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
-	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) = 0;
+	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) = 0;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) = 0;
 
 protected:
@@ -32,6 +33,7 @@ protected:
 	bool resetData_;
 	float findNeighbour(bool methodA, bool methodB);
 	void setAllToDefaultColors(std::vector<class RectangleHolder*>* rectList);
+	void resetBestScore();
 };
 
 
@@ -63,7 +65,7 @@ inline bool GeometryBasedNeighbourI<DataHolder*>::fitBoundingBox(std::vector<int
 	// place all rectangles specified in indices at the given bounding box
 	for (int i : indices) {
 		//if (!box->tryFit((*rectangles)[i], boundingBoxIndex)) {
-		if (!this->tryFitWrapper(boxList, boxIndex, rectangles, i)) {
+		if (!this->tryFitWrapper(boxList, boxIndex, rectangles, i, true)) {
 			return false;
 		}
 	}
@@ -89,6 +91,7 @@ inline bool GeometryBasedNeighbourI<DataHolder*>::removeRectFromBox(std::shared_
 	}
 
 	else {
+		// std::cout << "cannot fit old box  " << std::endl;
 		return false;
 	}
 }
@@ -114,6 +117,7 @@ IDEA: also use method B after failed method A.
 
 template<>
 inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, bool methodB) {
+	float score;
 
 	// get bounding box list
 	std::shared_ptr<BoundingBoxCreator> boxCreator = data_->getData()->getBoxCreator();
@@ -137,14 +141,14 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 	bool foundNeighbour = false;
 	int method = rand() % 100;
-	int probabilityB = 30; // use method B, when method value is smaller than MethodB
+	int probabilityB = 10; // use method B, when method value is smaller than MethodB
 
 
 	if (methodB && method < probabilityB) {
 
 		/******* METHOD B : Swap two rectangles *******/
 		
-		std::cout << "method B" << std::endl;
+		// std::cout << "method B" << std::endl;
 
 
 		bool isPlaced1 = false;
@@ -203,6 +207,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 				this->setAllToDefaultColors(rectList);
 				(*rectList)[rectIndex1]->setToSwappedColor();
 				(*rectList)[rectIndex2]->setToSwappedColor();
+				score = this->calculateScore(rectList, bBoxList) - 0.01;
 			}
 		}
 	}
@@ -210,7 +215,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 	/******* METHOD A : Rotate rectangle and place it at another bounding box *******/
 
-	std::cout << "method A" << std::endl;
+	// std::cout << "method A" << std::endl;
 
 	size_t iteration = 0;
 
@@ -246,7 +251,12 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 		// 3) try to move to another bounding box
 		int x, y;
+		// int newBoxIdx = -1;
+		// while (newBoxIdx < bBoxList.size()) {
 		for (int newBoxIdx = 0; newBoxIdx < bBoxList.size(); ++newBoxIdx) {
+			if (!methodB) newBoxIdx = rand() % bBoxList.size();
+			// std::cout << "try box  " << newBoxIdx << std::endl;
+
 
 			if (newBoxIdx == oldBoxIndex) {
 				continue; // TODO: handle separatly
@@ -254,13 +264,13 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 			std::shared_ptr<BoundingBox>& newBox = bBoxList[newBoxIdx];
 
-			bool rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx);
+			bool rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx, false);
 			if (!rectFitsInBox) {
 				// rotate rectangle and try to place again
 				rect.setWidth(height);
 				rect.setHeight(width);
 				hasRotated = true;
-				rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx);
+				rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx, false);
 			}
 
 			if (rectFitsInBox) {
@@ -272,9 +282,12 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 				else {
 					this->setAllToDefaultColors(rectList);
 					(*rectList)[rectIdx]->setToSwappedColor();
+					score = this->calculateScore(rectList, bBoxList);
 				}
 				break;
 			}
+			// ++newBoxIdx;
+			// std::cout << "updated box  " << newBoxIdx << std::endl;
 		}
 
 		// reset rotation since rotated rectangle could not be placed in any bounding box
@@ -287,9 +300,8 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	}
 
 
-	float score = this->calculateScore(rectList, bBoxList);
-
 	if (!foundNeighbour) {
+		std::cout << "no neighbour" << std::endl;
 		score = AlgorithmConstants::maxScore;
 	}
 
@@ -298,7 +310,11 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	}
 
 	resetData_ = score >= bestScore_;
-	bestScore_ = score >= bestScore_ ? bestScore_ : score;
+	// std::cout << "score: " << score << " bestscore: " << bestScore_ << std::endl;
+	if (score <= bestScore_) {
+		this->shiftScore(rectList, bBoxList);
+		bestScore_ = score;
+	}
 
 	return score;
 }
@@ -309,6 +325,12 @@ inline void GeometryBasedNeighbourI<Data>::setAllToDefaultColors(std::vector<cla
 	for (RectangleHolder* rect : *rectList) {
 		rect->setToDefaultColor();
 	}
+}
+
+template<class Data>
+inline void GeometryBasedNeighbourI<Data>::resetBestScore()
+{
+	bestScore_ = AlgorithmConstants::maxScore;
 }
 
 

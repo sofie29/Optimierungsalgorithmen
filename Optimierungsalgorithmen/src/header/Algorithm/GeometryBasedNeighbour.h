@@ -14,9 +14,10 @@ public:
 	GeometryBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
 	virtual float optimize() override;
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
-	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx) override;
+	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) override;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
 	virtual void initParameters() override;
+	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
 
 private:
 	virtual float calculateScoreDependingOnRectangles(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
@@ -37,8 +38,8 @@ inline float GeometryBasedNeighbour<DataHolder*>::optimize() {
 
 template<>
 inline float GeometryBasedNeighbour<DataHolder*>::calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) {
-	// return calculateScoreDependingOnRectangles(rectangles, bBoxList);
-	return calculateScoreDependingOnArea(rectangles, bBoxList);
+	return calculateScoreDependingOnRectangles(rectangles, bBoxList);
+	// return calculateScoreDependingOnArea(rectangles, bBoxList);
 }
 
 
@@ -89,24 +90,24 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnArea(
 	float boxScore = 0;
 
 	for (std::shared_ptr<BoundingBox> box : bBoxList) {
-		float usedArea = 0; // static_cast<float>((box->getRectangleIndices()).size());
-
+		float usedArea = 0;
 		for (RectangleHolder* rect : *rectangles) {
-			float area = (float)(rect->getRectRef().width() * rect->getRectRef().height());
-			usedArea += area / boxArea;
+			usedArea += (float)(rect->getRectRef().width() * rect->getRectRef().height());
 		}
+		float usedAreaPercent = usedArea / boxArea;
 		if (average > usedArea) {
 			boxScore += (average - usedArea) / average;
 		}
 
 	}
-
-	return bBoxListSize * rectListSize - boxScore;
+	// maximaler Boxscore: 1 * rectangles
+	// std::cout << bBoxListSize << " " << boxScore << std::endl;
+	return bBoxListSize * (rectListSize + 1) - boxScore;
 }
 
 
 template<class Data>
-inline bool GeometryBasedNeighbour<Data>::tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx)
+inline bool GeometryBasedNeighbour<Data>::tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects)
 {
 	return boxList[boxIdx]->tryFit((*rectangles)[rectIdx], boxIdx);
 }
@@ -121,5 +122,11 @@ inline void GeometryBasedNeighbour<Data>::handleEmptyBoundingBox(std::shared_ptr
 
 template<class Data>
 inline void GeometryBasedNeighbour<Data>::initParameters()
+{
+	this->resetBestScore();
+}
+
+template<class Data>
+inline void GeometryBasedNeighbour<Data>::shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
 {
 }

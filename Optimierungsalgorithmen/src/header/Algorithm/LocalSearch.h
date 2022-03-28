@@ -49,7 +49,8 @@ float LocalSearch<Data>::execute(int steps)
 	}
 
 	int steps_left = 0;
-	neighbourDefinition_->initParameters();
+	// TODO: neighbourDefinition_->initParameters();
+
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		std::cout << "Iteration: " << OptimAlgoI<Data>::currentStep_ << std::endl;
 		float tmp = neighbourDefinition_->optimize();
