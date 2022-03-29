@@ -18,21 +18,25 @@ public:
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
 	virtual void initParameters() override;
 	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
+	virtual int getRectPosMethodA(int rectListSize) override;
 
 private:
+	int rectPos_;
 	virtual float calculateScoreDependingOnRectangles(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
 	virtual float calculateScoreDependingOnArea(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
 };
 
 
 template<class Data>
-inline GeometryBasedNeighbour<Data>::GeometryBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : GeometryBasedNeighbourI<Data>(data, currentBest, initSol) {
+inline GeometryBasedNeighbour<Data>::GeometryBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : GeometryBasedNeighbourI<Data>(data, currentBest, initSol)
+{
+	rectPos_ = 0;
 }
 
 
 template<>
 inline float GeometryBasedNeighbour<DataHolder*>::optimize() {
-	return this->findNeighbour(true, true);
+	return this->findNeighbour(true);
 }
 
 
@@ -129,4 +133,11 @@ inline void GeometryBasedNeighbour<Data>::initParameters()
 template<class Data>
 inline void GeometryBasedNeighbour<Data>::shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
 {
+}
+
+template<class Data>
+inline int GeometryBasedNeighbour<Data>::getRectPosMethodA(int rectListSize)
+{
+	rectPos_ = (rectPos_ >= rectListSize) ? 1 : rectPos_ + 1;
+	return rectListSize - rectPos_;
 }

@@ -23,15 +23,14 @@ public:
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) = 0;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) = 0;
+	virtual int getRectPosMethodA(int rectListSize) = 0;
 
 protected:
-	size_t rectPos;
 	float bestScore_;
-	bool isFirstIteration_;
 	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex);
 	bool removeRectFromBox(std::shared_ptr<BoundingBox>& newBox, std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, int newBoxIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList);
 	bool resetData_;
-	float findNeighbour(bool methodA, bool methodB);
+	float findNeighbour(bool withoutOverlapping);
 	void setAllToDefaultColors(std::vector<class RectangleHolder*>* rectList);
 	void resetBestScore();
 };
@@ -39,9 +38,7 @@ protected:
 
 template<class Data>
 inline GeometryBasedNeighbourI<Data>::GeometryBasedNeighbourI(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, currentBest, initSol) {
-	rectPos = 0;
 	bestScore_ = AlgorithmConstants::maxScore;
-	isFirstIteration_ = true;
 	resetData_ = false;
 }
 
@@ -116,7 +113,7 @@ IDEA: also use method B after failed method A.
 *******/
 
 template<>
-inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, bool methodB) {
+inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOverlapping) {
 	float score;
 
 	// get bounding box list
@@ -129,11 +126,6 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	std::vector<class RectangleHolder*>* rectList = rectCreator->getRectList();
 	size_t rectListSize = rectList->size();
 
-	if (isFirstIteration_) {
-		// std::cout << "Start score: " << this->calculateScore(rectListSize, bBoxList) << std::endl;
-		isFirstIteration_ = false;
-	}
-
 	if (rectListSize <= 1) {
 		return this->calculateScore(rectList, bBoxList);
 	}
@@ -144,7 +136,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	int probabilityB = 10; // use method B, when method value is smaller than MethodB
 
 
-	if (methodB && method < probabilityB) {
+	if (withoutOverlapping && method < probabilityB) {
 
 		/******* METHOD B : Swap two rectangles *******/
 		
@@ -223,8 +215,8 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 	while (!foundNeighbour && iteration < rectListSize) {
 
 		// 1) select a rectangle
-		rectPos = (rectPos >= rectListSize) ? 1 : rectPos + 1;
-		int rectIdx = rectListSize - rectPos;
+		int rectIdx = this->getRectPosMethodA(rectListSize);
+		// std::cout << rectIdx << std::endl;
 		QRectF& rect = (*rectList)[rectIdx]->getRectRef(); // get a rectangle from list, start with the last one
 		int width = rect.width();
 		int height = rect.height();
@@ -251,15 +243,13 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 
 		// 3) try to move to another bounding box
 		int x, y;
-		// int newBoxIdx = -1;
-		// while (newBoxIdx < bBoxList.size()) {
 		for (int newBoxIdx = 0; newBoxIdx < bBoxList.size(); ++newBoxIdx) {
-			if (!methodB) newBoxIdx = rand() % bBoxList.size();
+			if (!withoutOverlapping) newBoxIdx = rand() % bBoxList.size();
 			// std::cout << "try box  " << newBoxIdx << std::endl;
 
 
 			if (newBoxIdx == oldBoxIndex) {
-				continue; // TODO: handle separatly
+				continue; // must be handled separatly
 			}
 
 			std::shared_ptr<BoundingBox>& newBox = bBoxList[newBoxIdx];
@@ -285,15 +275,31 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool methodA, b
 					score = this->calculateScore(rectList, bBoxList);
 				}
 				break;
-			}
-			// ++newBoxIdx;
-			// std::cout << "updated box  " << newBoxIdx << std::endl;
-		}
 
-		// reset rotation since rotated rectangle could not be placed in any bounding box
-		if (!foundNeighbour && hasRotated) {
-			rect.setWidth(width);
-			rect.setHeight(height);
+			}
+			else {
+				// reset rotation
+				if (hasRotated) {
+					hasRotated = false;
+					rect.setWidth(width);
+					rect.setHeight(height);
+				}
+			}
+		}
+		if (!foundNeighbour && !withoutOverlapping) {
+			// add bounding box (nur wenn von Transgression list?)
+			// std::cout << "boxlist size: " << bBoxList.size() << std::endl;
+			int amount = rectList->size();
+			int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
+			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
+			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
+
+			boxCreator->addBoundingBox(x_pos, y_pos, (*rectList)[rectIdx], rectIdx, bBoxList.size());
+			boxCreator->getBoundingBoxList(bBoxList);
+			// std::cout << "added bounding box, boxlist size: " << bBoxList.size() << std::endl;
+			// Algorithmus muss sie auch nutzen
+			foundNeighbour = true;
+			break;
 		}
 
 		++iteration;
