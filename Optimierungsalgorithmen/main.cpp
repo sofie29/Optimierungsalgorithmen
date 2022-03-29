@@ -1,18 +1,25 @@
 #include "Optimierungsalgorithmen.h"
 #include "stdafx.h"
 #include <QtWidgets/QApplication>
-
+#include "TestEnvironment.h"
 int main(int argc, char *argv[])
 {
     AllocConsole();
     FILE* fDummy;
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
     std::cout << "hdoh\n";
-
     QApplication a(argc, argv);
-    Optimierungsalgorithmen w;
-    w.show();
-    return a.exec();
+    if (UIConstants::useUI_) {
+        
+        Optimierungsalgorithmen w;
+        w.show();
+        return a.exec();
+    }
+    else {
+        std::unique_ptr<TestEnvironment> test = std::make_unique<TestEnvironment>(10, 250,  10, 30, 10, 30, 100);
+        test->Run("test.csv");
+        while (true);
+    }
 }
 
 void* operator new(size_t size) {

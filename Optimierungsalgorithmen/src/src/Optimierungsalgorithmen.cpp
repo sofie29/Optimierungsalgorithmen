@@ -45,9 +45,20 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     algoWrapper_ = new QAlgoWrapper(selectedAlgorithm_);
 
     connect(algoSelectionUI_->getRecAmountSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectAmountChangedI);
-    connect(algoSelectionUI_->getRecMaxSizeSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectSizeChangedI);
     connect(algoSelectionUI_->getRecAmountLineEdit(), &QLineEdit::textChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectAmountChangedS);
-    connect(algoSelectionUI_->getRecMaxSizeLineEdit(), &QLineEdit::textChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectSizeChangedS);
+
+    connect(algoSelectionUI_->getRecMinWidthSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMinWidthChangedI);
+    connect(algoSelectionUI_->getRecMinWidthLineEdit(), &QLineEdit::textChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMinWidthChangedS);
+
+    connect(algoSelectionUI_, &AlgorithmSelectionUI::EmitMaxWidthChangedI, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMaxWidthChangedI);
+    connect(algoSelectionUI_, &AlgorithmSelectionUI::EmitMaxWidthChangedS, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMaxWidthChangedS);
+
+    connect(algoSelectionUI_->getRecMinHeightSlider(), &QSlider::valueChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMinHeightChangedI);
+    connect(algoSelectionUI_->getRecMinHeightLineEdit(), &QLineEdit::textChanged, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMinHeightChangedS);
+
+    connect(algoSelectionUI_, &AlgorithmSelectionUI::EmitMaxHeightChangedI, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMaxHeightChangedI);
+    connect(algoSelectionUI_, &AlgorithmSelectionUI::EmitMaxHeightChangedS, mainScene_->getRecDrawer(), &RectangleDrawer::DrawRectMaxHeightChangedS);
+
     connect(algoSelectionUI_->getBoxEdgeSlider(), &QSlider::valueChanged, mainScene_->getBoxDrawer(), &BoundingBoxDrawer::BoundingBoxSizeChangedI);
     connect(algoSelectionUI_->getBoxEdgeLineEdit(), & QLineEdit::textChanged, mainScene_->getBoxDrawer(), &BoundingBoxDrawer::BoundingBoxSizeChangedS);
 
@@ -98,7 +109,7 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget *parent)
     leftDock_->setWidget(algoSelectionUI_);
     this->addDockWidget(Qt::LeftDockWidgetArea, leftDock_);
     
-    dataHolder_->getRectCreator()->CreateRects(AlgorithmConstants::initialAmount_, AlgorithmConstants::initialEdgeSize_);
+    dataHolder_->getRectCreator()->CreateRects(AlgorithmConstants::initialAmount_, AlgorithmConstants::initialEdgeSize_, AlgorithmConstants::initialEdgeSize_, AlgorithmConstants::initialEdgeSize_, AlgorithmConstants::initialEdgeSize_);
    
 
 

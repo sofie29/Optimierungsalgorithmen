@@ -7,9 +7,19 @@ public:
 	AlgorithmSelectionUI();
 	~AlgorithmSelectionUI();
 	QSlider* getRecAmountSlider() const;
-	QSlider* getRecMaxSizeSlider() const;
 	QLineEdit* getRecAmountLineEdit() const;
-	QLineEdit* getRecMaxSizeLineEdit() const;
+
+	QSlider* getRecMinWidthSlider() const;
+	QLineEdit* getRecMinWidthLineEdit() const;
+
+	QSlider* getRecMaxWidthSlider() const;
+	QLineEdit* getRecMaxWidthLineEdit() const;
+
+	QSlider* getRecMinHeightSlider() const;
+	QLineEdit* getRecMinHeightLineEdit() const;
+
+	QSlider* getRecMaxHeightSlider() const;
+	QLineEdit* getRecMaxHeightLineEdit() const;
 
 	QSlider* getBoxEdgeSlider() const;
 	QLineEdit* getBoxEdgeLineEdit() const;
@@ -25,6 +35,21 @@ public:
 	QPushButton* getNextStepButton() const;
 
 	QPushButton* getResetButton() const;
+signals:
+	void EmitMaxWidthChangedI(const int w);
+	void EmitMaxWidthChangedS(const QString& w);
+
+	void EmitMaxHeightChangedI(const int w);
+	void EmitMaxHeightChangedS(const QString& w);
+
+	/*
+	void EmitMinWidthChangedI(const int w);
+	void EmitMinWidthChangedS(const QString& w);
+
+	void EmitMinWidthChangedI(const int w);
+	void EmitMinWidthChangedS(const QString& w);
+	*/
+
 public slots:
 	void setCurrentNumberLabel(int number);
 	void setOptimNumberLabel(float number);
@@ -35,13 +60,28 @@ public slots:
 private:
 	QBoxLayout* layout_;
 	QGridLayout* topLayout_;
+	QGridLayout* middleLayout_;
 	QGridLayout* bottomLayout_;
 	QLabel* recAmountText_;
-	QLabel* recMaxSizeText_;
+
+	QLabel* recMinWidthText_;
+	QSlider* recMinWidthInput_;
+	QLineEdit* recMinWidthAltInput_;
+
+	QLabel* recMaxWidthText_;
+	QSlider* recMaxWidthInput_;
+	QLineEdit* recMaxWidthAltInput_;
+
+	QLabel* recMinHeightText_;
+	QSlider* recMinHeightInput_;
+	QLineEdit* recMinHeightAltInput_;
+
+	QLabel* recMaxHeightText_;
+	QSlider* recMaxHeightInput_;
+	QLineEdit* recMaxHeightAltInput_;
+
 	QSlider* recAmountInput_;
-	QSlider* recMaxSizeInput_;
 	QLineEdit* recAmountAltInput_;
-	QLineEdit* recMaxSizeAltInput_;
 	QLabel* boxSizeText_;
 	QSlider* boxSizeSlider_;
 	QLineEdit* boxSizeLineEdit_;

@@ -48,5 +48,7 @@ inline void DataHolderT<DataHolder*>::OverwriteData(DataHolderT<DataHolder*>* ot
 
 template<>
 inline void DataHolderT<DataHolder*>::ResetData() {
-	data_->ResetData();
+	if (UIConstants::useUI_)
+		data_->ResetData();
+	else data_->ResetDataForTestEnv();
 }

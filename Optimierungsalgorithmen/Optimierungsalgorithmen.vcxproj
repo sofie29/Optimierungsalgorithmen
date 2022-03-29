@@ -60,13 +60,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Optimierungsalgorithmen/src/header/Algorithm;$(SolutionDir)Optimierungsalgorithmen/src/header/UI;$(SolutionDir)Optimierungsalgorithmen/src/header/Constants;$(SolutionDir)Optimierungsalgorithmen/src/header;$(SolutionDir)Optimierungsalgorithmen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Optimierungsalgorithmen/src/header/TestSuite;$(SolutionDir)Optimierungsalgorithmen/src/header/Algorithm;$(SolutionDir)Optimierungsalgorithmen/src/header/UI;$(SolutionDir)Optimierungsalgorithmen/src/header/Constants;$(SolutionDir)Optimierungsalgorithmen/src/header;$(SolutionDir)Optimierungsalgorithmen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Optimierungsalgorithmen/src/header/Algorithm;$(SolutionDir)Optimierungsalgorithmen/src/header/UI;$(SolutionDir)Optimierungsalgorithmen/src/header/Constants;$(SolutionDir)Optimierungsalgorithmen/src/header;$(SolutionDir)Optimierungsalgorithmen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Optimierungsalgorithmen/src/header/TestSuite;$(SolutionDir)Optimierungsalgorithmen/src/header/Algorithm;$(SolutionDir)Optimierungsalgorithmen/src/header/UI;$(SolutionDir)Optimierungsalgorithmen/src/header/Constants;$(SolutionDir)Optimierungsalgorithmen/src/header;$(SolutionDir)Optimierungsalgorithmen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -149,7 +149,9 @@
     <QtMoc Include="src\header\UI\RectangleDrawer.h" />
     <QtMoc Include="src\header\UI\BoundingBoxDrawer.h" />
     <QtMoc Include="src\header\UI\Drawer.h" />
+    <ClInclude Include="src\header\TestSuite\TestEnvironment.h" />
     <ClInclude Include="stdafx.h" />
+    <ClCompile Include="src\src\TestSuite\TestEnvironment.cpp" />
     <ClCompile Include="src\src\UI\AlgorithmSelectionUI.cpp" />
     <ClCompile Include="src\src\UI\BoundingBoxDrawer.cpp" />
     <ClCompile Include="src\src\UI\Drawer.cpp" />

@@ -3,6 +3,7 @@
 RectangleCreator::RectangleCreator()
 {
 	rectangleList_ = new std::vector<class RectangleHolder*>();
+	squareSize_ = 0.0f;
 }
 RectangleCreator::~RectangleCreator()
 {
@@ -51,9 +52,14 @@ void RectangleCreator::ResetData()
 	rectangleList_->shrink_to_fit();
 }
 
+float RectangleCreator::getSquareSize()
+{
+	return squareSize_;
+}
 
 
-void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
+
+void RectangleCreator::CreateRectsQ(const int amount, const int maxEdgeLength) {
 
 	for (RectangleHolder* r : *rectangleList_) {
 		delete r;
@@ -62,7 +68,7 @@ void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
 
-	float squareSize = 0.0f;
+	squareSize_ = 0.0f;
 
 	std::random_device rd;
 	std::mt19937 engine(rd());
@@ -78,10 +84,46 @@ void RectangleCreator::CreateRects(const int amount, const int maxEdgeLength) {
 		int y_pos = 0;
 		QRectF rect(x_pos, y_pos, width, height);
 		rectangleList_->emplace_back(new class RectangleHolder(rect));
-		squareSize += height * width;
+		squareSize_ += height * width;
 	}
 	emit RectListUpdated(rectangleList_);
-	emit EmitSquareSize(squareSize);
+	emit EmitSquareSize(squareSize_);
+}
+void RectangleCreator::CreateRects(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight)
+{
+	for (RectangleHolder* r : *rectangleList_) {
+		delete r;
+		r = nullptr;
+	}
+	rectangleList_->clear();
+	rectangleList_->shrink_to_fit();
+
+	squareSize_ = 0.0f;
+
+	std::random_device rd;
+	std::mt19937 engine(rd());
+	std::uniform_int_distribution<> dist_width(minWidth, maxWidth);
+	std::uniform_int_distribution<> dist_height(minHeight, maxHeight);
+
+
+	int recsPerLine = std::ceil(std::sqrt(amount));
+	for (int i = 0; i < amount; i++) {
+
+		int height = dist_height(engine);
+		int width = dist_width(engine);
+		//int x_pos = (i % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
+		//int y_pos = (int)(i / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
+		int x_pos = 0;
+		int y_pos = 0;
+		QRectF rect(x_pos, y_pos, width, height);
+		rectangleList_->emplace_back(new class RectangleHolder(rect));
+		squareSize_ += height * width;
+	}
+
+	if (UIConstants::useUI_) {
+		emit RectListUpdated(rectangleList_);
+		emit EmitSquareSize(squareSize_);
+	}
 }
 void RectangleCreator::OnOptimDone() {
 	emit EmitRectList(rectangleList_);

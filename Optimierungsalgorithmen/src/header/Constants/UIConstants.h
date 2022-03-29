@@ -1,6 +1,8 @@
 #pragma once
 
 namespace UIConstants {
+	static const bool useUI_ = true;
+
 	static const int mainWindowWidth_ = 1600;
 	static const int mainWindowHeight_ = 900;
 

@@ -9,6 +9,13 @@ DataHolder::DataHolder()
 	rectCreator_ = std::make_shared<RectangleCreator>();
 }
 
+DataHolder::DataHolder(int rect_amount, int min_rect_width, int min_rect_height, int max_rect_width, int max_rect_height, int boxLength)
+{
+	boxCreator_ = std::make_shared<BoundingBoxCreator>(boxLength);
+	rectCreator_ = std::make_shared<RectangleCreator>();
+	rectCreator_->CreateRects(rect_amount, min_rect_width, min_rect_height, max_rect_width, max_rect_height);
+}
+
 
 
 std::shared_ptr<class BoundingBoxCreator> DataHolder::getBoxCreator()
@@ -49,4 +56,10 @@ void DataHolder::ResetData()
 {
 	boxCreator_->ResetBoundingBoxList();
 	
+}
+
+void DataHolder::ResetDataForTestEnv()
+{
+	boxCreator_->ResetBoundingBoxList();
+	boxCreator_->RecSquareSizeChanged(rectCreator_->getSquareSize());
 }

@@ -26,6 +26,7 @@ inline LocalSearch<Data>::LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* so
 {
 	neighbourDefinition_ = n;
 	currentBestScore_ = AlgorithmConstants::maxScore;
+	OptimAlgoI<Data>::identifier_ = "LocalSearch " + n->getIdentifier();
 }
 
 template<class Data>
@@ -107,6 +108,8 @@ inline void LocalSearch<Data>::reset()
 	OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_);
 	OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
 	neighbourDefinition_->resetData();
+
+
 	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);
 	emit OptimAlgoI<Data>::StepDone();
 	emit OptimAlgoI<Data>::DrawSolution();

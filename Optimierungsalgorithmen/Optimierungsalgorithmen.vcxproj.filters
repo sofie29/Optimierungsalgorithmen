@@ -97,6 +97,9 @@
     <ClCompile Include="src\src\Algorithm\GeometryBasedNeighbour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\src\TestSuite\TestEnvironment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\header\Optimierungsalgorithmen.h">
@@ -177,6 +180,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\header\Algorithm\GeometryBasedNeighbour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\TestSuite\TestEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,6 +8,13 @@ BoundingBoxCreator::BoundingBoxCreator() {
 	rectSquareSize_ = 0;
 }
 
+BoundingBoxCreator::BoundingBoxCreator(const int boxLength) {
+	edgeLength_ = boxLength;
+	optimalAmount_ = 0.0f;
+	currentFitScore_ = 0.0f;
+	rectSquareSize_ = 0;
+}
+
 
 void BoundingBoxCreator::getRectList(std::vector<QRectF>& list)
 {

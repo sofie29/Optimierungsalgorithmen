@@ -3,9 +3,11 @@
 RectangleDrawer::RectangleDrawer() 
 {
 	currentAmount_ = AlgorithmConstants::initialAmount_;
-	currentMaxEdgeLength_ = AlgorithmConstants::initialEdgeSize_;
-
 	
+	currentMinWidth_ = AlgorithmConstants::initialEdgeSize_;
+	currentMaxWidth_ = AlgorithmConstants::initialEdgeSize_;
+	currentMinHeight_ = AlgorithmConstants::initialEdgeSize_;
+	currentMaxHeight_ = AlgorithmConstants::initialEdgeSize_;
 }
 
 
@@ -38,7 +40,7 @@ void RectangleDrawer::DrawRectAmountChangedI(const int amount)
 {
 	if (amount <= AlgorithmConstants::maxRectangleAmount_) {
 		currentAmount_ = amount;
-		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
 	}
 }
 
@@ -47,25 +49,74 @@ void RectangleDrawer::DrawRectAmountChangedS(const QString& amount)
 {
 	if (amount.toInt() <= AlgorithmConstants::maxRectangleAmount_) {
 		currentAmount_ = amount.toInt();
-		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
 	}
 }
 
-void RectangleDrawer::DrawRectSizeChangedI(const int maxEdgeLength)
+void RectangleDrawer::DrawRectMinWidthChangedI(const int minWidth)
 {
-	if (maxEdgeLength <= AlgorithmConstants::maxRectangleEdgeSize_ && maxEdgeLength >= AlgorithmConstants::minRectangleEdgeSize_) {
-		currentMaxEdgeLength_ = maxEdgeLength;
-		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
+	if (minWidth <= AlgorithmConstants::maxRectangleEdgeSize_ && minWidth >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMinWidth_ = minWidth;
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
 	}
 }
 
-void RectangleDrawer::DrawRectSizeChangedS(const QString& maxEdgeLength)
+void RectangleDrawer::DrawRectMinWidthChangedS(const QString& minWidth)
 {
-	if (maxEdgeLength.toInt() <= AlgorithmConstants::maxRectangleEdgeSize_ && maxEdgeLength.toInt() >= AlgorithmConstants::minRectangleEdgeSize_){
-		currentMaxEdgeLength_ = maxEdgeLength.toInt();
-		emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
+	if (minWidth.toInt() <= AlgorithmConstants::maxRectangleEdgeSize_ && minWidth.toInt() >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMinWidth_ = minWidth.toInt();
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
 	}
 }
+
+void RectangleDrawer::DrawRectMaxWidthChangedI(const int maxWidth)
+{
+	if (maxWidth <= AlgorithmConstants::maxRectangleEdgeSize_ && maxWidth >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMaxWidth_ = maxWidth;
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+	}
+}
+
+void RectangleDrawer::DrawRectMaxWidthChangedS(const QString& maxWidth)
+{
+	if (maxWidth.toInt() <= AlgorithmConstants::maxRectangleEdgeSize_ && maxWidth.toInt() >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMaxWidth_ = maxWidth.toInt();
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+	}
+}
+
+void RectangleDrawer::DrawRectMinHeightChangedI(const int minHeight)
+{
+	if (minHeight <= AlgorithmConstants::maxRectangleEdgeSize_ && minHeight >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMinHeight_ = minHeight;
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+	}
+}
+
+void RectangleDrawer::DrawRectMinHeightChangedS(const QString& minHeight)
+{
+	if (minHeight.toInt() <= AlgorithmConstants::maxRectangleEdgeSize_ && minHeight.toInt() >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMinHeight_ = minHeight.toInt();
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+	}
+}
+
+void RectangleDrawer::DrawRectMaxHeightChangedI(const int maxHeight)
+{
+	if (maxHeight <= AlgorithmConstants::maxRectangleEdgeSize_ && maxHeight >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMaxHeight_ = maxHeight;
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+	}
+}
+
+void RectangleDrawer::DrawRectMaxHeightChangedS(const QString& maxHeight)
+{
+	if (maxHeight.toInt() <= AlgorithmConstants::maxRectangleEdgeSize_ && maxHeight.toInt() >= AlgorithmConstants::minRectangleEdgeSize_) {
+		currentMaxHeight_ = maxHeight.toInt();
+		emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+	}
+}
+
 
 void RectangleDrawer::SetRects(const std::vector<class RectangleHolder*>* list) {
 	
@@ -91,5 +142,5 @@ void RectangleDrawer::SetRects(const std::vector<class RectangleHolder*>* list) 
 }
 
 void RectangleDrawer::OnBoundingBoxSizeChanged(int x) {
-	emit EmitRectInformation(currentAmount_, currentMaxEdgeLength_);
+	emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
 }

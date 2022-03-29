@@ -14,12 +14,13 @@ public:
 	virtual void resetData() = 0;
 	virtual void initParameters() = 0;
 
+	std::string getIdentifier();
 	
 protected:
 	DataHolderT<Data>* data_;
 	DataHolderT<Data>* bestData_;
 	InitialSolutionI<Data>* initSol_;
-	
+	std::string identifier_;
 };
 
 template<class Data>
@@ -28,10 +29,17 @@ inline NeighbourI<Data>::NeighbourI(DataHolderT<Data>* d, DataHolderT<Data>* cur
 	// TODO: reset when changing parameters (e.g. number of rectangles)
 	// currentBest_ = 999000; // worst score in GeometryBasedNeighbourhood with 1000 rectangles
 	//initSol_->CreateInitialSolution(d);
+	identifier_ = "";
 }
 
 
 template<class Data>
 inline NeighbourI<Data>::~NeighbourI()
 {
+}
+
+template<class Data>
+inline std::string NeighbourI<Data>::getIdentifier()
+{
+	return identifier_;
 }
