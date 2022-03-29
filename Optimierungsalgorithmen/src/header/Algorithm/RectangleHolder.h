@@ -15,6 +15,7 @@ public:
 	void setColor(QColor c);
 	void setToSwappedColor();
 	void setToDefaultColor();
+	void rotateRect();
 private:
 	QRectF rect_;
 	int boundingBoxIndex_;

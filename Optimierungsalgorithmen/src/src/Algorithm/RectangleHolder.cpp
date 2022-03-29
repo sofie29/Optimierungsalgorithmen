@@ -59,6 +59,13 @@ void RectangleHolder::setToDefaultColor()
 	drawColor_ = defaultColor_;
 }
 
+void RectangleHolder::rotateRect()
+{
+	int width = rect_.width();
+	this->rect_.setWidth(rect_.height());
+	this->rect_.setHeight(width);
+}
+
 
 
 QColor RectangleHolder::defaultColor_ = QColor(Qt::darkCyan);

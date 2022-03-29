@@ -217,9 +217,8 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 		// 1) select a rectangle
 		int rectIdx = this->getRectPosMethodA(rectListSize);
 		// std::cout << rectIdx << std::endl;
-		QRectF& rect = (*rectList)[rectIdx]->getRectRef(); // get a rectangle from list, start with the last one
-		int width = rect.width();
-		int height = rect.height();
+		RectangleHolder* rectHolder = (*rectList)[rectIdx];
+		QRectF& rect = rectHolder->getRectRef(); // get a rectangle from list, start with the last one
 		bool hasRotated = false;
 
 		// 2) get index of rectangle's current bounding box
@@ -257,8 +256,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 			bool rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx, false);
 			if (!rectFitsInBox) {
 				// rotate rectangle and try to place again
-				rect.setWidth(height);
-				rect.setHeight(width);
+				rectHolder->rotateRect();
 				hasRotated = true;
 				rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx, false);
 			}
@@ -281,8 +279,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				// reset rotation
 				if (hasRotated) {
 					hasRotated = false;
-					rect.setWidth(width);
-					rect.setHeight(height);
+					rectHolder->rotateRect();
 				}
 			}
 		}
