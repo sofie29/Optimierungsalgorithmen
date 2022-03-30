@@ -54,10 +54,12 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnRecta
 	size_t bBoxListSize = bBoxList.size();
 	size_t rectListSize = rectangles->size();
 
+	/*
 	if (bBoxListSize <= 1) {
 		std::cout << "list size 0" << std::endl;
 		return 0;
 	}
+	*/
 
 	float average = static_cast<float>(rectListSize) / static_cast<float>(bBoxListSize);
 	float boxScore = 0;
@@ -66,7 +68,7 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnRecta
 		float rectanglesInBox = static_cast<float>((box->getRectangleIndices()).size());
 
 		if (average > rectanglesInBox) {
-			boxScore += (average - rectanglesInBox) / average;
+			boxScore += (average - rectanglesInBox) / average; // the emptier a box is, the better it is
 		}
 
 	}
@@ -75,8 +77,9 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnRecta
 }
 
 
+// THIS SCORE IS NOT USED
 // Calculate score, score should be minimized
-// The score depends on the number of bounding boxes and reducing the number of rectangles in a bounding box with a small amount of rectangles is rewarded extra.
+// The score depends on the number of bounding boxes and reducing the number of rectangles in a bounding box with a small filled area is rewarded extra.
 template<>
 inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnArea(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) {
 	size_t bBoxListSize = bBoxList.size();
@@ -84,11 +87,6 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnArea(
 	if (bBoxListSize <= 0) return 0;
 	float boxLength = bBoxList[0]->getBoxWidth();
 	float boxArea = boxLength * boxLength;
-
-	if (bBoxListSize <= 1) {
-		std::cout << "list size 0" << std::endl;
-		return 0;
-	}
 
 	float average = 0.5;
 	float boxScore = 0;
@@ -104,8 +102,7 @@ inline float GeometryBasedNeighbour<DataHolder*>::calculateScoreDependingOnArea(
 		}
 
 	}
-	// maximaler Boxscore: 1 * rectangles
-	// std::cout << bBoxListSize << " " << boxScore << std::endl;
+	// maximal boxScore: 1 * rectangles
 	return bBoxListSize * (rectListSize + 1) - boxScore;
 }
 

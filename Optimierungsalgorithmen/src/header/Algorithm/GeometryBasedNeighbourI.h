@@ -27,8 +27,9 @@ public:
 
 protected:
 	float bestScore_;
+	int initalNumberOfBoxes_;
 	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex);
-	bool removeRectFromBox(std::shared_ptr<BoundingBox>& newBox, std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, int newBoxIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList);
+	bool removeRectFromBox(std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList, std::shared_ptr<BoundingBox>* newBox = NULL);
 	bool resetData_;
 	float findNeighbour(bool withoutOverlapping);
 	void setAllToDefaultColors(std::vector<class RectangleHolder*>* rectList);
@@ -61,7 +62,6 @@ inline bool GeometryBasedNeighbourI<DataHolder*>::fitBoundingBox(std::vector<int
 
 	// place all rectangles specified in indices at the given bounding box
 	for (int i : indices) {
-		//if (!box->tryFit((*rectangles)[i], boundingBoxIndex)) {
 		if (!this->tryFitWrapper(boxList, boxIndex, rectangles, i, true)) {
 			return false;
 		}
@@ -70,14 +70,14 @@ inline bool GeometryBasedNeighbourI<DataHolder*>::fitBoundingBox(std::vector<int
 }
 
 template<>
-inline bool GeometryBasedNeighbourI<DataHolder*>::removeRectFromBox(std::shared_ptr<BoundingBox>& newBox, std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, int newBoxIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList) {
+inline bool GeometryBasedNeighbourI<DataHolder*>::removeRectFromBox(std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList, std::shared_ptr<BoundingBox>* newBox) {
 	std::vector<int> newIndices = oldBox->getRectangleIndices();
 	newIndices.erase(std::remove(newIndices.begin(), newIndices.end(), rectIdx), newIndices.end());
 
 	// replace all rectangles previous bounding box
 	if (this->fitBoundingBox(newIndices, rectList, bBoxList, oldBoxIdx)) {
-		newBox->addRectangleIndex(rectIdx);
-		oldBox->removeRectangleIndex(rectIdx);
+		if (newBox != nullptr) (*newBox)->addRectangleIndex(rectIdx);
+		oldBox->removeRectangleIndex(rectIdx); // TODO: delete before if, and add in case if fails
 
 		// delete bounding box in case it is empty
 		if (oldBox->getRectangleIndices().size() == 0) {
@@ -88,7 +88,6 @@ inline bool GeometryBasedNeighbourI<DataHolder*>::removeRectFromBox(std::shared_
 	}
 
 	else {
-		// std::cout << "cannot fit old box  " << std::endl;
 		return false;
 	}
 }
@@ -260,9 +259,11 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				hasRotated = true;
 				rectFitsInBox = this->tryFitWrapper(bBoxList, newBoxIdx, rectList, rectIdx, false);
 			}
-
+			// std::cout << "rect fits in box" << rectFitsInBox << std::endl;
 			if (rectFitsInBox) {
-				foundNeighbour = this->removeRectFromBox(newBox, oldBox, oldBoxIndex, rectIdx, newBoxIdx, bBoxList, rectList);
+				// std::cout << "box indices before" << newBox->getRectangleIndices().size() << std::endl;
+				foundNeighbour = this->removeRectFromBox(oldBox, oldBoxIndex, rectIdx, bBoxList, rectList, &newBox);
+				// std::cout << "box indices after" << newBox->getRectangleIndices().size() << std::endl;
 				if (!foundNeighbour) { // this rectangle can not be replaced since old bounding box cannot be resorted
 					data_->getData()->OverwriteData(bestData_->getData());
 					boxCreator->getBoundingBoxList(bBoxList);
@@ -283,20 +284,25 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				}
 			}
 		}
-		if (!foundNeighbour && !withoutOverlapping) {
-			// add bounding box (nur wenn von Transgression list?)
-			// std::cout << "boxlist size: " << bBoxList.size() << std::endl;
-			int amount = rectList->size();
-			int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
-			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
-			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
+		int prob = rand() % 100;
+		if (!foundNeighbour && !withoutOverlapping && prob < 50) {
+			// TODO: add bounding box nur wenn von Transgression list?
+			// TODO: modify box position
+			if (this->removeRectFromBox(oldBox, oldBoxIndex, rectIdx, bBoxList, rectList)) {
+				int amount = rectList->size();
+				int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
+				int x_pos = (rectListSize % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
+				int y_pos = (int)(rectListSize / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 
-			boxCreator->addBoundingBox(x_pos, y_pos, (*rectList)[rectIdx], rectIdx, bBoxList.size());
-			boxCreator->getBoundingBoxList(bBoxList);
-			// std::cout << "added bounding box, boxlist size: " << bBoxList.size() << std::endl;
-			// Algorithmus muss sie auch nutzen
-			foundNeighbour = true;
-			break;
+				boxCreator->addBoundingBox(x_pos, y_pos, (*rectList)[rectIdx], rectIdx, bBoxList.size());
+				boxCreator->getBoundingBoxList(bBoxList);
+				foundNeighbour = true;
+				break;
+			 }
+			else { // this rectangle can not be replaced since old bounding box cannot be resorted
+				data_->getData()->OverwriteData(bestData_->getData());
+				boxCreator->getBoundingBoxList(bBoxList);
+			}
 		}
 
 		++iteration;
@@ -314,6 +320,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 
 	resetData_ = score >= bestScore_;
 	// std::cout << "score: " << score << " bestscore: " << bestScore_ << std::endl;
+	// this->shiftScore(rectList, bBoxList);
 	if (score <= bestScore_) {
 		this->shiftScore(rectList, bBoxList);
 		bestScore_ = score;
