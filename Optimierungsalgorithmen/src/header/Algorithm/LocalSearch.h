@@ -73,6 +73,8 @@ float LocalSearch<Data>::execute(int steps)
 		OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
 		t1 = std::chrono::high_resolution_clock::now();
 	}
+	neighbourDefinition_->afterOptimization();
+	// TODO: done is never true, isn't it?
 	bool done = OptimAlgoI<Data>::currentStep_ >= AlgorithmConstants::maxIterations;
 	if (!done) {
 		std::cout << "Score after step: " << currentBestScore_ << std::endl;

@@ -13,6 +13,7 @@ public:
 	virtual float optimize() = 0;
 	virtual void resetData() = 0;
 	virtual void initParameters() = 0;
+	virtual void afterOptimization() = 0;
 
 	std::string getIdentifier();
 	

@@ -17,11 +17,18 @@ public:
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) override;
 	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
 	virtual void initParameters() override;
+	virtual int getRectPosMethodA(const int rectListSize) override;
+	virtual int getBoxPos(const int boxListSize) override;
+	virtual void resetBoxPos() override;
+
+	// not implemented here
+	virtual int calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
 	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
-	virtual int getRectPosMethodA(int rectListSize) override;
+
 
 private:
 	int rectPos_;
+	int boxPos_;
 	virtual float calculateScoreDependingOnRectangles(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
 	virtual float calculateScoreDependingOnArea(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
 };
@@ -31,6 +38,7 @@ template<class Data>
 inline GeometryBasedNeighbour<Data>::GeometryBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : GeometryBasedNeighbourI<Data>(data, currentBest, initSol)
 {
 	rectPos_ = 0;
+	boxPos_ = -1;
 }
 
 
@@ -125,16 +133,37 @@ template<class Data>
 inline void GeometryBasedNeighbour<Data>::initParameters()
 {
 	this->resetBestScore();
+	rectPos_ = 0;
+}
+
+
+template<class Data>
+inline int GeometryBasedNeighbour<Data>::getRectPosMethodA(const int rectListSize)
+{
+	rectPos_ = (rectPos_ >= rectListSize) ? 1 : rectPos_ + 1;
+	return rectListSize - rectPos_;
+}
+
+template<class Data>
+inline int GeometryBasedNeighbour<Data>::getBoxPos(const int boxListSize)
+{
+	boxPos_ = boxPos_ < boxListSize - 1 ? boxPos_ + 1 : 0;
+	return boxPos_;
+}
+
+template<class Data>
+inline void GeometryBasedNeighbour<Data>::resetBoxPos()
+{
+	boxPos_ = -1;
+}
+
+template<class Data>
+inline int GeometryBasedNeighbour<Data>::calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
+{
+	return 0;
 }
 
 template<class Data>
 inline void GeometryBasedNeighbour<Data>::shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
 {
-}
-
-template<class Data>
-inline int GeometryBasedNeighbour<Data>::getRectPosMethodA(int rectListSize)
-{
-	rectPos_ = (rectPos_ >= rectListSize) ? 1 : rectPos_ + 1;
-	return rectListSize - rectPos_;
 }
