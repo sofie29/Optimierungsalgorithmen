@@ -15,14 +15,14 @@ public:
 	virtual float optimize() override;
 	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) override;
-	virtual void handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex) override;
 	virtual void initParameters() override;
-	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
-	virtual int getRectPosMethodA(const int rectListSize) override;
+	virtual int getRectPos(const int rectListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList, bool& isTransgressionRect = false) override;
 	virtual int getBoxPos(const int boxListSize) override;
 	virtual void resetBoxPos() override;
 
-	virtual int calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList);
+	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
+	virtual int calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) override;
+	virtual void updateBoxQueue(int boxIndex1, int boxIndex2, std::vector<std::shared_ptr<BoundingBox>>& boxList, std::vector<class RectangleHolder*>* rectangles, bool deleteBox1) override;
 
 
 private:
@@ -36,12 +36,17 @@ private:
 
 	int transgressions_;
 	std::vector<int> rectIndicesWithTransgression_;
+	int rectPosTransgr_;
 	int rectPos_;
+	int rectQueuePos_;
 
 	int boxPos_;
 	std::vector<int> visitedBoxes_;
+	std::vector<std::tuple<int, float>> boxQueue_;
+	void sortBoxQueue();
 
 	int iterations_;
+
 };
 
 
@@ -53,7 +58,9 @@ inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbou
 	t_ = 1;
 	scoreShift_ = 0;
 	iterations_ = 0;
+	rectPosTransgr_ = 0;
 	rectPos_ = 0;
+	rectQueuePos_ = 0;
 	boxPos_ = -1;
 }
 
@@ -87,12 +94,9 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(std:
 
 	}
 
-
 	float maxOv = rectangles->size() + 1;
-
 	this->calculateOverlappingWrapper(rectangles, bBoxList);
 
-	// TODO: has the max score to be updated?
 	// upper bound of boxScore: length of rectangleList - 1
 	//std::cout << "boxList: " << bBoxListSize << ", transgressions: " << transgressions_ << ", scoreShift: " << scoreShift_ << std::endl;
 	return (bBoxListSize + (float)transgressions_ * scoreFactor_ - scoreShift_) * (rectListSize - 1) - boxScore;
@@ -113,24 +117,29 @@ inline bool GeometryBasedOverlappingNeighbour<Data>::tryFitWrapper(std::vector<s
 }
 
 
-template<class Data>
-inline void GeometryBasedOverlappingNeighbour<Data>::handleEmptyBoundingBox(std::shared_ptr<BoundingBoxCreator> boxCreator, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex)
-{
-	// IDEA: delete box but create new box after failed checking of all existing boxes
-	boxCreator->resetOneBoundingBox(boxIndex);
-	boxCreator->getBoundingBoxList(boxList);
-}
-
 
 // TODO: call this method
-template<class Data>
-inline void GeometryBasedOverlappingNeighbour<Data>::initParameters()
+template<>
+inline void GeometryBasedOverlappingNeighbour<DataHolder*>::initParameters()
 {
 	t_ = 1;
 	scoreShift_ = 0;
 	rectPos_ = 0;
 
 	this->resetBestScore();
+
+	// reset boxQueue
+	boxQueue_.clear();
+	std::vector<std::shared_ptr<BoundingBox>> boxList;
+	data_->getData()->getBoxCreator()->getBoundingBoxList(boxList);
+	std::cout << boxList.size() << std::endl;
+	for (int i = 0; i < boxList.size(); ++i) {
+		// struct with box index und filled area TODO AREA
+		boxQueue_.push_back(std::make_tuple(i, boxList[i]->getRectangleIndices().size()));
+	}
+	this->sortBoxQueue();
+	rectPos_ = boxList[0]->getRectangleIndices().size() - 1;
+	rectQueuePos_ = 0;
 }
 
 
@@ -155,48 +164,6 @@ inline void GeometryBasedOverlappingNeighbour<Data>::shiftScore(std::vector<clas
 	}
 }
 
-template<class Data>
-inline int GeometryBasedOverlappingNeighbour<Data>::getRectPosMethodA(const int rectListSize)
-{
-	// the smaller t_, the more should search focus on rectangles which are causing transgressions
-	int pos;
-	int randomValue = rand() % 100 - 20; // [-20...79]
-	if (randomValue < t_ * 100 || rectPos_ >= rectIndicesWithTransgression_.size()) {
-		pos = rand() % rectListSize; // choose rectangle randomly
-		//std::cout << "random rect: " << pos << std::endl;
-	}
-	else {
-		pos = rectIndicesWithTransgression_[rectPos_++]; // select rectangle from transgression list
-		//std::cout << "transgression rect: " << pos << std::endl;
-	}
-
-	return pos;
-}
-
-template<class Data>
-inline int GeometryBasedOverlappingNeighbour<Data>::getBoxPos(const int boxListSize)
-{
-	/*
-	std::vector<int> v(100) ; // vector with 100 ints.
-	std::iota (std::begin(v), std::end(v), 0); // Fill with 0, 1, ..., 99.
-	*/
-
-	boxPos_ = rand() % boxListSize;
-	// with 90 % probability, get another index in case the index was already visited
-	while (rand() % 100 < 90 && std::find(visitedBoxes_.begin(), visitedBoxes_.end(), boxPos_) != visitedBoxes_.end()) {
-		boxPos_ = rand() % boxListSize;
-	}
-	visitedBoxes_.push_back(boxPos_);
-	return boxPos_;
-}
-
-template<class Data>
-inline void GeometryBasedOverlappingNeighbour<Data>::resetBoxPos()
-{
-	boxPos_ = -1;
-	visitedBoxes_.clear();
-}
-
 // count number of intersections which exceed t and sum up all intersection areas
 template<class Data>
 inline int GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList)
@@ -206,7 +173,7 @@ inline int GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(
 	transgressions_ = 0;
 
 	rectIndicesWithTransgression_.clear();
-	rectPos_ = 0;
+	rectPosTransgr_ = 0;
 
 	for (std::shared_ptr<BoundingBox> box : bBoxList) {
 		std::vector<int> indices = box->getRectangleIndices();
@@ -234,4 +201,118 @@ inline int GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(
 	std::cout << "" << std::endl;
 	*/
 	return transgressions_;
+}
+
+template<class Data>
+inline int GeometryBasedOverlappingNeighbour<Data>::getRectPos(const int rectListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList, bool& isTransgressionRect)
+{
+	// the smaller t_, the more should search focus on rectangles which are causing transgressions
+	int pos = rand() % rectListSize;
+	int randomValue = rand() % 100 - 20; // [-20...79]
+	if (randomValue < t_ * 100 || rectPosTransgr_ >= rectIndicesWithTransgression_.size()) {
+		/*
+		int boxIdx = std::get<0>(boxQueue_[rectQueuePos_]); // current box
+		pos = boxList[boxIdx]->getRectangleIndices()[rectPos_];
+		// std::cout << "try box " << boxIdx << " with rect: " << pos << std::endl;
+
+		rectPos_ -= 1;
+		if (rectPos_ < 0) {
+			rectQueuePos_ = rectQueuePos_ >= boxQueue_.size() - 1 ? 0 : rectQueuePos_ + 1;
+			int newBoxIdx = std::get<0>(boxQueue_[rectQueuePos_]); // current box
+			rectPos_ = boxList[newBoxIdx]->getRectangleIndices().size() - 1;
+		}
+		// std::cout << "new rectQueueIdx " << rectQueuePos_ << ", new rectPos: " << rectPos_ << std::endl;
+		*/
+	}
+	else {
+		pos = rectIndicesWithTransgression_[rectPosTransgr_++]; // select rectangle from transgression list
+		isTransgressionRect = true;
+		//std::cout << "transgression rect: " << pos << std::endl;
+	}
+
+	return pos;
+}
+
+template<class Data>
+inline int GeometryBasedOverlappingNeighbour<Data>::getBoxPos(const int boxListSize)
+{
+	boxPos_ = rand() % boxListSize;
+	// with 90 % probability, get another index in case the index was already visited
+	while (rand() % 100 < 90 && std::find(visitedBoxes_.begin(), visitedBoxes_.end(), boxPos_) != visitedBoxes_.end()) {
+		boxPos_ = rand() % boxListSize;
+	}
+	visitedBoxes_.push_back(boxPos_);
+	return boxPos_;
+}
+
+template<class Data>
+inline void GeometryBasedOverlappingNeighbour<Data>::resetBoxPos()
+{
+	boxPos_ = -1;
+	visitedBoxes_.clear();
+}
+
+
+
+
+
+
+/***** BOX QUEUE *****/
+template<class Data>
+inline void GeometryBasedOverlappingNeighbour<Data>::sortBoxQueue()
+{
+	std::sort(
+		boxQueue_.begin(),
+		boxQueue_.end(),
+		[](std::tuple<int, float> b1, std::tuple<int, float> b2) { return std::get<1>(b1) < std::get<1>(b2); }
+	);
+}
+
+template<class Data>
+inline void GeometryBasedOverlappingNeighbour<Data>::updateBoxQueue(int boxIndex1, int boxIndex2, std::vector<std::shared_ptr<BoundingBox>>& boxList, std::vector<class RectangleHolder*>* rectangles, bool deleteBox1)
+{
+	bool foundBox1 = false;
+	bool foundBox2 = false;
+
+	if (deleteBox1) {
+		boxQueue_.erase(std::remove_if(
+			boxQueue_.begin(),
+			boxQueue_.end(),
+			[boxIndex1](const std::tuple<int, float>& tup) { return std::get<0>(tup) == boxIndex1; }),
+			boxQueue_.end());
+		foundBox1 = true;
+	}
+
+	for (std::tuple<int, float>& boxTuple : boxQueue_) {
+		int currentIndex = std::get<0>(boxTuple);
+
+		if (!foundBox1 && currentIndex == boxIndex1) {
+			// update box 1
+			std::get<1>(boxTuple) = boxList[boxIndex1]->getRectangleIndices().size();
+			foundBox1 = true;
+		}
+		else if (!foundBox2 && currentIndex == boxIndex2) {
+			// update box 2
+			if (deleteBox1 && boxIndex1 < boxIndex2) boxIndex2 -= 1;
+			std::get<1>(boxTuple) = boxList[boxIndex2]->getRectangleIndices().size();
+			foundBox2 = true;
+		}
+
+		if (deleteBox1 && currentIndex > boxIndex1) std::get<0>(boxTuple) = currentIndex - 1;
+	}
+
+	// TODO: change 1 here
+	if (!foundBox2) {
+		boxQueue_.push_back(std::make_tuple(boxIndex2, 1.0));
+	}
+
+	this->sortBoxQueue();
+	rectPos_ = boxList[0]->getRectangleIndices().size() - 1;
+	rectQueuePos_ = 0;
+
+	/*
+	for (std::tuple<int, float> t : boxQueue_) {
+		std::cout << "box " << std::get<0>(t) << "rects " << std::get<1>(t) << std::endl;
+	}
+	*/
 }
