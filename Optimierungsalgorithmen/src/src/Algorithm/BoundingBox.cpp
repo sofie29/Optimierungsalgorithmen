@@ -194,6 +194,7 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 	}
 
 	else { // BoundingBox is empty
+		if (this->rect_width == 0 || this->rect_height == 0) return false;
 
 		// box_width, box_x and box_y refer to the top level bounding box
 		int overlapTopLevelBoxX = this->x - box_x + rect_width - box_width;

@@ -336,8 +336,9 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 		}
 
 		// add bounding box
-		if (!foundNeighbour && overlapping_ && isTransgressionRect && rand() % 100 < 50 && oldBox->getRectangleIndices().size() > 1) {
+		if (!foundNeighbour && overlapping_ && isTransgressionRect && rand() % 100 < 80 && oldBox->getRectangleIndices().size() > 1) {
 			if (this->removeRectFromBox(oldBox, oldBoxIndex, rectIdx, bBoxList, rectList)) {
+				std::cout << "added box" << std::endl;
 				int amount = rectListSize;
 				int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
 				int x_pos = ((rectListSize+numberOfAddedBoxes_) % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);

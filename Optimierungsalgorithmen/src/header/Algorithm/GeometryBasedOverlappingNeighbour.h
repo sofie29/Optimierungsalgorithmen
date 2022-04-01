@@ -204,7 +204,9 @@ inline int GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(
 			if (indices.size() == 1) break;
 		}
 		box->setNumberOfOverlappings(numberOfIntersectionsPerBox);
+
 	};
+
 
 
 	/*
@@ -239,12 +241,15 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::calculateScore(std:
 	int transgressionsBefore_ = transgressions_;
 	this->calculateOverlappingWrapper(rectangles, bBoxList);
 	int diff = transgressions_ - transgressionsBefore_;
-	if (isTransgressionRect && diff > 0) {
-		scoreShift_ += diff * scoreFactor_;
+	if (isTransgressionRect && diff >= 0) {
+		// std::cout << "transgressions before " << transgressionsBefore_ << "transgressions after " << transgressions_ << std::endl;
+		//std::cout << "diff in transgressions: " << diff << std::endl;
+		scoreShift_ += (diff * scoreFactor_ + 1);
 	}
 
 	// upper bound of boxScore: length of rectangleList - 1
-	//std::cout << "boxList: " << bBoxListSize << ", transgressions: " << transgressions_ << ", scoreShift: " << scoreShift_ << std::endl;
+	
+	// std::cout << "boxList: " << bBoxListSize << ", transgressions: " << transgressions_ << ", scoreShift: " << scoreShift_ << std::endl;
 	return (bBoxListSize + ((float)transgressions_) * scoreFactor_ - scoreShift_) * (rectListSize - 1) - boxScore;
 }
 
