@@ -175,20 +175,19 @@ bool BoundingBox::tryFit(RectangleHolder* rectHolder, int boundingBoxIndex)
 	return false;
 }
 
-bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y, bool& crashesTreeStructure)
+bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y)
 {
-	crashesTreeStructure = false;
 	QRectF& rect = rectHolder->getRectRef();
 	int rect_width = rect.width();
 	int rect_height = rect.height();
 	if (this->first || this->second) { // BoundingBox is not empty
 
 		// try to place rectangle at first BoundingBox
-		if (this->first && this->first->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y, crashesTreeStructure))
+		if (this->first && this->first->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
 			return true;
 
 		// try to place rectangle at second BoundingBox
-		if (this->second && this->second->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y, crashesTreeStructure))
+		if (this->second && this->second->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
 			return true;
 
 		return false; // rectangle cannot be placed in neither the first nor the second BoundingBox
@@ -204,8 +203,6 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 		int rectPosX = overlapTopLevelBoxX > 0 ? this->x - overlapTopLevelBoxX : this->x;
 		int	rectPosY = overlapTopLevelBoxY > 0 ? this->y - overlapTopLevelBoxY : this->y;
 
-		crashesTreeStructure = (rectPosX != this->x || rectPosY != this->y);
-
 		float overlapping_area = this->calculateOverlappings(rectangles, indices, rectIdx, rectPosX, rectPosY, rect_width, rect_height, t);
 		if (overlapping_area == -1) {
 			return false; // overlapping exceeds parameter t
@@ -219,8 +216,6 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 
 		int areaNotInBox = (rect_width - this->rect_width) * (rect_height - this->rect_height);
 		if (areaNotInBox > 0 && areaNotInBox > overlapping_area) return false;
-
-		crashesTreeStructure = true;
 
 		rect.moveTopLeft(QPointF(rectPosX, rectPosY));
 		rectHolder->setBoundingBoxIndex(boundingBoxIndex);

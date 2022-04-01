@@ -21,7 +21,7 @@ public:
 	bool tryFit(class RectangleHolder* rectHolder, int boundingBoxIndex);
 
 	// box_width, box_x and box_y refer to the top level bounding box, temperature t
-	bool tryFitOverlapping(class RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y, bool& crashesTreeStructure);
+	bool tryFitOverlapping(class RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y);
 	float calculateOverlappings(std::vector<RectangleHolder*>* rectangles, std::vector<int> indices, int rectIdx, int x, int y, int w, int h, float t);
 
 	void removeLowerLevelBoundingBoxes();
