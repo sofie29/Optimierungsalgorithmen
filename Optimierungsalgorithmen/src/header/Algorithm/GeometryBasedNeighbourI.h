@@ -20,7 +20,7 @@ public:
 	virtual void resetData() override;
 
 	virtual void initParameters() = 0;
-	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
+	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, int oldBoxIdx) = 0;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) = 0;
 	virtual int getRectPos(const int rectListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList, bool& isTransgressionRect) = 0;
 	virtual int getBoxPos(const int boxListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList) = 0;
@@ -164,7 +164,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 	size_t rectListSize = rectList->size();
 
 	if (rectListSize <= 1) {
-		return this->calculateScore(rectList, bBoxList);
+		return this->calculateScore(rectList, bBoxList, -1);
 	}
 
 
@@ -236,7 +236,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				this->setAllToDefaultColors(rectList);
 				(*rectList)[rectIndex1]->setToSwappedColor();
 				(*rectList)[rectIndex2]->setToSwappedColor();
-				score = this->calculateScore(rectList, bBoxList) - 0.01;
+				score = this->calculateScore(rectList, bBoxList, -1) - 0.01;
 				changedBox1 = boxFromRect1;
 				changedBox2 = boxFromRect2;
 			}
@@ -287,7 +287,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 		}
 
 		// std::cout << "CHOOSE RECT " << rectIdx << " from box " << (*rectList)[rectIdx]->getBoundingBoxIndex() << std::endl;
-		std::cout << "CHOOSE RECT " << rectIdx << " from box " << oldBoxIndex << std::endl;
+		// std::cout << "CHOOSE RECT " << rectIdx << " from box " << oldBoxIndex << std::endl;
 
 		// 3) try to move to another bounding box
 		int boxIteration = 0;
@@ -319,7 +319,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				if (foundNeighbour) {
 					this->setAllToDefaultColors(rectList);
 					(*rectList)[rectIdx]->setToSwappedColor();
-					score = this->calculateScore(rectList, bBoxList);
+					score = this->calculateScore(rectList, bBoxList, oldBoxIndex);
 					changedBox1 = oldBoxIndex;
 					changedBox2 = newBoxIdx;
 					deleteBox1 = bBoxList.size() < oldBoxListSize;
@@ -363,11 +363,11 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				foundNeighbour = true;
 				changedBox1 = oldBoxIndex;
 				changedBox2 = int(bBoxList.size()) - 1;
-				score = this->calculateScore(rectList, bBoxList);
+				score = this->calculateScore(rectList, bBoxList, -1);
 				break;
 			 }
 			else { // this rectangle can not be replaced since old bounding box cannot be resorted
-				std::cout << "old Box cannot be reordered" << std::endl;
+				// std::cout << "old Box cannot be reordered" << std::endl;
 
 				data_->getData()->OverwriteData(bestData_->getData());
 				boxCreator->getBoundingBoxList(bBoxList);

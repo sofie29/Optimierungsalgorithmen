@@ -139,4 +139,5 @@ void BoundingBoxCreator::EdgeLengthChanged(const int length) {
 void BoundingBoxCreator::resetOneBoundingBox(int index) {
 	boundingBoxList_[index].reset();
 	boundingBoxList_.erase(boundingBoxList_.begin() + index);
+	rectangleList_.erase(rectangleList_.begin() + index);
 }
