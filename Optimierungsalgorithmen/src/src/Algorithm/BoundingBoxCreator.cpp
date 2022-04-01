@@ -43,11 +43,11 @@ std::shared_ptr<class BoundingBox> BoundingBoxCreator::createDeepCopy(std::share
 		std::shared_ptr<BoundingBox> secondCopy = createDeepCopy(secondBox);
 
 		return std::make_shared<BoundingBox>
-			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices(), firstCopy, secondCopy);
+			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices(), firstCopy, secondCopy, box->getNumberOfOverlappings());
 	}
 	else { // firstBox and secondBox are nullptr -> box is a leaf (can also be root node simultaneously)
 		return std::make_shared<BoundingBox>
-			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices()); // no child boxes
+			(box->getBoxWidth(), box->getBoxHeight(), box->getXPos(), box->getYPos(), box->getRectangleIndices(), box->getNumberOfOverlappings()); // no child boxes
 	}
 }
 
@@ -91,8 +91,6 @@ void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, RectangleHolder* r
 
 void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect)
 {
-
-
 	boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rect, 0)); // TODO: 0
 	rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), edgeLength_, edgeLength_));
 

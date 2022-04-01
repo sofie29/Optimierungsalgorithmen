@@ -8,7 +8,8 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, 
 	y(y_pos),
 	first(nullptr),
 	second(nullptr),
-	numberOfRectangles(0)
+	numberOfRectangles(0),
+	numberOfOverlappings(0)
 {
 	int x, y;
 	this->tryFit(rect.width(), rect.height(), x, y);
@@ -23,7 +24,8 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, 
 	y(y_pos),
 	first(nullptr),
 	second(nullptr),
-	numberOfRectangles(0)
+	numberOfRectangles(0),
+	numberOfOverlappings(0)
 {
 	this->tryFit(rectHolder, boxIndex);
 	this->addRectangleIndex(rectIndex);
@@ -35,12 +37,13 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y) :
 	y(y),
 	first(nullptr),
 	second(nullptr),
-	numberOfRectangles(0)
+	numberOfRectangles(0),
+	numberOfOverlappings(0)
 {
 }
 
 
-BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices) :
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices, int numberOv = 0) :
 	rect_height(rect_height),
 	rect_width(rect_width),
 	x(x),
@@ -48,12 +51,13 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vec
 	first(nullptr),
 	second(nullptr),
 	rectangleIndices(indices),
-	numberOfRectangles(indices.size())
+	numberOfRectangles(indices.size()),
+	numberOfOverlappings(numberOv)
 {
 }
 
 // Constructor for OverwriteData method / deep copy
-BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices, std::shared_ptr<BoundingBox> firstBox, std::shared_ptr<BoundingBox> secondBox) :
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices, std::shared_ptr<BoundingBox> firstBox, std::shared_ptr<BoundingBox> secondBox, int numberOv) :
 	rect_height(rect_height),
 	rect_width(rect_width),
 	x(x),
@@ -61,13 +65,9 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vec
 	first(firstBox),
 	second(secondBox),
 	rectangleIndices(indices),
-	numberOfRectangles(indices.size())
+	numberOfRectangles(indices.size()),
+	numberOfOverlappings(numberOv)
 {
-}
-
-BoundingBox::~BoundingBox()
-{
-	// std::cout << "destroy box" << std::endl;
 }
 
 
@@ -175,19 +175,20 @@ bool BoundingBox::tryFit(RectangleHolder* rectHolder, int boundingBoxIndex)
 	return false;
 }
 
-bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y)
+bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, int boundingBoxIndex, float t, std::vector<RectangleHolder*>* const rectangles, std::vector<int> indices, int box_width, int box_x, int box_y, bool& crashesTreeStructure)
 {
+	crashesTreeStructure = false;
 	QRectF& rect = rectHolder->getRectRef();
 	int rect_width = rect.width();
 	int rect_height = rect.height();
 	if (this->first || this->second) { // BoundingBox is not empty
 
-	// try to place rectangle at first BoundingBox
-		if (this->first && this->first->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
+		// try to place rectangle at first BoundingBox
+		if (this->first && this->first->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y, crashesTreeStructure))
 			return true;
 
 		// try to place rectangle at second BoundingBox
-		if (this->second && this->second->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y))
+		if (this->second && this->second->tryFitOverlapping(rectHolder, rectIdx, boundingBoxIndex, t, rectangles, indices, box_width, box_x, box_y, crashesTreeStructure))
 			return true;
 
 		return false; // rectangle cannot be placed in neither the first nor the second BoundingBox
@@ -203,8 +204,10 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 		int rectPosX = overlapTopLevelBoxX > 0 ? this->x - overlapTopLevelBoxX : this->x;
 		int	rectPosY = overlapTopLevelBoxY > 0 ? this->y - overlapTopLevelBoxY : this->y;
 
+		crashesTreeStructure = (rectPosX != this->x || rectPosY != this->y);
+
 		float overlapping_area = this->calculateOverlappings(rectangles, indices, rectIdx, rectPosX, rectPosY, rect_width, rect_height, t);
-		if (overlapping_area == rectangles->size() + 1) {
+		if (overlapping_area == -1) {
 			return false; // overlapping exceeds parameter t
 		}
 		// all overlappings are smaller than parameter t
@@ -213,6 +216,11 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 		if (rect_width <= this->rect_width && rect_height <= this->rect_height) {
 			return this->tryFit(rectHolder, boundingBoxIndex); // need this method because of correct child box creation
 		}
+
+		int areaNotInBox = (rect_width - this->rect_width) * (rect_height - this->rect_height);
+		if (areaNotInBox > 0 && areaNotInBox > overlapping_area) return false;
+
+		crashesTreeStructure = true;
 
 		rect.moveTopLeft(QPointF(rectPosX, rectPosY));
 		rectHolder->setBoundingBoxIndex(boundingBoxIndex);
@@ -259,10 +267,10 @@ float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangl
 		*/
 
 		if (overlap > t) {
-			return rectangles->size() + 1; // maximal overlap is 1, maximal overlap sum is 1 * rectangles->size()
+			return -1;
 		}
 
-		overlap_total += overlap;
+		overlap_total += area_overlap;
 
 	}
 	return overlap_total;
@@ -314,4 +322,14 @@ void BoundingBox::removeRectangleIndex(int index) {
 	--numberOfRectangles;
 
 	return;
+}
+
+int BoundingBox::getNumberOfOverlappings()
+{
+	return numberOfOverlappings;
+}
+
+void BoundingBox::setNumberOfOverlappings(int overlappings)
+{
+	numberOfOverlappings = overlappings;
 }

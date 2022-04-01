@@ -17,7 +17,7 @@ public:
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) override;
 	virtual void initParameters() override;
 	virtual int getRectPos(const int rectListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList, bool& isTransgressionRect = false) override;
-	virtual int getBoxPos(const int boxListSize) override;
+	virtual int getBoxPos(const int boxListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList) override;
 	virtual void resetBoxPos() override;
 
 	// not implemented here
@@ -124,7 +124,7 @@ inline bool GeometryBasedNeighbour<Data>::tryFitWrapper(std::vector<std::shared_
 template<class Data>
 inline void GeometryBasedNeighbour<Data>::initParameters()
 {
-	this->resetBestScore();
+	GeometryBasedNeighbourI<DataHolder*>::bestScore_ = AlgorithmConstants::maxScore;
 	rectPos_ = 0;
 }
 
@@ -137,7 +137,7 @@ inline int GeometryBasedNeighbour<Data>::getRectPos(const int rectListSize, std:
 }
 
 template<class Data>
-inline int GeometryBasedNeighbour<Data>::getBoxPos(const int boxListSize)
+inline int GeometryBasedNeighbour<Data>::getBoxPos(const int boxListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList)
 {
 	boxPos_ = boxPos_ < boxListSize - 1 ? boxPos_ + 1 : 0;
 	return boxPos_;
