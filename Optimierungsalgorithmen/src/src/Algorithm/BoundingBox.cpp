@@ -1,4 +1,4 @@
-﻿#include "BoundingBox.h"
+#include "BoundingBox.h"
 #include "RectangleHolder.h"
 
 BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, QRectF& rect, int rectIndex) :
@@ -215,7 +215,10 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 			return this->tryFit(rectHolder, boundingBoxIndex); // need this method because of correct child box creation
 		}
 
-		int areaNotInBox = (rect_width - this->rect_width) * (rect_height - this->rect_height);
+		int overlapArea_x = std::max(0, (rect_width - this->rect_width) * rect_height);
+		int overlapArea_y = std::max(0, (rect_height - this->rect_height) * rect_width);
+		int areaNotInBox = overlapArea_x + overlapArea_y - (rect_width - this->rect_width) * (rect_height - this->rect_height);
+
 		if (areaNotInBox > 0 && areaNotInBox > overlapping_area) return false;
 
 		rect.moveTopLeft(QPointF(rectPosX, rectPosY));
