@@ -17,6 +17,7 @@ public:
 
 	virtual float optimize() = 0;
 	virtual void afterOptimization() override;
+	virtual void postOptimStep(float newScore, float oldScore) override;
 	virtual void resetData() override;
 
 	virtual void initParameters() = 0;
@@ -68,6 +69,12 @@ inline void GeometryBasedNeighbourI<DataHolder*>::afterOptimization()
 	int transgressions = this->calculateOverlappingWrapper(rectList, bBoxList);
 	// if (transgressions > 0) std::cout << "Number of remaining transgressions: " << transgressions << std::endl;
 	std::cout << "Number of remaining transgressions: " << transgressions << std::endl;
+}
+
+template<class Data>
+inline void GeometryBasedNeighbourI<Data>::postOptimStep(float newScore, float oldScore)
+{
+	this->resetData();
 }
 
 template<class Data>

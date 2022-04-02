@@ -63,3 +63,8 @@ void DataHolder::ResetDataForTestEnv()
 	boxCreator_->ResetBoundingBoxList();
 	boxCreator_->RecSquareSizeChanged(rectCreator_->getSquareSize());
 }
+
+void DataHolder::ResetBoundingBoxContent()
+{
+	boxCreator_->ResetBoundingBoxContent();
+}

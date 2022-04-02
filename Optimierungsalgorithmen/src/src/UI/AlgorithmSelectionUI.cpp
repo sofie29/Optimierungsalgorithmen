@@ -174,7 +174,8 @@ AlgorithmSelectionUI::AlgorithmSelectionUI()
 	algoSelectionBox_->addItem("RuleBasedNeighbour");
 	algoSelectionBox_->addItem("Geometry");
 	algoSelectionBox_->addItem("GeometryOverlapping");
-	algoSelectionBox_->addItem("Greedy");
+	algoSelectionBox_->addItem("Greedy Area Sort");
+	algoSelectionBox_->addItem("Greedy Diagonal Sort");
 	middleLayout_->addWidget(algoSelectionBox_,0, 0, Qt::AlignLeft);
 
 	nextStepButton_ = new QPushButton("Next Step");

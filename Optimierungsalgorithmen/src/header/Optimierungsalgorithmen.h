@@ -8,12 +8,17 @@
 #include "GeometryBasedOverlappingNeighbour.h"
 #include "OptimAlgoI.h"
 #include "DataHolderT.h"
+#include "Greedy.h"
+#include "AreaSortingStrategy.h"
+#include "DiagonalSortingStrategy.h"
+#include "ObjectiveI.h"
+#include "EmptyBoxObjective.h"
 class Optimierungsalgorithmen : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    Optimierungsalgorithmen(QWidget *parent = Q_NULLPTR);
+    Optimierungsalgorithmen(QWidget* parent = Q_NULLPTR);
     ~Optimierungsalgorithmen();
 
 public slots:
@@ -34,7 +39,12 @@ private:
 
     OptimAlgoI<class DataHolder*>* selectedAlgorithm_;
     LocalSearch<class DataHolder*>* localSearch_;
+    Greedy<class DataHolder*>* greedy_;
 
+    ObjectiveI<class DataHolder*>* emptyBoxObjective_;
+
+    AreaSortingStrategy<class DataHolder*>* areaSortStrategy_;
+    DiagonalSortingStrategy<class DataHolder*>* diagonalSortStrategy_;
     RuleBasedNeighbour<class DataHolder*>* ruleBasedNeighbour_;
     GeometryBasedNeighbour<class DataHolder*>* geometryBasedNeighbour_;
     GeometryBasedOverlappingNeighbour<class DataHolder*>* geometryBasedOverlappingNeighbour_;

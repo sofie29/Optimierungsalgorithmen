@@ -10,6 +10,7 @@ public:
 	Data getData();
 	void OverwriteData(DataHolderT<Data>* other);
 	void ResetData();
+	void SoftResetData();
 private:
 	Data data_;
 };
@@ -39,6 +40,12 @@ inline void DataHolderT<Data>::OverwriteData(DataHolderT<Data>* other)
 template<class Data>
 inline void DataHolderT<Data>::ResetData()
 {
+}
+
+template<>
+inline void DataHolderT<DataHolder*>::SoftResetData()
+{
+	data_->ResetBoundingBoxContent();
 }
 
 template<>

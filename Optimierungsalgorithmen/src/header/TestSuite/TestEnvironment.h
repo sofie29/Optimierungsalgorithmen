@@ -6,6 +6,8 @@
 #include "LocalSearch.h"
 #include "RuleBasedNeighbour.h"
 #include "GeometryBasedNeighbour.h"
+#include "ObjectiveI.h"
+#include "EmptyBoxObjective.h"
 class TestEnvironment {
 public:
 	TestEnvironment(int instances, int rect_amount, int min_rect_width, int min_rect_height, int max_rect_width, int max_rect_height, int boxLenght);
@@ -24,6 +26,7 @@ private:
 	class DataHolder* data_;
 
 	InitialSolutionI<DataHolder*>* initSol_;
+	ObjectiveI<DataHolder*>* emptyBoxObjective_;
 
 	OptimAlgoI<class DataHolder*>* selectedAlgorithm_;
 	LocalSearch<class DataHolder*>* localSearch_;

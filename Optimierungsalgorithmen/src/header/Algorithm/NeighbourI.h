@@ -14,6 +14,7 @@ public:
 	virtual void resetData() = 0;
 	virtual void initParameters() = 0;
 	virtual void afterOptimization() = 0;
+	virtual void postOptimStep(float newScore, float oldScore) = 0;
 
 	std::string getIdentifier();
 	

@@ -16,6 +16,7 @@ public:
 	RuleBasedNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest,  InitialSolutionI<Data>* initSol);
 	
 	virtual float optimize() override;
+	virtual void postOptimStep(float newScore, float oldScore) override;
 	virtual void resetData() override;
 	virtual void initParameters() override;
 	virtual void afterOptimization() override;
@@ -37,9 +38,15 @@ inline float RuleBasedNeighbour<Data>::optimize()
 }
 
 template<class Data>
+inline void RuleBasedNeighbour<Data>::postOptimStep(float newScore, float oldScore)
+{
+	this->resetData();
+}
+
+template<class Data>
 inline void RuleBasedNeighbour<Data>::resetData()
 {
-	NeighbourI<Data>::data_->ResetData();
+	NeighbourI<Data>::data_->SoftResetData();
 }
 
 template<class Data>
@@ -50,6 +57,15 @@ inline void RuleBasedNeighbour<Data>::initParameters()
 template<class Data>
 inline void RuleBasedNeighbour<Data>::afterOptimization()
 {
+}
+
+template<>
+inline void RuleBasedNeighbour<DataHolder*>::afterOptimization()
+{
+	std::shared_ptr<BoundingBoxCreator> boxCreator = NeighbourI<DataHolder*>::bestData_->getData()->getBoxCreator();
+	boxCreator->RemoveEmptyBoundingBoxes();
+
+
 }
 
 template<>
@@ -84,26 +100,28 @@ inline float RuleBasedNeighbour<DataHolder*>::optimize() {
 
 	int amount = rectList->size();
 	int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
-	int idx = 0;
+	int rectIdx = 0;
 	for (class RectangleHolder* rect : *rectList) {
 		bool added = false;
-		int idx = 0;
+		int boxIdx = 0;
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
 			//int x, y;
-			if (box->tryFit(rect, idx)) {
+			if (box->tryFit(rect, boxIdx)) {
+				box->addRectangleIndex(rectIdx);
 				added = true;
 				break;
 			}
-			idx++;
+			boxIdx++;
 		}
 		if (!added) {
 			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
-			boxCreator->addBoundingBox(x_pos, y_pos, rect->getRectRef());
+			boxCreator->addBoundingBox(x_pos, y_pos, rect, rectIdx, boxIdx);
 			boxCreator->getBoundingBoxList(bBoxList);
 		}
 
 		rect->setToDefaultColor();
+		rectIdx++;
 	}
 	(*rectList)[firstIndex]->setToSwappedColor();
 	(*rectList)[secondIndex]->setToSwappedColor();

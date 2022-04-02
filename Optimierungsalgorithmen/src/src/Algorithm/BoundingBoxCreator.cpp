@@ -63,11 +63,26 @@ void BoundingBoxCreator::setBoundingBoxList(std::vector<std::shared_ptr<class Bo
 
 void BoundingBoxCreator::ResetBoundingBoxList()
 {
-
-
 	boundingBoxList_.clear();
 	rectangleList_.clear();
 }
+
+void BoundingBoxCreator::RemoveEmptyBoundingBoxes()
+{
+	std::vector<int> deleteIdx;
+	int cur_idx = 0;
+	for (auto& box : boundingBoxList_) {
+		if (box->getRectangleIndices().size() == 0) {
+			deleteIdx.emplace_back(cur_idx);
+		}
+		++cur_idx;
+	}
+	std::reverse(deleteIdx.begin(), deleteIdx.end());
+	for (int idx : deleteIdx) {
+		resetOneBoundingBox(idx);
+	}
+}
+
 
 void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex)
 {
@@ -140,4 +155,16 @@ void BoundingBoxCreator::resetOneBoundingBox(int index) {
 	boundingBoxList_[index].reset();
 	boundingBoxList_.erase(boundingBoxList_.begin() + index);
 	rectangleList_.erase(rectangleList_.begin() + index);
+}
+
+void BoundingBoxCreator::ResetBoundingBoxContent()
+{
+	for (auto& box : boundingBoxList_) {
+		
+		std::vector<int> rectIdx = box->getRectangleIndices();
+		for (int idx : rectIdx) {
+			box->removeRectangleIndex(idx);
+		}
+		box->removeLowerLevelBoundingBoxes();
+	}
 }

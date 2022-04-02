@@ -10,6 +10,7 @@ public:
 	void OverwriteData(DataHolder* other) ;
 	void ResetData();
 	void ResetDataForTestEnv();
+	void ResetBoundingBoxContent();
 private:
 	std::shared_ptr<class BoundingBoxCreator> boxCreator_;
 	std::shared_ptr<class RectangleCreator> rectCreator_;

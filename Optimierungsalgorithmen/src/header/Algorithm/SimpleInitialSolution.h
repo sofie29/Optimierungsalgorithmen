@@ -9,7 +9,7 @@ template<class Data>
 class SimpleInitialSolution : public InitialSolutionI<Data> {
 public:
 	SimpleInitialSolution();
-	void CreateInitialSolution(DataHolderT<Data>* d) override;
+	void CreateInitialSolution(DataHolderT<Data>* d, bool limitInitRectsPerBox) override;
 };
 
 template<class Data>
@@ -18,22 +18,16 @@ inline SimpleInitialSolution<Data>::SimpleInitialSolution() : InitialSolutionI<D
 }
 
 template<class Data>
-inline void SimpleInitialSolution<Data>::CreateInitialSolution(DataHolderT<Data>* d)
+inline void SimpleInitialSolution<Data>::CreateInitialSolution(DataHolderT<Data>* d, bool limitInitRectsPerBox)
 {
 }
 
 template<>
-inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolderT<DataHolder*>* d) {
+inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolderT<DataHolder*>* d, bool limitInitRectsPerBox) {
 	std::shared_ptr<BoundingBoxCreator> boxCreator = d->getData()->getBoxCreator();
 	std::shared_ptr<RectangleCreator> rectCreator = d->getData()->getRectCreator();
 
 	std::vector<class RectangleHolder*>* rectList = rectCreator->getRectList();
-	
-
-	//auto cmp = [](std:: &first, QRectF& second) {return first.width() * first.height() > second.width() * second.height(); };
-	//std::sort(rectList.begin(), rectList.end(), cmp);
-
-	
 
 	std::vector<std::shared_ptr<BoundingBox>> bBoxList;
 	boxCreator->getBoundingBoxList(bBoxList);
@@ -44,29 +38,25 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 		QRectF& rect = (*rectList)[rectIdx]->getRectRef();
 		bool added = false;
 		int boxIdx = 0;
-		/*
+
 		for (std::shared_ptr<BoundingBox> box : bBoxList) {
 			//int x, y;
-			if (box->tryFit((*rectList)[rectIdx], boxIdx)) {
+			if ((!limitInitRectsPerBox || box->getRectangleIndices().size() < AlgorithmConstants::maxInitialRectsPerBox_) && box->tryFit((*rectList)[rectIdx], boxIdx)) {
 				box->addRectangleIndex(rectIdx);
 				added = true;
 				break;
 			}
 			boxIdx++;
 		}
-		*/
-		if (!added) {
-			//BoundingBox* box = new BoundingBox();
 
+		if (!added) {
 			int x_pos = (bBoxList.size() % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 			int y_pos = (int)(bBoxList.size() / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 			boxCreator->addBoundingBox(x_pos, y_pos, (*rectList)[rectIdx], rectIdx, boxIdx);
 			boxCreator->getBoundingBoxList(bBoxList);
 
 		}
-		//boxCreator->addBoundingBox(rect.x(), rect.y());
+
 	}
-	
-	rectCreator->setRectList(rectList);
-	//boxCreator->OnOptimDone();
+
 }

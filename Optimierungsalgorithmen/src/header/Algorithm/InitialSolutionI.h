@@ -6,7 +6,7 @@ template<class Data>
 class InitialSolutionI {
 public:
 	InitialSolutionI();
-	virtual void CreateInitialSolution(DataHolderT<Data>* data) = 0;
+	virtual void CreateInitialSolution(DataHolderT<Data>* data, bool limitInitRectsPerBox) = 0;
 };
 
 template<class Data>
@@ -15,7 +15,8 @@ inline InitialSolutionI<Data>::InitialSolutionI()
 }
 
 template<class Data>
-inline void InitialSolutionI<Data>::CreateInitialSolution(DataHolderT<Data>* data)
+inline void InitialSolutionI<Data>::CreateInitialSolution(DataHolderT<Data>* data, bool limitInitRectsPerBox)
 {
 }
+
 

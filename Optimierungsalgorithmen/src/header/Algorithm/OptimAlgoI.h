@@ -2,6 +2,16 @@
 #include "stdafx.h"
 #include "InitialSolutionI.h"
 #include "DataHolderT.h"
+#include "ObjectiveI.h"
+struct Metric {
+public: Metric(float s, float t) {
+	score_ = s;
+	time_ = t;
+}
+	  float score_;
+	  float time_;
+};
+
 class SignalHelper : public QObject {
 	Q_OBJECT
 signals:
@@ -16,29 +26,40 @@ signals:
 template<class Data>
 class OptimAlgoI : public SignalHelper{
 public:
-	OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, class InitialSolutionI<Data>* init);
-	virtual float execute(int steps) = 0;
+	OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init, ObjectiveI<Data>* objective);
+	virtual Metric execute(int steps) = 0;
 	virtual void reset() = 0;
+	void setObjective(class ObjectiveI<Data>* objective);
 	std::string getIdentifier();
 protected:
 	int currentStep_;
+	float currentBestScore_;
 	DataHolderT<Data>* currentSol_;
 	DataHolderT<Data>* bestSol_;
-	class InitialSolutionI<Data>* initSol_;
+	InitialSolutionI<Data>* initSol_;
+	ObjectiveI<Data>* objective_;
 	double currentTimeTaken_;
 	std::string identifier_;
 };
 
 
 template<class Data>
-inline OptimAlgoI<Data>::OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init)
+inline OptimAlgoI<Data>::OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init, ObjectiveI<Data>* objective)
 {
 	identifier_ = "";
 	currentStep_ = -1;
 	currentTimeTaken_ = 0.0;
+	currentBestScore_ = AlgorithmConstants::maxScore;
 	currentSol_ = dt;
 	bestSol_ = bestSol;
 	initSol_ = init;
+	objective_ = objective;
+}
+
+template<class Data>
+inline void OptimAlgoI<Data>::setObjective(ObjectiveI<Data>* objective)
+{
+	objective_ = objective;
 }
 
 template<class Data>

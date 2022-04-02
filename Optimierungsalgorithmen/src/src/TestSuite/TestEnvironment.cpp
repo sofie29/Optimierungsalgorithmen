@@ -13,10 +13,11 @@ TestEnvironment::TestEnvironment(int instances, int rect_amount, int min_rect_wi
 	dataT_ = new DataHolderT<DataHolder*>(data_);
 
 	initSol_ = new SimpleInitialSolution<DataHolder*>();
+    emptyBoxObjective_ = new EmptyBoxObjective<DataHolder*>();
 	ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataT_, bestDataT_, initSol_);
 	geometryBasedNeighbour_ = new GeometryBasedNeighbour<DataHolder*>(dataT_, bestDataT_, initSol_);
 
-	localSearch_ = new LocalSearch<DataHolder*>(ruleBasedNeighbour_, dataT_, bestDataT_, initSol_);
+	localSearch_ = new LocalSearch<DataHolder*>(ruleBasedNeighbour_, dataT_, bestDataT_, initSol_, emptyBoxObjective_);
     selectedAlgorithm_ = localSearch_;
 }
 
@@ -41,6 +42,9 @@ TestEnvironment::~TestEnvironment() {
 
     delete bestData_;
     bestData_ = nullptr;
+
+    delete emptyBoxObjective_;
+    emptyBoxObjective_ = nullptr;
 }
 
 void TestEnvironment::Run(std::string path)
@@ -52,8 +56,8 @@ void TestEnvironment::Run(std::string path)
         ProtocollNewLine(file, i);
         selectedAlgorithm_->reset();
         for (int j = 0; j < 1000; j++) {
-            float score = selectedAlgorithm_->execute(1);
-            Protocoll(file, score, 0.0);
+            Metric metric = selectedAlgorithm_->execute(1);
+            Protocoll(file, metric.score_, metric.time_);
         }
     }
     file.close();

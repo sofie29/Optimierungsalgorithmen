@@ -185,5 +185,23 @@
     <ClInclude Include="src\header\TestSuite\TestEnvironment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\Algorithm\Greedy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\SortingStrategyI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\AreaSortingStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\DiagonalSortingStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\ObjectiveI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\EmptyBoxObjective.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
