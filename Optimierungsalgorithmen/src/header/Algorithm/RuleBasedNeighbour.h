@@ -20,6 +20,7 @@ public:
 	virtual void resetData() override;
 	virtual void initParameters() override;
 	virtual void afterOptimization() override;
+	virtual float getScoreInformation() override;
 	
 };
 
@@ -57,6 +58,12 @@ inline void RuleBasedNeighbour<Data>::initParameters()
 template<class Data>
 inline void RuleBasedNeighbour<Data>::afterOptimization()
 {
+}
+
+template<class Data>
+inline float RuleBasedNeighbour<Data>::getScoreInformation()
+{
+	return 0.0f;
 }
 
 template<>

@@ -41,7 +41,8 @@ private:
     LocalSearch<class DataHolder*>* localSearch_;
     Greedy<class DataHolder*>* greedy_;
 
-    ObjectiveI<class DataHolder*>* emptyBoxObjective_;
+    // ObjectiveI<class DataHolder*>* emptyBoxObjective_;
+    EmptyBoxObjective<class DataHolder*>* emptyBoxObjective_;
 
     AreaSortingStrategy<class DataHolder*>* areaSortStrategy_;
     DiagonalSortingStrategy<class DataHolder*>* diagonalSortStrategy_;

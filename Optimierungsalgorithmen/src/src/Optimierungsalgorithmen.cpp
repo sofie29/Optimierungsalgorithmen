@@ -203,18 +203,21 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
     case 0:
         neighbourWrapper_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setNeighbourDefinition(ruleBasedNeighbour_);
+        emptyBoxObjective_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setObjective(emptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;
         break;
     case 1:
         neighbourWrapper_->setNeighbour(geometryBasedNeighbour_);
         localSearch_->setNeighbourDefinition(geometryBasedNeighbour_);
+        emptyBoxObjective_->setNeighbour(geometryBasedNeighbour_);
         localSearch_->setObjective(emptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;
         break;
     case 2:
         neighbourWrapper_->setNeighbour(geometryBasedOverlappingNeighbour_);
         localSearch_->setNeighbourDefinition(geometryBasedOverlappingNeighbour_);
+        emptyBoxObjective_->setNeighbour(geometryBasedOverlappingNeighbour_);
         localSearch_->setObjective(emptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;
         break;

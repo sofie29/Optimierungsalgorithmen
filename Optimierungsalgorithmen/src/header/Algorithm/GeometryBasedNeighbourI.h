@@ -21,14 +21,14 @@ public:
 	virtual void resetData() override;
 
 	virtual void initParameters() = 0;
-	virtual float calculateScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, bool isTransgressionRect) = 0;
+	virtual float beforeScoreCalculation(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, bool isTransgressionRect) = 0;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) = 0;
 	virtual int getRectPos(const int rectListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList, bool& isTransgressionRect) = 0;
 	virtual int getBoxPos(const int boxListSize, std::vector<std::shared_ptr<BoundingBox>>& boxList) = 0;
 	virtual void resetBoxPos() = 0;
 	
 	// for overlapping
-	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, bool isBetter) = 0;
+	virtual void decreaseT(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, bool isBetter) = 0;
 	virtual int calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
 	virtual void updateBoxQueue(int boxIndex1, int boxIndex2, std::vector<std::shared_ptr<BoundingBox>>& boxList, std::vector<class RectangleHolder*>* rectangles, bool deleteBox1) = 0;
 
@@ -72,22 +72,6 @@ inline void GeometryBasedNeighbourI<DataHolder*>::afterOptimization()
 	// if (transgressions > 0) std::cout << "Number of remaining transgressions: " << transgressions << std::endl;
 	std::cout << "Number of remaining transgressions: " << transgressions << std::endl;
 }
-
-template<class Data>
-inline void GeometryBasedNeighbourI<Data>::postOptimStep(float newScore, float oldScore)
-{
-	this->resetData();
-}
-
-template<class Data>
-inline void GeometryBasedNeighbourI<Data>::resetData()
-{
-	if (resetData_) {
-		resetData_ = false;
-		NeighbourI<Data>::data_->OverwriteData(NeighbourI<Data>::bestData_);
-	}
-}
-
 
 
 // attention: this method doesn't update index vector of the bounding box
@@ -172,7 +156,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 	size_t rectListSize = rectList->size();
 
 	if (rectListSize <= 1) {
-		return this->calculateScore(rectList, bBoxList, false);
+		return this->beforeScoreCalculation(rectList, bBoxList, false);
 	}
 
 
@@ -240,7 +224,8 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				this->setAllToDefaultColors(rectList);
 				(*rectList)[rectIndex1]->setToSwappedColor();
 				(*rectList)[rectIndex2]->setToSwappedColor();
-				score = this->calculateScore(rectList, bBoxList, false) - 0.01;
+				// TODO: no rotation possible
+				// score = this->beforeScoreCalculation(rectList, bBoxList, false) - 0.01;
 				changedBox1 = boxFromRect1;
 				changedBox2 = boxFromRect2;
 			}
@@ -325,7 +310,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 					// std::cout << "place at box " << newBoxIdx << std::endl;
 					this->setAllToDefaultColors(rectList);
 					(*rectList)[rectIdx]->setToSwappedColor();
-					score = this->calculateScore(rectList, bBoxList, isTransgressionRect);
+					score = this->beforeScoreCalculation(rectList, bBoxList, isTransgressionRect);
 					changedBox1 = oldBoxIndex;
 					changedBox2 = newBoxIdx;
 					deleteBox1 = bBoxList.size() < oldBoxListSize;
@@ -361,7 +346,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 				foundNeighbour = true;
 				changedBox1 = oldBoxIndex;
 				changedBox2 = int(bBoxList.size()) - 1;
-				score = this->calculateScore(rectList, bBoxList, isTransgressionRect);
+				score = this->beforeScoreCalculation(rectList, bBoxList, isTransgressionRect);
 				break;
 			 }
 			else { // this rectangle can not be replaced since old bounding box cannot be resorted
@@ -375,23 +360,40 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 		++iteration;
 	}
 
+	// TODO: WHAT IF NO NEIGHBOUR IS FOUND ???
 	if (!foundNeighbour) {
 		std::cout << "no neighbour" << std::endl;
 		score = AlgorithmConstants::maxScore;
 	}
 
-	resetData_ = score >= bestScore_;
+	// resetData_ = score >= bestScore_;
 	// std::cout << "score: " << score << " bestscore: " << bestScore_ << std::endl;
-	this->shiftScore(rectList, bBoxList, score < bestScore_);
+	// this->decreaseT(rectList, bBoxList, score < bestScore_);
 
-	// TODO: after postOptimStep() calls resetData in case new score is worse and shiftScore
-
+	/*
 	if (score < bestScore_) {
 		bestScore_ = score;
 		// this->updateBoxQueue(changedBox1, changedBox2, bBoxList, rectList, deleteBox1);
 	}
-
+	*/
 	return score;
+}
+
+template<>
+inline void GeometryBasedNeighbourI<DataHolder*>::postOptimStep(float newScore, float oldScore)
+{
+	if (newScore >= oldScore) data_->OverwriteData(bestData_);
+
+	std::vector<std::shared_ptr<BoundingBox>> bBoxList;
+	data_->getData()->getBoxCreator()->getBoundingBoxList(bBoxList);
+	std::vector<class RectangleHolder*>* rectList = data_->getData()->getRectCreator()->getRectList();
+
+	this->decreaseT(rectList, bBoxList, newScore < oldScore);
+}
+
+template<class Data>
+inline void GeometryBasedNeighbourI<Data>::resetData()
+{
 }
 
 template<class Data>

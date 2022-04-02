@@ -46,12 +46,11 @@ Metric LocalSearch<Data>::execute(int steps)
 	if (OptimAlgoI<Data>::currentStep_ == -1) {
 		OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_, true);
 		OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
-		neighbourDefinition_->resetData();
 		OptimAlgoI<Data>::currentStep_++;
+		neighbourDefinition_->initParameters();
 	}
 
 	int steps_left = 0;
-	// TODO: neighbourDefinition_->initParameters();
 
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		neighbourDefinition_->optimize();
@@ -98,7 +97,7 @@ inline void LocalSearch<Data>::reset()
 
 	OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_, true);
 	OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
-	neighbourDefinition_->resetData();
+	neighbourDefinition_->initParameters();
 
 
 	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);

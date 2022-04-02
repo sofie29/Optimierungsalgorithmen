@@ -6,11 +6,16 @@
 #include "BoundingBox.h"
 #include "BoundingBoxCreator.h"
 #include "RectangleCreator.h"
+
 template<class Data>
 class EmptyBoxObjective : public ObjectiveI<Data> {
 public:
 	EmptyBoxObjective();
 	virtual float calculateObjectiveScore(DataHolderT<Data>* dt) override;
+	void setNeighbour(NeighbourI<Data>* neighbour);
+
+private:
+	NeighbourI<Data>* neighbour_;
 };
 
 template<class Data>
@@ -22,6 +27,12 @@ template<class Data>
 inline float EmptyBoxObjective<Data>::calculateObjectiveScore(DataHolderT<Data>* dt)
 {
 	return 0.0f;
+}
+
+template<class Data>
+inline void EmptyBoxObjective<Data>::setNeighbour(NeighbourI<Data>* neighbour)
+{
+	neighbour_ = neighbour;
 }
 
 template<>
@@ -44,5 +55,5 @@ inline float EmptyBoxObjective<DataHolder*>::calculateObjectiveScore(DataHolderT
 
 	}
 
-	return bBoxListSize * (rectListSize - 1) - boxScore;
+	return ((bBoxListSize + neighbour_->getScoreInformation()) * (rectListSize - 1) - boxScore) * 0.2; // 0.2 to prevent overflow
 }
