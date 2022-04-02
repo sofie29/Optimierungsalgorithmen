@@ -204,7 +204,8 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 		int rectPosX = overlapTopLevelBoxX > 0 ? this->x - overlapTopLevelBoxX : this->x;
 		int	rectPosY = overlapTopLevelBoxY > 0 ? this->y - overlapTopLevelBoxY : this->y;
 
-		float overlapping_area = this->calculateOverlappings(rectangles, indices, rectIdx, rectPosX, rectPosY, rect_width, rect_height, t);
+		std::vector<int> unusedVector;
+		float overlapping_area = this->calculateOverlappings(rectangles, indices, rectIdx, rectPosX, rectPosY, rect_width, rect_height, t, unusedVector);
 		if (overlapping_area == -1) {
 			return false; // overlapping exceeds parameter t
 		}
@@ -241,9 +242,10 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 	}
 }
 
-float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangles, std::vector<int> indices, int rectIdx, int x, int y, int w, int h, float t)
+float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangles, std::vector<int> indices, int rectIdx, int x, int y, int w, int h, float t, std::vector<int>& transgrIndices)
 {
 	float overlap_total = 0;
+	bool causesTransgression = false;
 	for (int i : indices) {
 		if (i == rectIdx) {
 			continue;
@@ -271,13 +273,14 @@ float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangl
 		*/
 
 		if (overlap > t) {
-			return -1;
+			transgrIndices.push_back(i);
+			causesTransgression = true;
 		}
 
 		overlap_total += area_overlap;
 
 	}
-	return overlap_total;
+	return causesTransgression ? -1 : overlap_total;
 }
 
 int BoundingBox::getXPos() const

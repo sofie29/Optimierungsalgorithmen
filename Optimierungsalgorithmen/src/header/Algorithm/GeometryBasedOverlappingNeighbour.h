@@ -101,7 +101,9 @@ inline bool GeometryBasedOverlappingNeighbour<Data>::tryFitWrapper(std::vector<s
 
 	// float t = multipleRects ? t_ + stepSize_ : t_;
 	// float t = multipleRects ? t_ * stepFactor_ : t_;
-	float t = multipleRects ? 1 : t_;
+	
+	float t = multipleRects ? 1 : t_; // TRANSGRESSION
+	if (box->getNumberOfOverlappings() == 0 && multipleRects) t = 0;
 
 	// std::cout << "fit rectangle " << rectIdx << " multiple: " << multipleRects << std::endl;
 	bool doesFit = box->tryFitOverlapping((*rectangles)[rectIdx], rectIdx, boxIdx, t, rectangles, indices, box->getBoxWidth(), box->getXPos(), box->getYPos());
@@ -158,7 +160,7 @@ inline int GeometryBasedOverlappingNeighbour<Data>::getBoxPos(const int boxListS
 {
 	int iteration = 0;
 	boxPos_ = boxPos_ < boxListSize - 1 ? boxPos_ + 1 : 0;
-	while (boxList[boxPos_]->getNumberOfOverlappings() >= 3 && iteration++ < boxListSize) {
+	while (boxList[boxPos_]->getNumberOfOverlappings() >= 1 && iteration++ < boxListSize) {
 		boxPos_ = boxPos_ < boxListSize - 1 ? boxPos_ + 1 : 0;
 	}
 	return boxPos_;
@@ -188,17 +190,21 @@ inline int GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(
 	for (std::shared_ptr<BoundingBox> box : bBoxList) {
 		std::vector<int> indices = box->getRectangleIndices();
 		int numberOfIntersectionsPerBox = 0;
-
+		
 		for (int i : indices) {
-			// indices.erase(std::remove(indices.begin(), indices.end(), i), indices.end()); // IDEA: without erase, we could collect all rect indices of transgressions
+			int position = *indices.begin();
+			indices.erase(indices.begin());
 
-			QRectF& rect = (*rectangles)[i]->getRectRef();
-			float intersection = box->calculateOverlappings(rectangles, indices, i, rect.x(), rect.y(), rect.width(), rect.height(), t_);
+			QRectF& rect = (*rectangles)[position]->getRectRef();
+			std::vector<int> transgressionRects;
+			transgressionRects.clear();
+			float intersection = box->calculateOverlappings(rectangles, indices, position, rect.x(), rect.y(), rect.width(), rect.height(), t_, transgressionRects);
 			if (intersection > 0) ++numberOfIntersectionsPerBox;
 
 			if (intersection == maxOv) {
-				++transgressions_;
-				rectIndicesWithTransgression_.push_back(i); // other rectangle is missing here, could be resolved by deleting the erase above
+				transgressions_ += transgressionRects.size();
+				rectIndicesWithTransgression_.push_back(i);
+				rectIndicesWithTransgression_.insert(rectIndicesWithTransgression_.end(), transgressionRects.begin(), transgressionRects.end());
 				++numberOfIntersectionsPerBox; // count intersection twice in case there is a transgression
 			}
 			else {
@@ -211,15 +217,16 @@ inline int GeometryBasedOverlappingNeighbour<Data>::calculateOverlappingWrapper(
 
 	};
 
+	rectIndicesWithTransgression_.erase(unique(rectIndicesWithTransgression_.begin(), rectIndicesWithTransgression_.end()), rectIndicesWithTransgression_.end());
 
 
 	/*
-	std::cout << "transgressions per Box on calculate";
+	std::cout << "transgression rects ";
 	for (int j : rectIndicesWithTransgression_) {
 		std::cout << j << ", ";
 	}
-	std::cout << "" << std::endl;
-	*/
+	std::cout << "" << std::endl;*/
+	
 
 	return transgressions_;
 }
