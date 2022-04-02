@@ -28,12 +28,13 @@ public:
 	virtual void resetBoxPos() = 0;
 	
 	// for overlapping
-	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
+	virtual void shiftScore(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, bool isBetter) = 0;
 	virtual int calculateOverlappingWrapper(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList) = 0;
 	virtual void updateBoxQueue(int boxIndex1, int boxIndex2, std::vector<std::shared_ptr<BoundingBox>>& boxList, std::vector<class RectangleHolder*>* rectangles, bool deleteBox1) = 0;
 
 protected:
 	float bestScore_;
+	int iteration_;
 	int initalNumberOfBoxes_;
 	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex);
 	bool removeRectFromBox(std::shared_ptr<BoundingBox>& oldBox, int oldBoxIdx, int rectIdx, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, std::vector<class RectangleHolder*>* rectList, std::shared_ptr<BoundingBox>* newBox = NULL);
@@ -53,6 +54,7 @@ inline GeometryBasedNeighbourI<Data>::GeometryBasedNeighbourI(DataHolderT<Data>*
 	resetData_ = false;
 	overlapping_ = false;
 	numberOfAddedBoxes_ = 0;
+	iteration_ = 0;
 }
 
 
@@ -153,6 +155,7 @@ IDEA: also use method B after failed method A.
 
 template<>
 inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOverlapping) {
+	++iteration_;
 	float score;
 	int changedBox1, changedBox2, changedBox1newIndex;
 	bool deleteBox1 = false;
@@ -379,13 +382,13 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 
 	resetData_ = score >= bestScore_;
 	// std::cout << "score: " << score << " bestscore: " << bestScore_ << std::endl;
-	if (score <= bestScore_) {
-		this->shiftScore(rectList, bBoxList);
-	}
+	this->shiftScore(rectList, bBoxList, score < bestScore_);
+
+	// TODO: after postOptimStep() calls resetData in case new score is worse and shiftScore
 
 	if (score < bestScore_) {
 		bestScore_ = score;
-		this->updateBoxQueue(changedBox1, changedBox2, bBoxList, rectList, deleteBox1);
+		// this->updateBoxQueue(changedBox1, changedBox2, bBoxList, rectList, deleteBox1);
 	}
 
 	return score;

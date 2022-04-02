@@ -215,15 +215,20 @@ bool BoundingBox::tryFitOverlapping(RectangleHolder* rectHolder, int rectIdx, in
 			return this->tryFit(rectHolder, boundingBoxIndex); // need this method because of correct child box creation
 		}
 
+
+		/*
 		int overlapArea_x = std::max(0, (rect_width - this->rect_width) * rect_height);
 		int overlapArea_y = std::max(0, (rect_height - this->rect_height) * rect_width);
 		int areaNotInBox = overlapArea_x + overlapArea_y - (rect_width - this->rect_width) * (rect_height - this->rect_height);
+		// don't place here because rectangle would cover white space of another bounding box
+		// if (areaNotInBox > 0 && areaNotInBox > overlapping_area) return false;
+		*/
 
-		if (areaNotInBox > 0 && areaNotInBox > overlapping_area) return false;
 
+		// don't place here because rectangle would cover space of another bounding box
+		if ((rect_width > this->rect_width && rectPosX == this->x) || (rect_height > this->rect_height && rectPosY == this->y)) return false;
 		rect.moveTopLeft(QPointF(rectPosX, rectPosY));
 		rectHolder->setBoundingBoxIndex(boundingBoxIndex);
-
 		this->first = rect_width > this->rect_width ?
 			std::make_shared<BoundingBox>(0, 0, this->x, this->y) : // position can be chosen arbitrarily
 			std::make_shared<BoundingBox>(this->rect_width - rect_width, this->rect_height, this->x + rect_width, this->y);
