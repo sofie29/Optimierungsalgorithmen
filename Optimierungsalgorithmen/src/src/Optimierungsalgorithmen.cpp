@@ -42,6 +42,8 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget* parent)
     geometryBasedOverlappingNeighbour_ = new GeometryBasedOverlappingNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
     neighbourWrapper_ = new QNeighbourWrapper(ruleBasedNeighbour_);
     localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), dataHolderT_, bestDataHolderT_, initSol_, emptyBoxObjective_);
+    
+    emptyBoxObjective_->setNeighbour(ruleBasedNeighbour_);
 
     areaSortStrategy_ = new AreaSortingStrategy<DataHolder*>();
     diagonalSortStrategy_ = new DiagonalSortingStrategy<DataHolder*>();
