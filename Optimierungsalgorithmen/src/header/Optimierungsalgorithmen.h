@@ -13,6 +13,8 @@
 #include "DiagonalSortingStrategy.h"
 #include "ObjectiveI.h"
 #include "EmptyBoxObjective.h"
+#include "SimpleEmptyBoxObjective.h"
+#include "BoxListLengthObjective.h"
 class Optimierungsalgorithmen : public QMainWindow
 {
     Q_OBJECT
@@ -41,8 +43,10 @@ private:
     LocalSearch<class DataHolder*>* localSearch_;
     Greedy<class DataHolder*>* greedy_;
 
-    // ObjectiveI<class DataHolder*>* emptyBoxObjective_;
+    
     EmptyBoxObjective<class DataHolder*>* emptyBoxObjective_;
+    SimpleEmptyBoxObjective<class DataHolder*>* simpleEmptyBoxObjective_;
+    BoxListLengthObjective<class DataHolder*>* boxListLengthObjective_;
 
     AreaSortingStrategy<class DataHolder*>* areaSortStrategy_;
     DiagonalSortingStrategy<class DataHolder*>* diagonalSortStrategy_;

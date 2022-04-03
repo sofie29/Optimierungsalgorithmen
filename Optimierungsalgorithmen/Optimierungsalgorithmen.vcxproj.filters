@@ -203,5 +203,11 @@
     <ClInclude Include="src\header\Algorithm\EmptyBoxObjective.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\header\Algorithm\SimpleEmptyBoxObjective.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\header\Algorithm\BoxListLengthObjective.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

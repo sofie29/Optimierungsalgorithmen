@@ -5,7 +5,7 @@ class RectangleDrawer : public QWidget {
 public:
 	RectangleDrawer();
 	~RectangleDrawer();
-	void DrawOnScreen(QGraphicsScene* scene);
+	void DrawOnScreen(QGraphicsScene* scene, bool drawOld);
 signals:
 	void EmitRectInformation(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight);
 	void EmitListChanged();
@@ -25,12 +25,15 @@ public slots:
 	void SetRects(const std::vector<class RectangleHolder*>* list);
 	void OnBoundingBoxSizeChanged(int x);
 private:
+	void SetOldRects();
+
 	int currentAmount_;
 	int currentMinWidth_;
 	int currentMaxWidth_;
 	int currentMinHeight_;
 	int currentMaxHeight_;
 	std::vector<QRectF> rectList_;
+	std::vector<QRectF> rectListOld_;
 	std::vector<QColor> rectColors_;
 	
 };

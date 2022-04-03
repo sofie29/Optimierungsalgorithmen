@@ -58,5 +58,6 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 		}
 
 	}
+	boxCreator->RemoveEmptyBoundingBoxes();
 
 }

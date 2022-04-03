@@ -18,6 +18,7 @@ signals:
 	void OptimDone();
 	void StepDone();
 	void DrawSolution();
+	void DrawSwappedRects();
 	void EmitCurrentStep(int step);
 	void EmitTakenTime(double time);
 	void EmitTakenTimeAvg(double time);
@@ -26,7 +27,7 @@ signals:
 template<class Data>
 class OptimAlgoI : public SignalHelper{
 public:
-	OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init, ObjectiveI<Data>* objective);
+	OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init, ObjectiveI<Data>* algoObjective, ObjectiveI<Data>* cmpObjective);
 	virtual Metric execute(int steps) = 0;
 	virtual void reset() = 0;
 	void setObjective(class ObjectiveI<Data>* objective);
@@ -37,14 +38,15 @@ protected:
 	DataHolderT<Data>* currentSol_;
 	DataHolderT<Data>* bestSol_;
 	InitialSolutionI<Data>* initSol_;
-	ObjectiveI<Data>* objective_;
+	ObjectiveI<Data>* algoObjective_;
+	ObjectiveI<Data>* cmpObjective_;
 	double currentTimeTaken_;
 	std::string identifier_;
 };
 
 
 template<class Data>
-inline OptimAlgoI<Data>::OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init, ObjectiveI<Data>* objective)
+inline OptimAlgoI<Data>::OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* init, ObjectiveI<Data>* algoObjective, ObjectiveI<Data>* cmpObjective)
 {
 	identifier_ = "";
 	currentStep_ = -1;
@@ -53,13 +55,14 @@ inline OptimAlgoI<Data>::OptimAlgoI(DataHolderT<Data>* dt, DataHolderT<Data>* be
 	currentSol_ = dt;
 	bestSol_ = bestSol;
 	initSol_ = init;
-	objective_ = objective;
+	algoObjective_ = algoObjective;
+	cmpObjective_ = cmpObjective;
 }
 
 template<class Data>
 inline void OptimAlgoI<Data>::setObjective(ObjectiveI<Data>* objective)
 {
-	objective_ = objective;
+	algoObjective_ = objective;
 }
 
 template<class Data>

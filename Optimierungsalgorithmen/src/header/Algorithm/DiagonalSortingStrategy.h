@@ -14,6 +14,7 @@ public:
 template<class Data>
 inline DiagonalSortingStrategy<Data>::DiagonalSortingStrategy()
 {
+	SortingStrategyI<Data>::identifier_ = "DiagonalSort";
 }
 
 template<class Data>

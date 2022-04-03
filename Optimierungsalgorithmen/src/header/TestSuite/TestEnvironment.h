@@ -8,6 +8,12 @@
 #include "GeometryBasedNeighbour.h"
 #include "ObjectiveI.h"
 #include "EmptyBoxObjective.h"
+#include "SimpleEmptyBoxObjective.h"
+#include "BoxListLengthObjective.h"
+#include "Greedy.h"
+#include "AreaSortingStrategy.h"
+#include "DiagonalSortingStrategy.h"
+#include "GeometryBasedOverlappingNeighbour.h"
 class TestEnvironment {
 public:
 	TestEnvironment(int instances, int rect_amount, int min_rect_width, int min_rect_height, int max_rect_width, int max_rect_height, int boxLenght);
@@ -16,6 +22,7 @@ public:
 private:
 	void Protocoll(std::ofstream& file, float score, float time);
 	void ProtocollNewLine(std::ofstream& file, int prefix);
+	void setAlgorithm(int index);
 	int instances_;
 
 	std::shared_ptr<class RectangleCreator> rectCreator_;
@@ -26,12 +33,22 @@ private:
 	class DataHolder* data_;
 
 	InitialSolutionI<DataHolder*>* initSol_;
-	ObjectiveI<DataHolder*>* emptyBoxObjective_;
+	
 
 	OptimAlgoI<class DataHolder*>* selectedAlgorithm_;
 	LocalSearch<class DataHolder*>* localSearch_;
+	Greedy<class DataHolder*>* greedy_;
 
+
+	EmptyBoxObjective<class DataHolder*>* emptyBoxObjective_;
+	SimpleEmptyBoxObjective<class DataHolder*>* simpleEmptyBoxObjective_;
+	BoxListLengthObjective<class DataHolder*>* boxListLengthObjective_;
+
+	AreaSortingStrategy<class DataHolder*>* areaSortStrategy_;
+	DiagonalSortingStrategy<class DataHolder*>* diagonalSortStrategy_;
 	RuleBasedNeighbour<class DataHolder*>* ruleBasedNeighbour_;
 	GeometryBasedNeighbour<class DataHolder*>* geometryBasedNeighbour_;
+	GeometryBasedOverlappingNeighbour<class DataHolder*>* geometryBasedOverlappingNeighbour_;
+
 	
 };

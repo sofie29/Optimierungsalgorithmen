@@ -81,6 +81,7 @@ void BoundingBoxCreator::RemoveEmptyBoundingBoxes()
 	for (int idx : deleteIdx) {
 		resetOneBoundingBox(idx);
 	}
+	currentFitScore_ = (float)rectSquareSize_ / (float)(boundingBoxList_.size() * edgeLength_ * edgeLength_);
 }
 
 

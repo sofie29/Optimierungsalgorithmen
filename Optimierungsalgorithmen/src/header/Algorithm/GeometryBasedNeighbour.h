@@ -38,6 +38,8 @@ inline GeometryBasedNeighbour<Data>::GeometryBasedNeighbour(DataHolderT<Data>* d
 {
 	rectPos_ = 0;
 	boxPos_ = -1;
+
+	NeighbourI<Data>::identifier_ = "GeometryBasedNeighbour";
 }
 
 

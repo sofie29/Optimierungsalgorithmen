@@ -9,11 +9,13 @@ class AreaSortingStrategy : public SortingStrategyI<Data> {
 public:
 	AreaSortingStrategy();
 	virtual void sort(DataHolderT<Data>* data) override;
+	
 };
 
 template<class Data>
 inline AreaSortingStrategy<Data>::AreaSortingStrategy()
 {
+	SortingStrategyI<Data>::identifier_ = "AreaSort";
 }
 
 template<class Data>

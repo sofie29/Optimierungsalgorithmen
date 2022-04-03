@@ -55,13 +55,18 @@ void DataHolder::OverwriteData(DataHolder* other)
 void DataHolder::ResetData()
 {
 	boxCreator_->ResetBoundingBoxList();
-	
+	rectCreator_->ResetRectColors();
 }
 
-void DataHolder::ResetDataForTestEnv()
+void DataHolder::ResetBoundingBoxForTestEnv()
 {
 	boxCreator_->ResetBoundingBoxList();
 	boxCreator_->RecSquareSizeChanged(rectCreator_->getSquareSize());
+}
+
+void DataHolder::ResetRectanglesForTestEnv()
+{
+	rectCreator_->ResetRectsForTestEnv();
 }
 
 void DataHolder::ResetBoundingBoxContent()

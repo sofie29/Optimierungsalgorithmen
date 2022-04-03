@@ -5,6 +5,7 @@ Drawer::Drawer(QGraphicsScene* scene) : scene_(scene) {
 	boundingBoxDrawer_ = new BoundingBoxDrawer();
 	rectDrawer_ = new RectangleDrawer();
 
+
 	//connect(boundingBoxDrawer_, &BoundingBoxDrawer::EmitListChanged, this, &Drawer::DrawScene);
 	//connect(rectDrawer_, &RectangleDrawer::EmitListChanged, this, &Drawer::DrawScene);
 }
@@ -16,6 +17,8 @@ Drawer::~Drawer()
 
 	delete boundingBoxDrawer_;
 	boundingBoxDrawer_ = nullptr;
+
+
 
 	scene_ = nullptr;
 }
@@ -30,9 +33,17 @@ BoundingBoxDrawer* Drawer::getBBoxDrawer()
 	return boundingBoxDrawer_;
 }
 
+void Drawer::DrawSwappedRects()
+{
+	scene_->clear();
+	boundingBoxDrawer_->DrawOnScene(scene_, true);
+	rectDrawer_->DrawOnScreen(scene_, true);
+	scene_->update();
+}
+
 void Drawer::DrawScene() {
 	scene_->clear();
-	boundingBoxDrawer_->DrawOnScene(scene_);
-	rectDrawer_->DrawOnScreen(scene_);
+	boundingBoxDrawer_->DrawOnScene(scene_, false);
+	rectDrawer_->DrawOnScreen(scene_, false);
 	scene_->update();
 }

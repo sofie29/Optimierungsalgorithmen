@@ -146,7 +146,9 @@
     <ClInclude Include="src\header\Algorithm\ObjectiveI.h" />
     <ClInclude Include="src\header\Algorithm\RectangleHolder.h" />
     <ClInclude Include="src\header\Algorithm\RuleBasedNeighbour.h" />
+    <ClInclude Include="src\header\Algorithm\SimpleEmptyBoxObjective.h" />
     <ClInclude Include="src\header\Algorithm\SimpleInitialSolution.h" />
+    <ClInclude Include="src\header\Algorithm\BoxListLengthObjective.h" />
     <ClInclude Include="src\header\Algorithm\SortingStrategyI.h" />
     <ClInclude Include="src\header\Constants\AlgorithmConstants.h" />
     <ClInclude Include="src\header\Constants\UIConstants.h" />

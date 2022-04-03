@@ -4,6 +4,12 @@ RectangleCreator::RectangleCreator()
 {
 	rectangleList_ = new std::vector<class RectangleHolder*>();
 	squareSize_ = 0.0f;
+
+	amount_ = 0;
+	minWidth_ = 0;
+	maxWidth_ = 0;
+	minHeight_ = 0;
+	maxHeight_ = 0;
 }
 RectangleCreator::~RectangleCreator()
 {
@@ -52,15 +58,20 @@ void RectangleCreator::ResetData()
 	rectangleList_->shrink_to_fit();
 }
 
+void RectangleCreator::ResetRectColors()
+{
+	for (RectangleHolder* r : *rectangleList_) {
+		r->setToDefaultColor();
+	}
+}
+
 float RectangleCreator::getSquareSize()
 {
 	return squareSize_;
 }
 
-
-
-void RectangleCreator::CreateRectsQ(const int amount, const int maxEdgeLength) {
-
+void RectangleCreator::ResetRectsForTestEnv()
+{
 	for (RectangleHolder* r : *rectangleList_) {
 		delete r;
 		r = nullptr;
@@ -68,16 +79,20 @@ void RectangleCreator::CreateRectsQ(const int amount, const int maxEdgeLength) {
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
 
+	
 	squareSize_ = 0.0f;
 
 	std::random_device rd;
 	std::mt19937 engine(rd());
-	std::uniform_int_distribution<> dist(AlgorithmConstants::minRectangleEdgeSize_, maxEdgeLength);
-	int recsPerLine = std::ceil(std::sqrt(amount));
-	for (int i = 0; i < amount; i++) {
+	std::uniform_int_distribution<> dist_width(minWidth_, maxWidth_);
+	std::uniform_int_distribution<> dist_height(minHeight_, maxHeight_);
 
-		int height = dist(engine);
-		int width = dist(engine);
+
+	int recsPerLine = std::ceil(std::sqrt(amount_));
+	for (int i = 0; i < amount_; i++) {
+
+		int height = dist_height(engine);
+		int width = dist_width(engine);
 		//int x_pos = (i % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 		//int y_pos = (int)(i / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 		int x_pos = 0;
@@ -86,9 +101,9 @@ void RectangleCreator::CreateRectsQ(const int amount, const int maxEdgeLength) {
 		rectangleList_->emplace_back(new class RectangleHolder(rect));
 		squareSize_ += height * width;
 	}
-	emit RectListUpdated(rectangleList_);
-	emit EmitSquareSize(squareSize_);
 }
+
+
 void RectangleCreator::CreateRects(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight)
 {
 	for (RectangleHolder* r : *rectangleList_) {
@@ -98,16 +113,21 @@ void RectangleCreator::CreateRects(const int amount, const int minWidth, const i
 	rectangleList_->clear();
 	rectangleList_->shrink_to_fit();
 
+	amount_ = amount;
+	minWidth_ = minWidth;
+	maxWidth_ = maxWidth;
+	minHeight_ = minHeight;
+	maxHeight_ = maxHeight;
 	squareSize_ = 0.0f;
 
 	std::random_device rd;
 	std::mt19937 engine(rd());
-	std::uniform_int_distribution<> dist_width(minWidth, maxWidth);
-	std::uniform_int_distribution<> dist_height(minHeight, maxHeight);
+	std::uniform_int_distribution<> dist_width(minWidth_, maxWidth_);
+	std::uniform_int_distribution<> dist_height(minHeight_, maxHeight_);
 
 
-	int recsPerLine = std::ceil(std::sqrt(amount));
-	for (int i = 0; i < amount; i++) {
+	int recsPerLine = std::ceil(std::sqrt(amount_));
+	for (int i = 0; i < amount_; i++) {
 
 		int height = dist_height(engine);
 		int width = dist_width(engine);

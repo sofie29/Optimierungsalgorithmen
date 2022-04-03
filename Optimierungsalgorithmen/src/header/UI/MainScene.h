@@ -8,6 +8,8 @@ public:
 	~MainScene();
 	class RectangleDrawer* getRecDrawer() const;
 	class BoundingBoxDrawer* getBoxDrawer() const;
+
+
 	class Drawer* getDrawer() const;
 protected:
 	virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent) override;

@@ -16,11 +16,14 @@ RectangleDrawer::~RectangleDrawer()
 	rectList_.clear();
 	rectList_.shrink_to_fit();
 
+	rectListOld_.clear();
+	rectListOld_.shrink_to_fit();
+
 	rectColors_.clear();
 	rectColors_.shrink_to_fit();
 }
 
-void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
+void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene, bool drawOld)
 {
 	QBrush brush;
 	brush.setStyle(Qt::BrushStyle::SolidPattern);
@@ -29,10 +32,19 @@ void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene)
 	pen.setColor(Qt::black);
 	pen.setWidth(1);
 	int idx = 0;
-	for (const QRectF& rect : rectList_) {
-		brush.setColor(rectColors_[idx]);
-		scene->addRect(rect, pen, brush);
-		++idx;
+	if (drawOld) {
+		for (const QRectF& rect : rectListOld_) {
+			brush.setColor(rectColors_[idx]);
+			scene->addRect(rect, pen, brush);
+			++idx;
+		}
+	}
+	else {
+		for (const QRectF& rect : rectList_) {
+			brush.setColor(rectColors_[idx]);
+			scene->addRect(rect, pen, brush);
+			++idx;
+		}
 	}
 }
 
@@ -120,6 +132,7 @@ void RectangleDrawer::DrawRectMaxHeightChangedS(const QString& maxHeight)
 
 void RectangleDrawer::SetRects(const std::vector<class RectangleHolder*>* list) {
 	
+	SetOldRects();
 	rectList_.clear();
 	rectColors_.clear();
 	for (class RectangleHolder* r : *list) {
@@ -143,4 +156,12 @@ void RectangleDrawer::SetRects(const std::vector<class RectangleHolder*>* list) 
 
 void RectangleDrawer::OnBoundingBoxSizeChanged(int x) {
 	emit EmitRectInformation(currentAmount_, currentMinWidth_, currentMaxWidth_, currentMinHeight_, currentMaxHeight_);
+}
+
+void RectangleDrawer::SetOldRects()
+{
+	rectListOld_.clear();
+	for (QRectF rect : rectList_) {
+		rectListOld_.emplace_back(rect);
+	}
 }

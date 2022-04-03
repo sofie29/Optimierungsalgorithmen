@@ -57,5 +57,5 @@ template<>
 inline void DataHolderT<DataHolder*>::ResetData() {
 	if (UIConstants::useUI_)
 		data_->ResetData();
-	else data_->ResetDataForTestEnv();
+	else data_->ResetBoundingBoxForTestEnv();
 }

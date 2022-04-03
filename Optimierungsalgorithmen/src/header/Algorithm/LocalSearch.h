@@ -7,7 +7,7 @@ template<class Data>
 class LocalSearch : public OptimAlgoI<Data>{
 
 public:
-	LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* sol, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* initSol, ObjectiveI<Data>* objective);
+	LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* sol, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* initSol, ObjectiveI<Data>* algoObjective, ObjectiveI<Data>* cmpObjective);
 	~LocalSearch();
 	//returns optimal box amount
 	virtual Metric execute(int steps) override;
@@ -22,8 +22,8 @@ private:
 };
 
 template<class Data>
-inline LocalSearch<Data>::LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* sol, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* initSol, ObjectiveI<Data>* objective) 
-	: OptimAlgoI<Data>(sol, bestSol, initSol, objective)
+inline LocalSearch<Data>::LocalSearch(NeighbourI<Data>* n, DataHolderT<Data>* sol, DataHolderT<Data>* bestSol, InitialSolutionI<Data>* initSol, ObjectiveI<Data>* algoObjective, ObjectiveI<Data>* cmpObjective)
+	: OptimAlgoI<Data>(sol, bestSol, initSol, algoObjective, cmpObjective)
 {
 	neighbourDefinition_ = n;
 	
@@ -55,7 +55,7 @@ Metric LocalSearch<Data>::execute(int steps)
 
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		neighbourDefinition_->optimize();
-		float newScore = OptimAlgoI<Data>::objective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_);
+		float newScore = OptimAlgoI<Data>::algoObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_);
 		if (newScore < OptimAlgoI<Data>::currentBestScore_) {
 			OptimAlgoI<Data>::currentBestScore_ = newScore;
 			OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
@@ -80,8 +80,8 @@ Metric LocalSearch<Data>::execute(int steps)
 	OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
 	emit OptimAlgoI<Data>::EmitTakenTime(OptimAlgoI<Data>::currentTimeTaken_);
 	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ /(double) OptimAlgoI<Data>::currentStep_);
-	emit OptimAlgoI<Data>::DrawSolution();
-	return Metric::Metric(OptimAlgoI<Data>::currentBestScore_, OptimAlgoI<Data>::currentTimeTaken_);
+	//emit OptimAlgoI<Data>::DrawSolution();
+	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::bestSol_), OptimAlgoI<Data>::currentTimeTaken_);
 }
 
 template<class Data>
@@ -104,7 +104,7 @@ inline void LocalSearch<Data>::reset()
 
 	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);
 	emit OptimAlgoI<Data>::StepDone();
-	emit OptimAlgoI<Data>::DrawSolution();
+	//emit OptimAlgoI<Data>::DrawSolution();
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
@@ -117,6 +117,7 @@ template<class Data>
 inline void LocalSearch<Data>::setNeighbourDefinition(NeighbourI<Data>* n)
 {
 	neighbourDefinition_ = n;
+	OptimAlgoI<Data>::identifier_ = "LocalSearch " + n->getIdentifier();
 }
 
 

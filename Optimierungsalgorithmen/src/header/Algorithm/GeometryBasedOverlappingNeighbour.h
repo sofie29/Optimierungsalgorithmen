@@ -60,6 +60,8 @@ inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbou
 	rectPos_ = 0;
 	rectQueuePos_ = 0;
 	boxPos_ = -1;
+
+	NeighbourI<Data>::identifier_ = "GeometryOverlappingNeighbour";
 }
 
 template<>

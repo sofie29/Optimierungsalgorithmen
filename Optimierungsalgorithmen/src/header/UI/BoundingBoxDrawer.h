@@ -6,7 +6,7 @@ class BoundingBoxDrawer : public QWidget {
 public:
 	BoundingBoxDrawer();
 	~BoundingBoxDrawer();
-	void DrawOnScene(QGraphicsScene* scene);
+	void DrawOnScene(QGraphicsScene* scene, bool drawOld);
 signals:
 	void BoundingBoxSizeChanged(const int edgeLength);
 	void EmitListChanged();
@@ -15,7 +15,8 @@ public slots:
 	void BoundingBoxSizeChangedI(const int maxEdgeLength);
 	void SetBoundingBoxes(const std::vector<QRectF>& list);
 private:
-	
+	void SetOldBoundingBoxes();
 	int currentBoxLength_;
 	std::vector<QRectF> boundingBoxList_;
+	std::vector<QRectF> boundingBoxListOld_;
 };

@@ -36,18 +36,20 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget* parent)
 
     initSol_ = new SimpleInitialSolution<DataHolder*>();
     emptyBoxObjective_ = new EmptyBoxObjective<DataHolder*>();
+    simpleEmptyBoxObjective_ = new SimpleEmptyBoxObjective<DataHolder*>();
+    boxListLengthObjective_ = new BoxListLengthObjective<DataHolder*>();
 
     ruleBasedNeighbour_ = new RuleBasedNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
     geometryBasedNeighbour_ = new GeometryBasedNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
     geometryBasedOverlappingNeighbour_ = new GeometryBasedOverlappingNeighbour<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_);
+    emptyBoxObjective_->setNeighbour(geometryBasedOverlappingNeighbour_);
+
     neighbourWrapper_ = new QNeighbourWrapper(ruleBasedNeighbour_);
-    localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), dataHolderT_, bestDataHolderT_, initSol_, emptyBoxObjective_);
-    
-    emptyBoxObjective_->setNeighbour(ruleBasedNeighbour_);
+    localSearch_ = new LocalSearch<DataHolder*>(neighbourWrapper_->getNeighbourI(), dataHolderT_, bestDataHolderT_, initSol_, simpleEmptyBoxObjective_, boxListLengthObjective_);
 
     areaSortStrategy_ = new AreaSortingStrategy<DataHolder*>();
     diagonalSortStrategy_ = new DiagonalSortingStrategy<DataHolder*>();
-    greedy_ = new Greedy<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_, areaSortStrategy_, emptyBoxObjective_);
+    greedy_ = new Greedy<DataHolder*>(dataHolderT_, bestDataHolderT_, initSol_, areaSortStrategy_, simpleEmptyBoxObjective_, boxListLengthObjective_);
 
    
 
@@ -108,6 +110,8 @@ Optimierungsalgorithmen::Optimierungsalgorithmen(QWidget* parent)
     //Draw Solution
     connect(localSearch_, &OptimAlgoI<DataHolder*>::DrawSolution, mainScene_->getDrawer(), &Drawer::DrawScene);
     connect(greedy_, &OptimAlgoI<DataHolder*>::DrawSolution, mainScene_->getDrawer(), &Drawer::DrawScene);
+
+    connect(localSearch_, &OptimAlgoI<DataHolder*>::DrawSwappedRects, mainScene_->getDrawer(), &Drawer::DrawSwappedRects);
 
     //Step Logic
     connect(localSearch_, &OptimAlgoI<DataHolder*>::EmitCurrentStep, algoSelectionUI_, &AlgorithmSelectionUI::setCurrentStepNumberLabel);
@@ -197,6 +201,12 @@ Optimierungsalgorithmen::~Optimierungsalgorithmen()
     delete emptyBoxObjective_;
     emptyBoxObjective_ = nullptr;
 
+    delete simpleEmptyBoxObjective_;
+    simpleEmptyBoxObjective_ = nullptr;
+
+    delete boxListLengthObjective_;
+    boxListLengthObjective_ = nullptr;
+
 }
 
 void Optimierungsalgorithmen::changeAlgorithm(int idx)
@@ -206,15 +216,17 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
         neighbourWrapper_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setNeighbourDefinition(ruleBasedNeighbour_);
         emptyBoxObjective_->setNeighbour(ruleBasedNeighbour_);
-        localSearch_->setObjective(emptyBoxObjective_);
+        localSearch_->setObjective(simpleEmptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;
+        algoWrapper_->setMod(2);
         break;
     case 1:
         neighbourWrapper_->setNeighbour(geometryBasedNeighbour_);
         localSearch_->setNeighbourDefinition(geometryBasedNeighbour_);
         emptyBoxObjective_->setNeighbour(geometryBasedNeighbour_);
-        localSearch_->setObjective(emptyBoxObjective_);
+        localSearch_->setObjective(simpleEmptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;
+        algoWrapper_->setMod(2);
         break;
     case 2:
         neighbourWrapper_->setNeighbour(geometryBasedOverlappingNeighbour_);
@@ -222,16 +234,19 @@ void Optimierungsalgorithmen::changeAlgorithm(int idx)
         emptyBoxObjective_->setNeighbour(geometryBasedOverlappingNeighbour_);
         localSearch_->setObjective(emptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;
+        algoWrapper_->setMod(2);
         break;
     case 3:
         greedy_->setSortStrat(areaSortStrategy_);
         greedy_->setObjective(emptyBoxObjective_);
         selectedAlgorithm_ = greedy_;
+        algoWrapper_->setMod(1);
         break;
     case 4:
         greedy_->setSortStrat(diagonalSortStrategy_);
         greedy_->setObjective(emptyBoxObjective_);
         selectedAlgorithm_ = greedy_;
+        algoWrapper_->setMod(1);
         break;
     }
     algoWrapper_->setAlgorithm(selectedAlgorithm_);
