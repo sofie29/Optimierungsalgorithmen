@@ -44,5 +44,6 @@ inline float SimpleEmptyBoxObjective<DataHolder*>::calculateObjectiveScore(DataH
 
 	}
 
+	// upper bound of boxScore : length of rectangleList - 1
 	return (bBoxListSize * (rectListSize - 1) - boxScore) * 0.2; // 0.2 to prevent overflow
 }

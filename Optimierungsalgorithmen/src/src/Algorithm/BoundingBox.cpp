@@ -264,14 +264,6 @@ float BoundingBox::calculateOverlappings(std::vector<RectangleHolder*>* rectangl
 
 		float overlap = (float)area_overlap / (float)area_max;
 
-		/*
-		std::cout << "" << std::endl;
-		std::cout << "x1 " << x << ", y1: " << y << ", w1: " << w << ", h1: " << h << std::endl;
-		std::cout << "x2 " << other.x() << ", y2: " << other.y() << ", w2: " << other.width() << ", h2: " << other.height() << std::endl;
-		std::cout << "x_overlap " << x_overlap << ", y_overlap: " << y_overlap << std::endl;
-		std::cout << "overlapping area: " << overlap << ", parameter: " << t << std::endl;
-		*/
-
 		if (overlap > t) {
 			transgrIndices.push_back(i);
 			causesTransgression = true;

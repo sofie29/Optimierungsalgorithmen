@@ -56,11 +56,12 @@ Metric LocalSearch<Data>::execute(int steps)
 	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
 		neighbourDefinition_->optimize();
 		float newScore = OptimAlgoI<Data>::algoObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_);
+		float oldBestScore = OptimAlgoI<Data>::currentBestScore_;
 		if (newScore < OptimAlgoI<Data>::currentBestScore_) {
 			OptimAlgoI<Data>::currentBestScore_ = newScore;
 			OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
 		}
-		neighbourDefinition_->postOptimStep(newScore, OptimAlgoI<Data>::currentBestScore_);
+		neighbourDefinition_->postOptimStep(newScore, oldBestScore);
 		steps_left++;
 
 		OptimAlgoI<Data>::currentStep_++;
@@ -73,11 +74,11 @@ Metric LocalSearch<Data>::execute(int steps)
 		
 	}
 	neighbourDefinition_->afterOptimization();	
-	emit OptimAlgoI<Data>::StepDone();
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
 	OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
+	emit OptimAlgoI<Data>::StepDone();
 	emit OptimAlgoI<Data>::EmitTakenTime(OptimAlgoI<Data>::currentTimeTaken_);
 	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ /(double) OptimAlgoI<Data>::currentStep_);
 	//emit OptimAlgoI<Data>::DrawSolution();
