@@ -97,7 +97,6 @@ inline bool GeometryBasedNeighbour<Data>::tryFitWrapper(std::vector<std::shared_
 template<class Data>
 inline void GeometryBasedNeighbour<Data>::initParameters()
 {
-	GeometryBasedNeighbourI<DataHolder*>::bestScore_ = AlgorithmConstants::maxScore;
 	rectPos_ = 0;
 }
 

@@ -33,7 +33,6 @@ public:
 	virtual void updateBoxQueue(int boxIndex1, int boxIndex2, std::vector<std::shared_ptr<BoundingBox>>& boxList, std::vector<class RectangleHolder*>* rectangles, bool deleteBox1) = 0;
 
 protected:
-	float bestScore_;
 	int iteration_;
 	int initalNumberOfBoxes_;
 	bool fitBoundingBox(std::vector<int> indices, std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIndex);
@@ -50,7 +49,6 @@ protected:
 
 template<class Data>
 inline GeometryBasedNeighbourI<Data>::GeometryBasedNeighbourI(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) : NeighbourI<Data>(data, currentBest, initSol) {
-	bestScore_ = AlgorithmConstants::maxScore;
 	resetData_ = false;
 	overlapping_ = false;
 	numberOfAddedBoxes_ = 0;
@@ -359,16 +357,6 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 
 		++iteration;
 	}
-
-	// TODO: WHAT IF NO NEIGHBOUR IS FOUND ???
-	if (!foundNeighbour) {
-		std::cout << "no neighbour" << std::endl;
-		score = AlgorithmConstants::maxScore;
-	}
-
-	// resetData_ = score >= bestScore_;
-	// std::cout << "score: " << score << " bestscore: " << bestScore_ << std::endl;
-	// this->decreaseT(rectList, bBoxList, score < bestScore_);
 
 	/*
 	if (score < bestScore_) {

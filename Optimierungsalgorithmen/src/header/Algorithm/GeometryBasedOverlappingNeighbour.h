@@ -79,7 +79,6 @@ inline void GeometryBasedOverlappingNeighbour<DataHolder*>::initParameters()
 	transgressions_ = 0;
 	transgressionsBestSol_ = 0;
 	GeometryBasedNeighbourI<DataHolder*>::numberOfAddedBoxes_ = 0;
-	GeometryBasedNeighbourI<DataHolder*>::bestScore_ = AlgorithmConstants::maxScore;
 	GeometryBasedNeighbourI<DataHolder*>::iteration_ = 0;
 
 	// initialize boxQueue
@@ -162,7 +161,7 @@ inline int GeometryBasedOverlappingNeighbour<Data>::getBoxPos(const int boxListS
 {
 	int iteration = 0;
 	boxPos_ = boxPos_ < boxListSize - 1 ? boxPos_ + 1 : 0;
-	while (boxList[boxPos_]->getNumberOfOverlappings() >= 1 && iteration++ < boxListSize) {
+	while (boxList[boxPos_]->getNumberOfOverlappings() >= 3 && iteration++ < boxListSize) {
 		boxPos_ = boxPos_ < boxListSize - 1 ? boxPos_ + 1 : 0;
 	}
 	return boxPos_;
@@ -242,15 +241,11 @@ inline float GeometryBasedOverlappingNeighbour<DataHolder*>::beforeScoreCalculat
 	int transgressionsBefore_ = transgressions_;
 	this->calculateOverlappingWrapper(rectangles, bBoxList);
 	int diff = transgressions_ - transgressionsBefore_;
-	if (isTransgressionRect && diff >= 0) {
-		// std::cout << "transgressions before " << transgressionsBefore_ << "transgressions after " << transgressions_ << std::endl;
-		//std::cout << "diff in transgressions: " << diff << std::endl;
+	if (isTransgressionRect && diff >= 0) { // if a transgressionRect is replaced, score must always be better
 		scoreShift_ += (diff * scoreFactor_ + 1);
 	}
 
 	// upper bound of boxScore: length of rectangleList - 1
-	
-	// std::cout << "boxList: " << bBoxListSize << ", transgressions: " << transgressions_ << ", scoreShift: " << scoreShift_ << std::endl;
 	//return ((bBoxListSize + ((float)transgressions_) * scoreFactor_ - scoreShift_) * (rectListSize - 1) - boxScore) * 0.2;
 	return 0;
 }

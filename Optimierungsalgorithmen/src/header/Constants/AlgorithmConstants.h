@@ -17,7 +17,7 @@ namespace AlgorithmConstants {
 	static constexpr double maxTime_ = 10000.0;
 	static constexpr double timeOverhead_ = 200.0;
 
-	static const int maxInitialRectsPerBox_ = 3;
+	static const int maxInitialRectsPerBox_ = 1;
 
 	static const int amountAlgorithms_ = 5;
 }
