@@ -35,6 +35,11 @@ TestEnvironment::TestEnvironment(int instances, int rect_amount, int min_rect_wi
 }
 
 TestEnvironment::~TestEnvironment() {
+
+    entryList_.clear();
+    entryList_.shrink_to_fit();
+
+
     delete ruleBasedNeighbour_;
     ruleBasedNeighbour_ = nullptr;
 
@@ -92,11 +97,35 @@ void TestEnvironment::Run(std::string path)
             std::cout << "Algo " << k << "\n";
             setAlgorithm(k);
             ProtocollNewLine(file, k);
-            for (int j = 0; j < 1000; j++) {
+            for (int j = 0; j < 1000000; j++) {
                 Metric metric = selectedAlgorithm_->execute(1);
                 if (metric.time_ > AlgorithmConstants::maxTime_) break;
                 Protocoll(file, metric.score_, metric.time_);
             }
+            int size = static_cast<int>(entryList_.size());
+            std::cout <<size << "\n";
+            if (entryList_.size() < 1000) {
+                for (int l = 0; l < entryList_.size(); ++l) {
+                    const char* chars = entryList_[l].c_str();
+                    file << chars;
+                }
+               
+            }
+            else {
+                for (int m = 0; m < 498; ++m) {
+                    const char* chars = entryList_[m].c_str();
+                    file << chars;
+                }
+                file << ",";
+
+                for (int n = entryList_.size() - 498; n < entryList_.size(); ++n) {
+                    const char* chars = entryList_[n].c_str();
+                    file << chars;
+                }
+            }
+
+            entryList_.clear();
+
         }
         file << "\n";
         data_->ResetRectanglesForTestEnv();
@@ -112,8 +141,10 @@ void TestEnvironment::Protocoll(std::ofstream& file, float score, float time)
     stream << " after " << std::fixed << std::setprecision(2) << time << "ms,";
 
     std::string s = stream.str();
-    const char* chars = s.c_str();
-    file << chars;
+    entryList_.emplace_back(s);
+    //const char* chars = s.c_str();
+
+    //file << chars;
    
 }
 
