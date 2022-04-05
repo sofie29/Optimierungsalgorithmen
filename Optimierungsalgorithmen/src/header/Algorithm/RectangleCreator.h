@@ -12,7 +12,7 @@ public:
 	void ResetData();
 	void ResetRectColors();
 	float getSquareSize();
-	void ResetRectsForTestEnv();
+	void ResetRectsForTestEnv(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight);
 signals:
 	void RectListUpdated(const std::vector<class RectangleHolder* >* list);
 	void EmitRectList(const std::vector<class RectangleHolder* >* list);

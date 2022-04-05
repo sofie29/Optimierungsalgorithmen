@@ -16,6 +16,7 @@
 #include "GeometryBasedOverlappingNeighbour.h"
 class TestEnvironment {
 public:
+	TestEnvironment(int boxLength);
 	TestEnvironment(int instances, int rect_amount, int min_rect_width, int min_rect_height, int max_rect_width, int max_rect_height, int boxLenght);
 	~TestEnvironment();
 	void Run(std::string path);
@@ -24,6 +25,7 @@ private:
 	void ProtocollNewLine(std::ofstream& file, int prefix);
 	void setAlgorithm(int index);
 	int instances_;
+	std::vector<std::string> entryList_;
 
 	std::shared_ptr<class RectangleCreator> rectCreator_;
 	std::shared_ptr<class BoundingBoxCreator> boxCreator_;
@@ -50,5 +52,10 @@ private:
 	GeometryBasedNeighbour<class DataHolder*>* geometryBasedNeighbour_;
 	GeometryBasedOverlappingNeighbour<class DataHolder*>* geometryBasedOverlappingNeighbour_;
 
+
+	std::vector<int> min_rect_width_vector_;
+	std::vector<int> max_rect_width_vector_;
+	std::vector<int> min_rect_height_vector_;
+	std::vector<int> max_rect_height_vector_;
 	
 };

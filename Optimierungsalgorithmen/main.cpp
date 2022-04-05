@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
         return a.exec();
     }
     else {
-        std::unique_ptr<TestEnvironment> test = std::make_unique<TestEnvironment>(10, 250,  10, 30, 10, 30, 100);
+        std::unique_ptr<TestEnvironment> test = std::make_unique<TestEnvironment>(100);
         test->Run("test.csv");
         while (true);
     }

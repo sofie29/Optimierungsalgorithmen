@@ -53,7 +53,7 @@ Metric LocalSearch<Data>::execute(int steps)
 
 	int steps_left = 0;
 
-	while(OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_- AlgorithmConstants::timeOverhead_ && steps_left < steps){
+	while((!UIConstants::useUI_ && steps_left < steps) || (OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_ - AlgorithmConstants::timeOverhead_ && UIConstants::useUI_) && steps_left < steps){
 		neighbourDefinition_->optimize();
 		float newScore = OptimAlgoI<Data>::algoObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_);
 		float oldBestScore = OptimAlgoI<Data>::currentBestScore_;

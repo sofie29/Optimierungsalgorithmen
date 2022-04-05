@@ -70,26 +70,26 @@ float RectangleCreator::getSquareSize()
 	return squareSize_;
 }
 
-void RectangleCreator::ResetRectsForTestEnv()
+void RectangleCreator::ResetRectsForTestEnv(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight)
 {
 	for (RectangleHolder* r : *rectangleList_) {
 		delete r;
 		r = nullptr;
 	}
 	rectangleList_->clear();
-	rectangleList_->shrink_to_fit();
+	// rectangleList_->shrink_to_fit();
 
 	
 	squareSize_ = 0.0f;
 
 	std::random_device rd;
 	std::mt19937 engine(rd());
-	std::uniform_int_distribution<> dist_width(minWidth_, maxWidth_);
-	std::uniform_int_distribution<> dist_height(minHeight_, maxHeight_);
+	std::uniform_int_distribution<> dist_width(minWidth, maxWidth);
+	std::uniform_int_distribution<> dist_height(minHeight, maxHeight);
 
 
-	int recsPerLine = std::ceil(std::sqrt(amount_));
-	for (int i = 0; i < amount_; i++) {
+	int recsPerLine = std::ceil(std::sqrt(amount));
+	for (int i = 0; i < amount; i++) {
 
 		int height = dist_height(engine);
 		int width = dist_width(engine);

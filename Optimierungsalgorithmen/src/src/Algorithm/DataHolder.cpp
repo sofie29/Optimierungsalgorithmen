@@ -64,9 +64,9 @@ void DataHolder::ResetBoundingBoxForTestEnv()
 	boxCreator_->RecSquareSizeChanged(rectCreator_->getSquareSize());
 }
 
-void DataHolder::ResetRectanglesForTestEnv()
+void DataHolder::ResetRectanglesForTestEnv(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight)
 {
-	rectCreator_->ResetRectsForTestEnv();
+	rectCreator_->ResetRectsForTestEnv(amount, minWidth, maxWidth, minHeight, maxHeight);
 }
 
 void DataHolder::ResetBoundingBoxContent()
