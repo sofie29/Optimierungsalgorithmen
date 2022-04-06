@@ -13,6 +13,7 @@ namespace AlgorithmConstants {
 
 	static const int  maxIterations = 5000;
 	static const int  maxScore = 999000; // upper bound for score in geometry based neighbourhoods
+	
 
 	static constexpr double maxTime_ = 10000.0;
 	static constexpr double timeOverhead_ = 200.0;

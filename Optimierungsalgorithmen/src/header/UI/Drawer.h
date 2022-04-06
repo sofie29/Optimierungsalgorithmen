@@ -10,9 +10,10 @@ public:
 	class BoundingBoxDrawer* getBBoxDrawer();
 
 public slots:
-	void DrawScene();
+	void DrawScene(class BoundingBoxCreator* bBoxCreator);
 	void DrawSwappedRects();
 private:
+	void rearrangeBoxes(class BoundingBoxCreator* bBoxCreator);
 	QGraphicsScene* scene_;
 	class RectangleDrawer* rectDrawer_;
 	class BoundingBoxDrawer* boundingBoxDrawer_;

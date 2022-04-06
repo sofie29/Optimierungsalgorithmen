@@ -23,6 +23,10 @@ RectangleDrawer::~RectangleDrawer()
 	rectColors_.shrink_to_fit();
 }
 
+void RectangleDrawer::setRectsQRectF(std::vector<QRectF>& list) {
+	rectList_ = list;
+}
+
 void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene, bool drawOld)
 {
 	QBrush brush;
@@ -46,6 +50,11 @@ void RectangleDrawer::DrawOnScreen(QGraphicsScene* scene, bool drawOld)
 			++idx;
 		}
 	}
+}
+
+void RectangleDrawer::getRects(std::vector<QRectF>& list)
+{
+	list = rectList_;
 }
 
 void RectangleDrawer::DrawRectAmountChangedI(const int amount)

@@ -6,6 +6,8 @@ public:
 	RectangleDrawer();
 	~RectangleDrawer();
 	void DrawOnScreen(QGraphicsScene* scene, bool drawOld);
+	void getRects(std::vector<QRectF>& list);
+	void setRectsQRectF(std::vector<QRectF>& list);
 signals:
 	void EmitRectInformation(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight);
 	void EmitListChanged();

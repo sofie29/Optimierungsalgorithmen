@@ -1,5 +1,6 @@
 #include "QAlgoWrapper.h"
-
+#include "DataHolderT.h"
+#include "OptimAlgoI.h"
 QAlgoWrapper::QAlgoWrapper(class OptimAlgoI<class DataHolder*>* algo) : algo_(algo) {
 	stepIdx_ = 0;
 	mod_ = 2;
@@ -25,18 +26,25 @@ void QAlgoWrapper::RunOneStep()
 	if (algo_) {
 		switch (rmd) {
 		case 0:
-			algo_->execute(1);
+		{
+			bool improved = false;
+			while (!improved) {
+				Metric m = algo_->execute(1);
+				improved = m.improved_;
+			}
 			if (mod_ > 1) {
 				//draw flipped rects
 				emit algo_->DrawSwappedRects();
 			}
 			else {
 				//draw all
-				emit algo_->DrawSolution();
+				emit algo_->DrawSolution(algo_->getBestSol()->getData()->getBoxCreator().get());
 			}
+		}
 			break;
+		
 		case 1:
-			emit algo_->DrawSolution();
+			emit algo_->DrawSolution(algo_->getBestSol()->getData()->getBoxCreator().get());
 			break;
 		}
 		
@@ -48,12 +56,12 @@ void QAlgoWrapper::Reset()
 {
 	algo_->reset();
 	stepIdx_ = 0;
-	emit algo_->DrawSolution();
+	emit algo_->DrawSolution(algo_->getBestSol()->getData()->getBoxCreator().get());
 }
 
 void QAlgoWrapper::RunUntilTermination() {
 	if (algo_) {
 		algo_->execute(AlgorithmConstants::maxIterations);
-		emit algo_->DrawSolution();
+		emit algo_->DrawSolution(algo_->getBestSol()->getData()->getBoxCreator().get());
 	}
 }

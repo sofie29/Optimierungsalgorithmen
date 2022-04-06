@@ -24,6 +24,10 @@ void BoundingBoxDrawer::DrawOnScene(QGraphicsScene* scene, bool useOld)
 		}
 	}
 }
+void BoundingBoxDrawer::getBoundingBoxList(std::vector<QRectF>& list)
+{
+	list = boundingBoxList_;
+}
 void BoundingBoxDrawer::BoundingBoxSizeChangedS(const QString& maxEdgeLength)
 {
 	if (maxEdgeLength.toInt() <= AlgorithmConstants::maxBoxEdgeSize_) {

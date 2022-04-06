@@ -32,7 +32,8 @@ inline Metric Greedy<Data>::execute(int steps)
 	OptimAlgoI<Data>::currentStep_ += 1;
 	OptimAlgoI<Data>::currentBestScore_ = OptimAlgoI<Data>::algoObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_);
 	OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
-	emit OptimAlgoI<Data>::OptimDone();
+	emit OptimAlgoI<Data>::StepDone();
+	emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);
 
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
@@ -41,7 +42,7 @@ inline Metric Greedy<Data>::execute(int steps)
 	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ / (double)OptimAlgoI<Data>::currentStep_);
 
 	//emit OptimAlgoI<Data>::DrawSolution();
-	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_) , OptimAlgoI<Data>::currentTimeTaken_);
+	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_) , OptimAlgoI<Data>::currentTimeTaken_, true);
 }
 
 template<class Data>

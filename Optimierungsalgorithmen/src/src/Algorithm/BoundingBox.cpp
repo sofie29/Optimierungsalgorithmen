@@ -1,6 +1,21 @@
 #include "BoundingBox.h"
 #include "RectangleHolder.h"
 
+BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, QRectF& rect, int rectIndex) :
+	rect_height(rect_height),
+	rect_width(rect_width),
+	x(x_pos),
+	y(y_pos),
+	first(nullptr),
+	second(nullptr),
+	numberOfRectangles(0),
+	numberOfOverlappings(0)
+{
+	int x, y;
+	this->tryFit(rect.width(), rect.height(), x, y);
+	this->addRectangleIndex(rectIndex);
+	rect.moveTopLeft(QPointF(x, y));
+}
 
 BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, RectangleHolder* rectHolder, int rectIndex, int boxIndex) :
 	rect_height(rect_height),
@@ -15,8 +30,6 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x_pos, int y_pos, 
 	this->tryFit(rectHolder, boxIndex);
 	this->addRectangleIndex(rectIndex);
 }
-
-
 BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y) :
 	rect_height(rect_height),
 	rect_width(rect_width),

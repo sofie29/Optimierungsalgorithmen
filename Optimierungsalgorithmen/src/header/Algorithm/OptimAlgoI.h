@@ -4,12 +4,17 @@
 #include "DataHolderT.h"
 #include "ObjectiveI.h"
 struct Metric {
-public: Metric(float s, float t) {
+public: Metric(float s, float t, bool impr) {
 	score_ = s;
 	time_ = t;
+	improved_ = impr;
+	
+
 }
 	  float score_;
 	  float time_;
+	  bool improved_;
+	 
 };
 
 class SignalHelper : public QObject {
@@ -17,7 +22,7 @@ class SignalHelper : public QObject {
 signals:
 	void OptimDone();
 	void StepDone();
-	void DrawSolution();
+	void DrawSolution(class BoundingBoxCreator* bBoxCreator);
 	void DrawSwappedRects();
 	void EmitCurrentStep(int step);
 	void EmitTakenTime(double time);
@@ -32,6 +37,7 @@ public:
 	virtual void reset() = 0;
 	void setObjective(class ObjectiveI<Data>* objective);
 	std::string getIdentifier();
+	DataHolderT<Data>* getBestSol();
 protected:
 	int currentStep_;
 	float currentBestScore_;
@@ -69,4 +75,10 @@ template<class Data>
 inline std::string OptimAlgoI<Data>::getIdentifier()
 {
 	return identifier_;
+}
+
+template<class Data>
+inline DataHolderT<Data>* OptimAlgoI<Data>::getBestSol()
+{
+	return bestSol_;
 }

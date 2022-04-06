@@ -259,7 +259,7 @@ inline float GeometryBasedNeighbourI<DataHolder*>::findNeighbour(bool withoutOve
 		++iteration;
 	}
 
-	if (foundNeighbour == false) std::cout << "No neighbour" << std::endl;
+	//if (foundNeighbour == false) //std::cout << "No neighbour" << std::endl;
 
 	return 0;
 }

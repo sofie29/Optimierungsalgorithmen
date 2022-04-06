@@ -4,21 +4,21 @@
 #include "DataHolder.h"
 #include "DataHolderT.h"
 #include "SimpleInitialSolution.h"
-TestEnvironment::TestEnvironment(int boxLength)
+TestEnvironment::TestEnvironment(int rectAmount, int boxLength)
 {
-    min_rect_width_vector_ = { 10, 20, 30, 10, 50 };
-    max_rect_width_vector_ = { 13, 20, 50, 50, 100 };
-    min_rect_height_vector_ = { 10, 20, 10, 10, 50 };
-    max_rect_height_vector_ = { 17, 20, 13, 50, 100 };
+    min_rect_width_vector_ = { 10, 10, 30, 10, 20 };
+    max_rect_width_vector_ = { 20, 15, 50, 50, 30 };
+    min_rect_height_vector_ = { 10, 30, 10, 10, 20 };
+    max_rect_height_vector_ = { 20, 50, 15, 50, 30 };
+    rectAmount_ = rectAmount;
 
     instances_ = min_rect_height_vector_.size();
-    int rect_amount = 1000;
     int min_rect_width = min_rect_width_vector_[0];
     int min_rect_height = min_rect_height_vector_[0];
     int max_rect_width = max_rect_width_vector_[0];
     int max_rect_height = max_rect_height_vector_[0];
-    bestData_ = new DataHolder(rect_amount, min_rect_width, min_rect_height, max_rect_width, max_rect_height, boxLength);
-    data_ = new DataHolder(rect_amount, min_rect_width, min_rect_height, max_rect_width, max_rect_height, boxLength);
+    bestData_ = new DataHolder(rectAmount_, min_rect_width, min_rect_height, max_rect_width, max_rect_height, boxLength);
+    data_ = new DataHolder(rectAmount_, min_rect_width, min_rect_height, max_rect_width, max_rect_height, boxLength);
     bestDataT_ = new DataHolderT<DataHolder*>(bestData_);
     dataT_ = new DataHolderT<DataHolder*>(data_);
 
@@ -72,10 +72,7 @@ TestEnvironment::TestEnvironment(int instances, int rect_amount, int min_rect_wi
 
     selectedAlgorithm_ = localSearch_;
 
-    min_rect_width_vector_ = {10, 20, 30, 10, 50};
-    max_rect_width_vector_ = {13, 20, 50, 50, 100};
-    min_rect_height_vector_ = {10, 20, 10, 10, 50};
-    max_rect_height_vector_ = {17, 20, 13, 50, 100};
+  
 
     instances_ = min_rect_height_vector_.size();
 }
@@ -137,26 +134,42 @@ void TestEnvironment::Run(std::string path)
     std::ofstream file;
     file.open(path);
     
-    Metric metric = { 0.0, 0.0 };
+
+    Metric metric = { 0.0, 0.0 , false};
     for (int i = 0; i < instances_; i++) {
         std::cout << "Instance " << i << "\n";
-        data_->ResetRectanglesForTestEnv(1000, min_rect_width_vector_[i], max_rect_width_vector_[i], min_rect_height_vector_[i], max_rect_height_vector_[i]);
+        data_->ResetRectanglesForTestEnv(rectAmount_, min_rect_width_vector_[i], max_rect_width_vector_[i], min_rect_height_vector_[i], max_rect_height_vector_[i]);
         for (int k = 0; k < AlgorithmConstants::amountAlgorithms_; ++k) {
+            //if (k != 2) continue;
             std::cout << "Algo " << k << "\n";
             setAlgorithm(k);
             ProtocollNewLine(file, k);
             file << "[" + std::to_string(min_rect_width_vector_[i]) + "-" + std::to_string(max_rect_width_vector_[i]) + "] [" + std::to_string(min_rect_height_vector_[i]) + "-" + std::to_string(max_rect_height_vector_[i]) + "]" + ",";
-            for (int j = 0; j < AlgorithmConstants::maxIterations; j++) {
+            for (int j = 0; j < 900; j++) {
+               // std::cout << std::to_string(j) + "\n";
                 if (((k == 3 || k == 4) && j == 0) || k < 3) {
                     metric = selectedAlgorithm_->execute(1);
                 }
-              
-                if (j % 2000 == 0) std::cout << j << "\n";
-                //if (metric.time > AlgorithmConstants::maxTime) break;
                 Protocoll(file, metric.score_, metric.time_);
             }
-            int size = static_cast<int>(entryList_.size());
-            std::cout <<size << "\n";
+            //std::cout << "First phase over \n";
+            if (k < 3) {
+                selectedAlgorithm_->execute(AlgorithmConstants::maxIterations - 990);
+            }
+            for (int u = 0; u < 90; u++) {
+                if (k < 3) {
+                    metric = selectedAlgorithm_->execute(1);
+                }
+                Protocoll(file, metric.score_, metric.time_);
+            }
+                //if (metric.time > AlgorithmConstants::maxTime) break;
+           
+                 
+                
+            
+            //int size = static_cast<int>(entryList_.size());
+            //std::cout <<size << "\n";
+            /*
             if (entryList_.size() < 1000) {
                 for (int l = 0; l < entryList_.size(); ++l) {
                     const char* chars = entryList_[l].c_str();
@@ -176,8 +189,9 @@ void TestEnvironment::Run(std::string path)
                     file << chars;
                 }
             }
+            */
 
-            entryList_.clear();
+           // entryList_.clear();
 
         }
         file << "\n";
@@ -194,9 +208,9 @@ void TestEnvironment::Protocoll(std::ofstream& file, float score, float time)
 
     std::string s = stream.str();
     entryList_.emplace_back(s);
-    //const char* chars = s.c_str();
+    const char* chars = s.c_str();
 
-    //file << chars;
+    file << chars;
    
 }
 
@@ -211,19 +225,16 @@ void TestEnvironment::setAlgorithm(int index)
     switch (index) {
     case 0:
         localSearch_->setNeighbourDefinition(ruleBasedNeighbour_);
-        emptyBoxObjective_->setNeighbour(ruleBasedNeighbour_);
         localSearch_->setObjective(simpleEmptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;      
         break;
     case 1:
       
         localSearch_->setNeighbourDefinition(geometryBasedNeighbour_);
-        emptyBoxObjective_->setNeighbour(geometryBasedNeighbour_);
         localSearch_->setObjective(simpleEmptyBoxObjective_);
         selectedAlgorithm_ = localSearch_;       
         break;
     case 2:
-       
         localSearch_->setNeighbourDefinition(geometryBasedOverlappingNeighbour_);
         emptyBoxObjective_->setNeighbour(geometryBasedOverlappingNeighbour_);
         localSearch_->setObjective(emptyBoxObjective_);
@@ -231,12 +242,12 @@ void TestEnvironment::setAlgorithm(int index)
         break;
     case 3:
         greedy_->setSortStrat(areaSortStrategy_);
-        greedy_->setObjective(emptyBoxObjective_);
+        greedy_->setObjective(simpleEmptyBoxObjective_);
         selectedAlgorithm_ = greedy_; 
         break;
     case 4:
         greedy_->setSortStrat(diagonalSortStrategy_);
-        greedy_->setObjective(emptyBoxObjective_);
+        greedy_->setObjective(simpleEmptyBoxObjective_);
         selectedAlgorithm_ = greedy_;
         break;
     }

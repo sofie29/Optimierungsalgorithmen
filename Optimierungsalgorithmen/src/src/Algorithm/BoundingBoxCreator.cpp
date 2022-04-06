@@ -85,6 +85,17 @@ void BoundingBoxCreator::RemoveEmptyBoundingBoxes()
 }
 
 
+void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect, int rectIndex)
+{
+
+
+	boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rect, rectIndex));
+	rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), edgeLength_, edgeLength_));
+
+	currentFitScore_ = (float)rectSquareSize_ / (float)(boundingBoxList_.size() * edgeLength_ * edgeLength_);
+}
+
+
 void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, RectangleHolder* rectHolder, int rectIndex, int boxIndex)
 {
 	boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rectHolder, rectIndex, boxIndex));
@@ -93,6 +104,14 @@ void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, RectangleHolder* r
 	currentFitScore_ = (float)rectSquareSize_ / (float)(boundingBoxList_.size() * edgeLength_ * edgeLength_);
 }
 
+
+void BoundingBoxCreator::addBoundingBox(int x_pos, int y_pos, QRectF& rect)
+{
+	boundingBoxList_.emplace_back(std::make_shared<BoundingBox>(edgeLength_, edgeLength_, x_pos, y_pos, rect, 0)); // TODO: 0
+	rectangleList_.emplace_back(QRectF(rect.x(), rect.y(), edgeLength_, edgeLength_));
+
+	currentFitScore_ = (float)rectSquareSize_ / (float)(boundingBoxList_.size() * edgeLength_ * edgeLength_);
+}
 
 float BoundingBoxCreator::getCurrentFitScore()
 {

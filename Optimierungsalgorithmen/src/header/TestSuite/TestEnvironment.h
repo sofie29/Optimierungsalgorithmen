@@ -16,7 +16,7 @@
 #include "GeometryBasedOverlappingNeighbour.h"
 class TestEnvironment {
 public:
-	TestEnvironment(int boxLength);
+	TestEnvironment(int rectAmount, int boxLength);
 	TestEnvironment(int instances, int rect_amount, int min_rect_width, int min_rect_height, int max_rect_width, int max_rect_height, int boxLenght);
 	~TestEnvironment();
 	void Run(std::string path);
@@ -57,5 +57,6 @@ private:
 	std::vector<int> max_rect_width_vector_;
 	std::vector<int> min_rect_height_vector_;
 	std::vector<int> max_rect_height_vector_;
+	int rectAmount_;
 	
 };

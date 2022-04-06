@@ -227,7 +227,7 @@ inline void GeometryBasedOverlappingNeighbour<DataHolder*>::decreaseT(std::vecto
 		lastTDecreasingIteration_ = iteration_;
 		wasFitScoreLowerThan1_ = false;
 
-		std::cout << "REDUCE T_ TO " << t_ << std::endl;
+		//std::cout << "REDUCE T_ TO " << t_ << std::endl;
 
 		// Shift score in case old box has new transgressions:
 

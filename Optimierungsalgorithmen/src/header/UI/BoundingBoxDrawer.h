@@ -7,6 +7,7 @@ public:
 	BoundingBoxDrawer();
 	~BoundingBoxDrawer();
 	void DrawOnScene(QGraphicsScene* scene, bool drawOld);
+	void getBoundingBoxList(std::vector<QRectF>& list);
 signals:
 	void BoundingBoxSizeChanged(const int edgeLength);
 	void EmitListChanged();
