@@ -135,7 +135,7 @@ void TestEnvironment::Run(std::string path)
     file.open(path);
     
 
-    Metric metric = { 0.0, 0.0 , false};
+    Metric metric = { 0.0, 0.0};
     for (int i = 0; i < instances_; i++) {
         std::cout << "Instance " << i << "\n";
         data_->ResetRectanglesForTestEnv(rectAmount_, min_rect_width_vector_[i], max_rect_width_vector_[i], min_rect_height_vector_[i], max_rect_height_vector_[i]);

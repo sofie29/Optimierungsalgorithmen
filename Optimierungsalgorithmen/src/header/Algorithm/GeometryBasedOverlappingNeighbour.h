@@ -26,7 +26,6 @@ public:
 
 private:
 	float t_;
-	const float stepSize_; // decrease t_ by subtracting stepSize_
 	const float stepFactor_; // decrease t_ by dividing by stepFactor_
 	const float scoreFactor_;
 	float scoreShift_;
@@ -49,7 +48,7 @@ private:
 
 template<class Data>
 inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol) :
-	GeometryBasedNeighbourI<Data>(data, currentBest, initSol), stepSize_(0.01), scoreFactor_(1.1), stepFactor_(2)
+	GeometryBasedNeighbourI<Data>(data, currentBest, initSol), scoreFactor_(1.1), stepFactor_(2)
 {
 	t_ = 1;
 	scoreShift_ = 0;
@@ -220,10 +219,10 @@ inline void GeometryBasedOverlappingNeighbour<DataHolder*>::decreaseT(std::vecto
 	if (fitScore < 1) {
 		wasFitScoreLowerThan1_ = true;
 	}
-	// std::cout << "wasLowerThan1: " << wasFitScoreLowerThan1_ << ", lastDecreasingIteration: " << lastTDecreasingIteration_ << ", noBetterNeighbourFound: " << noBetterNeighbourFound_ << std::endl;
+
 	if ((fitScore > 1 && wasFitScoreLowerThan1_) || lastTDecreasingIteration_ + 20 == iteration_ || noBetterNeighbourFound_ >= rectangles->size()*1/6) {
 		// Reduce t:
-		t_ = t_ > 0.05 ? roundf(t_ * 3 / 4 * 100) / 100 : 0; // 11 different t_ before t_ is 0
+		t_ = t_ > 0.05 ? roundf(t_ * 3 / 4 * 100) / 100 : 0; // 11 different t_ before t_ is 0: 1, 0.75, 0.56, 0.42, 0.32, 0.24, 0.18, 0.13, 0.1, 0.075, 0.056, 0
 		lastTDecreasingIteration_ = iteration_;
 		wasFitScoreLowerThan1_ = false;
 
@@ -240,20 +239,4 @@ inline void GeometryBasedOverlappingNeighbour<DataHolder*>::decreaseT(std::vecto
 
 		if (transgressions_ - transgressionsBefore == 0) wasFitScoreLowerThan1_ = true;
 	}
-
-	/*
-	// shift score in case old box has new transgressions
-	if ((GeometryBasedNeighbourI<DataHolder*>::iteration_ % 20 == 0) && t_ > 0) {
-		t_ = t_ > 0.1 ? roundf(t_ * 3/4 * 100) / 100 : 0;
-		std::cout << "REDUCE T_ TO " << t_ << std::endl;
-
-		// calculate number of transgressions after decreasing of t
-		int transgressionsBefore = transgressionsBestSol_;
-		this->calculateOverlappingWrapper(rectangles, bBoxList);
-
-		// new transgressions because of t decreasing are not punished extra
-		scoreShift_ += (transgressions_ - transgressionsBefore) * scoreFactor_;
-	}
-	*/
-
 }

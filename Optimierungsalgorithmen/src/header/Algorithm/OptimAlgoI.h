@@ -4,17 +4,12 @@
 #include "DataHolderT.h"
 #include "ObjectiveI.h"
 struct Metric {
-public: Metric(float s, float t, bool impr) {
+public: Metric(float s, float t) {
 	score_ = s;
 	time_ = t;
-	improved_ = impr;
-	
-
 }
 	  float score_;
-	  float time_;
-	  bool improved_;
-	 
+	  float time_;	 
 };
 
 class SignalHelper : public QObject {

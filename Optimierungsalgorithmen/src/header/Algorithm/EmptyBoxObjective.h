@@ -56,5 +56,7 @@ inline float EmptyBoxObjective<DataHolder*>::calculateObjectiveScore(DataHolderT
 	}
 
 	// upper bound of boxScore : length of rectangleList - 1
+	// scoreInformation in Geometry Overlapping: transgressions_ * 1.1 - scoreShift_;
+	// explanation for factor 1.1: 4 boxes + 1 transgession must be better than 3 boxes + 2 transgressions
 	return ((bBoxListSize + neighbour_->getScoreInformation()) * (rectListSize - 1) - boxScore) * 0.2; // 0.2 to prevent overflow
 }

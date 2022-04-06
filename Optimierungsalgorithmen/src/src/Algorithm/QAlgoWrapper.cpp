@@ -27,11 +27,8 @@ void QAlgoWrapper::RunOneStep()
 		switch (rmd) {
 		case 0:
 		{
-			bool improved = false;
-			while (!improved) {
-				Metric m = algo_->execute(1);
-				improved = m.improved_;
-			}
+			algo_->execute(1);
+		
 			if (mod_ > 1) {
 				//draw flipped rects
 				emit algo_->DrawSwappedRects();

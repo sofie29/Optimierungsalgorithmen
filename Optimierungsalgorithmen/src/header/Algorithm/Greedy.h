@@ -42,7 +42,7 @@ inline Metric Greedy<Data>::execute(int steps)
 	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ / (double)OptimAlgoI<Data>::currentStep_);
 
 	//emit OptimAlgoI<Data>::DrawSolution();
-	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_) , OptimAlgoI<Data>::currentTimeTaken_, true);
+	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_) , OptimAlgoI<Data>::currentTimeTaken_);
 }
 
 template<class Data>

@@ -55,7 +55,7 @@ void Drawer::rearrangeBoxes(BoundingBoxCreator* bBoxCreator)
 	rectDrawer_->getRects(rectRects);
 
 	int idx = 0;
-	int boxesPerLine = 20;
+	int boxesPerLine = 13;
 	for (QRectF& bBox : bBoxRects) {
 		int x_pos = (idx % boxesPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 		float val = std::floor((float)idx / (float)boxesPerLine);

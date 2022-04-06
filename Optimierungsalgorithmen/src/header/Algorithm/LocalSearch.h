@@ -52,7 +52,6 @@ Metric LocalSearch<Data>::execute(int steps)
 	}
 
 	int steps_left = 0;
-	bool improved = true;
 	while((!UIConstants::useUI_ && steps_left < steps) || (OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_ - AlgorithmConstants::timeOverhead_ && UIConstants::useUI_) && steps_left < steps){
 		neighbourDefinition_->optimize();
 		float newScore = OptimAlgoI<Data>::algoObjective_->calculateObjectiveScore(OptimAlgoI<Data>::currentSol_);
@@ -61,10 +60,9 @@ Metric LocalSearch<Data>::execute(int steps)
 			OptimAlgoI<Data>::currentBestScore_ = newScore;
 			OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
 		}
-		else improved = false;
 
 		neighbourDefinition_->postOptimStep(newScore, oldBestScore);
-		if(improved || !UIConstants::useUI_) steps_left++;
+		steps_left++;
 
 		//std::cout << std::to_string(steps_left) + "\n";
 
@@ -86,7 +84,7 @@ Metric LocalSearch<Data>::execute(int steps)
 	emit OptimAlgoI<Data>::EmitTakenTime(OptimAlgoI<Data>::currentTimeTaken_);
 	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ /(double) OptimAlgoI<Data>::currentStep_);
 	//emit OptimAlgoI<Data>::DrawSolution();
-	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::bestSol_), OptimAlgoI<Data>::currentTimeTaken_, improved);
+	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::bestSol_), OptimAlgoI<Data>::currentTimeTaken_);
 }
 
 template<class Data>
