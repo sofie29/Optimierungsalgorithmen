@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     AllocConsole();
     FILE* fDummy;
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
-    std::cout << "hdoh\n";
+   
     QApplication a(argc, argv);
     if (UIConstants::useUI_) {
         
