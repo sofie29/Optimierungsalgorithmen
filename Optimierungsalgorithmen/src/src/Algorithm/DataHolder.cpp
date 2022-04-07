@@ -56,12 +56,14 @@ void DataHolder::ResetData()
 {
 	boxCreator_->ResetBoundingBoxList();
 	rectCreator_->ResetRectColors();
+	rectCreator_->ShuffleList();
 }
 
 void DataHolder::ResetBoundingBoxForTestEnv()
 {
 	boxCreator_->ResetBoundingBoxList();
 	boxCreator_->RecSquareSizeChanged(rectCreator_->getSquareSize());
+	rectCreator_->ShuffleList();
 }
 
 void DataHolder::ResetRectanglesForTestEnv(const int amount, const int minWidth, const int maxWidth, const int minHeight, const int maxHeight)

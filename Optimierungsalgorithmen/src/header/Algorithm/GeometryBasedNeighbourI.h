@@ -14,7 +14,7 @@ class GeometryBasedNeighbourI : public NeighbourI<Data>
 {
 public:
 	GeometryBasedNeighbourI(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
-
+	virtual ~GeometryBasedNeighbourI();
 	virtual float optimize() = 0;
 	virtual void afterOptimization() override;
 	virtual void postOptimStep(float newScore, float oldScore) override;
@@ -55,6 +55,11 @@ inline GeometryBasedNeighbourI<Data>::GeometryBasedNeighbourI(DataHolderT<Data>*
 	numberOfAddedBoxes_ = 0;
 	iteration_ = 0;
 	noBetterNeighbourFound_ = 0;
+}
+
+template<class Data>
+inline GeometryBasedNeighbourI<Data>::~GeometryBasedNeighbourI()
+{
 }
 
 

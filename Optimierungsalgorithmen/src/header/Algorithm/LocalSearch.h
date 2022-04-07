@@ -66,7 +66,7 @@ Metric LocalSearch<Data>::execute(int steps)
 		neighbourDefinition_->postOptimStep(newScore, oldBestScore);
 		steps_left++;
 
-		if(steps_left % 1000 == 0)
+		if(!UIConstants::useUI_ && steps_left % 1000 == 0)
 		std::cout << std::to_string(steps_left) + "\n";
 
 		OptimAlgoI<Data>::currentStep_++;

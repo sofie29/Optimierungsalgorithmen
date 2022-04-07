@@ -9,7 +9,7 @@ class NeighbourI {
 public:
 	NeighbourI(DataHolderT<Data>* d, DataHolderT<Data>* currentBest,  InitialSolutionI<Data>* initSol);
 	
-	~NeighbourI();
+	virtual ~NeighbourI();
 	virtual float optimize() = 0;
 	virtual void resetData() = 0;
 	virtual void initParameters() = 0;

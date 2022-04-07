@@ -7,6 +7,7 @@ class BoundingBoxCreator : public QWidget {
 public:
 	BoundingBoxCreator();
 	BoundingBoxCreator(const int boxSize);
+	~BoundingBoxCreator();
 	void getRectList(std::vector<QRectF>& list);
 	void setRectList(std::vector<QRectF>& list);
 	void getBoundingBoxList(std::vector<std::shared_ptr<class BoundingBox>>& list);

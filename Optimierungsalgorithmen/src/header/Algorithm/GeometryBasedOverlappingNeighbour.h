@@ -12,6 +12,7 @@ template<class Data>
 class GeometryBasedOverlappingNeighbour : public GeometryBasedNeighbourI<Data> {
 public:
 	GeometryBasedOverlappingNeighbour(DataHolderT<Data>* data, DataHolderT<Data>* currentBest, InitialSolutionI<Data>* initSol);
+	~GeometryBasedOverlappingNeighbour();
 	virtual float optimize() override;
 	virtual void beforeScoreCalculation(std::vector<class RectangleHolder*>* rectangles, std::vector<std::shared_ptr<BoundingBox>>& bBoxList, bool isTransgressionRect) override;
 	virtual bool tryFitWrapper(std::vector<std::shared_ptr<BoundingBox>>& boxList, int boxIdx, std::vector<class RectangleHolder*>* rectangles, int rectIdx, bool multipleRects) override;
@@ -59,6 +60,13 @@ inline GeometryBasedOverlappingNeighbour<Data>::GeometryBasedOverlappingNeighbou
 	wasFitScoreLowerThan1_ = true; // is true, when fitScore was lower than 1 after fitScore was higher than 1
 
 	NeighbourI<Data>::identifier_ = "GeometryOverlappingNeighbour";
+}
+
+template<class Data>
+inline GeometryBasedOverlappingNeighbour<Data>::~GeometryBasedOverlappingNeighbour()
+{
+	rectIndicesWithTransgression_.clear();
+	rectIndicesWithTransgression_.shrink_to_fit();
 }
 
 template<>

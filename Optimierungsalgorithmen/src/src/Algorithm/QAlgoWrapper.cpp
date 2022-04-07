@@ -60,8 +60,7 @@ void QAlgoWrapper::Reset()
 
 void QAlgoWrapper::RunUntilTermination() {
 	if (algo_) {
-		int iterations = UIConstants::useUI_ ? AlgorithmConstants::maxIterationsUI : AlgorithmConstants::maxIterations;
-		algo_->execute(iterations);
+		algo_->execute(AlgorithmConstants::maxIterationsUI_);
 		emit algo_->DrawSolution(algo_->getBestSol()->getData()->getBoxCreator().get(), true);
 	}
 }

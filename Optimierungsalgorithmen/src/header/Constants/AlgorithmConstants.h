@@ -11,8 +11,8 @@ namespace AlgorithmConstants {
 	static const int maxBoxEdgeSize_ = 2 * maxRectangleEdgeSize_;
 	static const int initialBoxEdgeSize_ = initialEdgeSize_;
 
-	static const int  maxIterations = 7500;
-	static const int  maxIterationsUI = 1000000;
+	static const int  maxIterations = 10000;
+	static const int  maxIterationsUI_ = 10000000;
 	static const int  maxScore = 999000; // upper bound for score in geometry based neighbourhoods
 	
 

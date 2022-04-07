@@ -25,7 +25,7 @@ private:
 	void ProtocollNewLine(std::ofstream& file, int prefix);
 	void setAlgorithm(int index);
 	int instances_;
-	std::vector<std::string> entryList_;
+	
 
 	std::shared_ptr<class RectangleCreator> rectCreator_;
 	std::shared_ptr<class BoundingBoxCreator> boxCreator_;

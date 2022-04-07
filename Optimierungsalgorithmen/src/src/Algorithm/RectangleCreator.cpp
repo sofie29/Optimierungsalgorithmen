@@ -93,14 +93,18 @@ void RectangleCreator::ResetRectsForTestEnv(const int amount, const int minWidth
 
 		int height = dist_height(engine);
 		int width = dist_width(engine);
-		//int x_pos = (i % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
-		//int y_pos = (int)(i / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 		int x_pos = 0;
 		int y_pos = 0;
 		QRectF rect(x_pos, y_pos, width, height);
 		rectangleList_->emplace_back(new class RectangleHolder(rect));
 		squareSize_ += height * width;
 	}
+}
+
+void RectangleCreator::ShuffleList()
+{
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::shuffle(rectangleList_->begin(), rectangleList_->end(), std::default_random_engine(seed));
 }
 
 
@@ -131,8 +135,6 @@ void RectangleCreator::CreateRects(const int amount, const int minWidth, const i
 
 		int height = dist_height(engine);
 		int width = dist_width(engine);
-		//int x_pos = (i % recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
-		//int y_pos = (int)(i / (float)recsPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 		int x_pos = 0;
 		int y_pos = 0;
 		QRectF rect(x_pos, y_pos, width, height);

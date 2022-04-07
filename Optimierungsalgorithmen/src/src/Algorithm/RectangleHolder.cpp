@@ -67,10 +67,7 @@ void RectangleHolder::rotateRect()
 }
 
 
-/*
-QColor RectangleHolder::defaultColor_ = QColor(Qt::darkCyan);
-QColor RectangleHolder::swappedColor_ = QColor(Qt::red);
-*/
+
 
 QColor RectangleHolder::defaultColor_ = QColor(0.0, 55.0, 55.0, 140.0);
 QColor RectangleHolder::swappedColor_ = QColor(224.0, 181.0, 36.0, 140.0);

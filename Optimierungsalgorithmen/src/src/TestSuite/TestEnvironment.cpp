@@ -105,8 +105,17 @@ TestEnvironment::TestEnvironment(int instances, int rect_amount, int min_rect_wi
 
 TestEnvironment::~TestEnvironment() {
 
-    entryList_.clear();
-    entryList_.shrink_to_fit();
+    min_rect_width_vector_.clear();
+    min_rect_width_vector_.shrink_to_fit();
+
+    max_rect_width_vector_.clear();
+    max_rect_width_vector_.shrink_to_fit();
+
+    min_rect_height_vector_.clear();
+    min_rect_height_vector_.shrink_to_fit();
+
+    max_rect_height_vector_.clear();
+    max_rect_width_vector_.shrink_to_fit();
 
 
     delete ruleBasedNeighbour_;
@@ -165,6 +174,9 @@ void TestEnvironment::Run(std::string path)
     for (int i = 0; i < instances_; i++) {
         std::cout << "Instance " << i << "\n";
         data_->ResetRectanglesForTestEnv(rectAmount_, min_rect_width_vector_[i], max_rect_width_vector_[i], min_rect_height_vector_[i], max_rect_height_vector_[i]);
+        std::cout << min_rect_width_vector_[i] << " " << max_rect_width_vector_[i] << "\n";
+        std::cout << min_rect_height_vector_[i] << " " << max_rect_height_vector_[i] << "\n";
+        std::cout << "\n";
         for (int k = 0; k < AlgorithmConstants::amountAlgorithms_; ++k) {
 
             //if (k != 2) continue;
@@ -207,7 +219,6 @@ void TestEnvironment::Protocoll(std::ofstream& file, float score, float time)
     stream << " after " << std::fixed << std::setprecision(2) << time << "ms,";
 
     std::string s = stream.str();
-    entryList_.emplace_back(s);
     const char* chars = s.c_str();
 
     file << chars;

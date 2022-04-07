@@ -15,6 +15,15 @@ BoundingBoxCreator::BoundingBoxCreator(const int boxLength) {
 	rectSquareSize_ = 0;
 }
 
+BoundingBoxCreator::~BoundingBoxCreator()
+{
+	rectangleList_.clear();
+	rectangleList_.shrink_to_fit();
+
+	boundingBoxList_.clear();
+	boundingBoxList_.shrink_to_fit();
+}
+
 
 void BoundingBoxCreator::getRectList(std::vector<QRectF>& list)
 {
