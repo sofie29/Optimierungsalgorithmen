@@ -55,6 +55,14 @@ BoundingBox::BoundingBox(int rect_width, int rect_height, int x, int y, std::vec
 {
 }
 
+BoundingBox::~BoundingBox()
+{
+	rectangleIndices.clear();
+	rectangleIndices.shrink_to_fit();
+
+	removeLowerLevelBoundingBoxes();
+}
+
 
 void BoundingBox::removeLowerLevelBoundingBoxes() {
 	first.reset();

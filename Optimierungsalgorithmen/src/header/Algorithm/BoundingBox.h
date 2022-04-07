@@ -7,7 +7,7 @@ public:
 	BoundingBox(int rect_width, int rect_height, int x, int y);
 	BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices, int numberOv);
 	BoundingBox(int rect_width, int rect_height, int x, int y, std::vector<int> indices, std::shared_ptr<BoundingBox> firstBox, std::shared_ptr<BoundingBox> secondBox, int numberOv); // for deep copy
-
+	~BoundingBox();
 	int getXPos() const;
 	int getYPos() const;
 	std::shared_ptr<BoundingBox> getFirstBox();

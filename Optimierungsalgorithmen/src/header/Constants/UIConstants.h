@@ -1,7 +1,7 @@
 #pragma once
 
 namespace UIConstants {
-	static const bool useUI_ = true;
+	static const bool useUI_ = false;
 
 	static const int mainWindowWidth_ = 1600;
 	static const int mainWindowHeight_ = 1000;
@@ -13,7 +13,7 @@ namespace UIConstants {
 	static const int leftDockHeight_ = 900;
 
 	static const int rectangleSpace_ = 5;
-	static const int maxBoxesPerLine = 20;
+	static const int maxBoxesPerLine = 13;
 
 
 }

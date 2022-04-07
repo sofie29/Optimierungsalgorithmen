@@ -10,7 +10,7 @@ public:
 	class BoundingBoxDrawer* getBBoxDrawer();
 
 public slots:
-	void DrawScene(class BoundingBoxCreator* bBoxCreator);
+	void DrawScene(class BoundingBoxCreator* bBoxCreator, bool isDone);
 	void DrawSwappedRects();
 private:
 	void rearrangeBoxes(class BoundingBoxCreator* bBoxCreator);

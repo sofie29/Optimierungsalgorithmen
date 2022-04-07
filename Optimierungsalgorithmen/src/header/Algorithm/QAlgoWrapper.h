@@ -17,4 +17,5 @@ private:
 	class OptimAlgoI<DataHolder*>* algo_;
 	int stepIdx_;
 	int mod_;
+	bool isDone_;
 };

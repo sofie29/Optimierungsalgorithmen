@@ -55,7 +55,7 @@ void Drawer::rearrangeBoxes(BoundingBoxCreator* bBoxCreator)
 	rectDrawer_->getRects(rectRects);
 
 	int idx = 0;
-	int boxesPerLine = 13;
+	int boxesPerLine = UIConstants::maxBoxesPerLine;
 	for (QRectF& bBox : bBoxRects) {
 		int x_pos = (idx % boxesPerLine) * (AlgorithmConstants::maxBoxEdgeSize_ + UIConstants::rectangleSpace_);
 		float val = std::floor((float)idx / (float)boxesPerLine);
@@ -78,8 +78,8 @@ void Drawer::rearrangeBoxes(BoundingBoxCreator* bBoxCreator)
 	boundingBoxDrawer_->SetBoundingBoxes(bBoxRects);
 }
 
-void Drawer::DrawScene(class BoundingBoxCreator* bBoxCreator) {
-	rearrangeBoxes(bBoxCreator);
+void Drawer::DrawScene(class BoundingBoxCreator* bBoxCreator, bool isDone) {
+	if(isDone)rearrangeBoxes(bBoxCreator);
 	scene_->clear();
 	boundingBoxDrawer_->DrawOnScene(scene_, false);
 	rectDrawer_->DrawOnScreen(scene_, false);

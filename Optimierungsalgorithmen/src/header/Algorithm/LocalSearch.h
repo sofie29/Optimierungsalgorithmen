@@ -43,6 +43,7 @@ Metric LocalSearch<Data>::execute(int steps)
 {
 	auto t1 = std::chrono::high_resolution_clock::now();
 
+	/*
 	if (OptimAlgoI<Data>::currentStep_ == -1) {
 		OptimAlgoI<Data>::initSol_->CreateInitialSolution(OptimAlgoI<Data>::currentSol_, true);
 		OptimAlgoI<Data>::bestSol_->OverwriteData(OptimAlgoI<Data>::currentSol_);
@@ -50,7 +51,8 @@ Metric LocalSearch<Data>::execute(int steps)
 		OptimAlgoI<Data>::currentStep_++;
 		neighbourDefinition_->initParameters();
 	}
-
+	*/
+	
 	int steps_left = 0;
 	while((!UIConstants::useUI_ && steps_left < steps) || (OptimAlgoI<Data>::currentTimeTaken_ < AlgorithmConstants::maxTime_ - AlgorithmConstants::timeOverhead_ && UIConstants::useUI_) && steps_left < steps){
 		neighbourDefinition_->optimize();
@@ -64,7 +66,8 @@ Metric LocalSearch<Data>::execute(int steps)
 		neighbourDefinition_->postOptimStep(newScore, oldBestScore);
 		steps_left++;
 
-		//std::cout << std::to_string(steps_left) + "\n";
+		if(steps_left % 1000 == 0)
+		std::cout << std::to_string(steps_left) + "\n";
 
 		OptimAlgoI<Data>::currentStep_++;
 		emit OptimAlgoI<Data>::EmitCurrentStep(OptimAlgoI<Data>::currentStep_);
@@ -80,11 +83,14 @@ Metric LocalSearch<Data>::execute(int steps)
 	auto t2 = std::chrono::high_resolution_clock::now();
 	auto ms = std::chrono::duration<double, std::milli>(t2 - t1);
 	OptimAlgoI<Data>::currentTimeTaken_ += ms.count();
+
+	bool isDone = (OptimAlgoI<Data>::currentTimeTaken_ >= AlgorithmConstants::maxTime_ - AlgorithmConstants::timeOverhead_);
+
 	emit OptimAlgoI<Data>::StepDone();
 	emit OptimAlgoI<Data>::EmitTakenTime(OptimAlgoI<Data>::currentTimeTaken_);
 	emit OptimAlgoI<Data>::EmitTakenTimeAvg(OptimAlgoI<Data>::currentTimeTaken_ /(double) OptimAlgoI<Data>::currentStep_);
 	//emit OptimAlgoI<Data>::DrawSolution();
-	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::bestSol_), OptimAlgoI<Data>::currentTimeTaken_);
+	return Metric::Metric(OptimAlgoI<Data>::cmpObjective_->calculateObjectiveScore(OptimAlgoI<Data>::bestSol_), OptimAlgoI<Data>::currentTimeTaken_, isDone);
 }
 
 template<class Data>

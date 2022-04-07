@@ -4,12 +4,15 @@
 #include "DataHolderT.h"
 #include "ObjectiveI.h"
 struct Metric {
-public: Metric(float s, float t) {
+public: Metric(float s, float t, bool b) {
 	score_ = s;
 	time_ = t;
+	isDone_ = b;
+	
 }
 	  float score_;
-	  float time_;	 
+	  float time_;
+	  bool isDone_;
 };
 
 class SignalHelper : public QObject {
@@ -17,7 +20,7 @@ class SignalHelper : public QObject {
 signals:
 	void OptimDone();
 	void StepDone();
-	void DrawSolution(class BoundingBoxCreator* bBoxCreator);
+	void DrawSolution(class BoundingBoxCreator* bBoxCreator, bool isDone);
 	void DrawSwappedRects();
 	void EmitCurrentStep(int step);
 	void EmitTakenTime(double time);
