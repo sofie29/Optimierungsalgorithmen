@@ -33,7 +33,7 @@ inline void SimpleInitialSolution<DataHolder*>::CreateInitialSolution(DataHolder
 	boxCreator->getBoundingBoxList(bBoxList);
 
 	int amount = rectList->size();
-	int recsPerLine = std::min(UIConstants::maxBoxesPerLine, (int)std::ceil(std::sqrt(amount)));
+	int recsPerLine = UIConstants::maxBoxesPerLine;
 	for (int rectIdx = 0; rectIdx < rectList->size(); ++rectIdx) {
 		QRectF& rect = (*rectList)[rectIdx]->getRectRef();
 		bool added = false;

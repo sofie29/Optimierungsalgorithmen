@@ -7,10 +7,10 @@
 TestEnvironment::TestEnvironment(int rectAmount, int boxLength)
 {
     
-    min_rect_width_vector_ = { 10, 10, 30, 10, 20 };
-    max_rect_width_vector_ = { 20, 15, 50, 50, 30 };
-    min_rect_height_vector_ = { 10, 30, 10, 10, 20 };
-    max_rect_height_vector_ = { 20, 50, 15, 50, 30 };
+    min_rect_width_vector_ = { 20, 10,  10, 30, 10, 20 };
+    max_rect_width_vector_ = { 20, 20,  15, 50, 50, 30 };
+    min_rect_height_vector_ = { 20, 10,  30, 10, 10, 20 };
+    max_rect_height_vector_ = { 20, 20, 50, 15, 50, 30 };
    
     /*
     std::random_device rd;
@@ -204,8 +204,11 @@ void TestEnvironment::Run(std::string path)
                 }
                 Protocoll(file, metric.score_, metric.time_);
             }
-    
+        
+            file << "," << "[" + std::to_string(min_rect_width_vector_[i]) + "-" + std::to_string(max_rect_width_vector_[i]) + "] [" + std::to_string(min_rect_height_vector_[i]) + "-" + std::to_string(max_rect_height_vector_[i]) + "]" + ",";
+            file << std::to_string(k) + ". " + selectedAlgorithm_->getIdentifier() + ",";
         }
+       
         file << "\n";
     }
     file.close();
